@@ -13,6 +13,7 @@ type TestData struct {
 }
 
 
+
 type CodeType int //错误码
 const (
 	NULLError CodeType = iota //无错误
@@ -24,6 +25,12 @@ const (
 	DBSessionInsertError//xorm事务中Insert方法执行出错
 	DBSessionCommitError//xorm事务中Commit方法执行出错
 	DBSessionUpdateError//xorm事务中Update方法执行出错
+)
+
+type Platform int //平台
+const (
+	WX_Platform Platform = iota //微信平台
+    PC_Platform //pc平台
 )
 
 type TestTable struct {

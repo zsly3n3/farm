@@ -1,5 +1,9 @@
 package db
 
-func (handle *DBHandler) testabc(){
+import(
+	"farm/datastruct"
+)
+
+func (handle *DBHandler) login(p datastruct.Platform){
 	  
 }
