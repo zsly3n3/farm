@@ -3,8 +3,10 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"farm/datastruct"
+	"farm/db"
 )
 
+var dbHandler *db.DBHandler
 
 func getTest(r *gin.Engine) {
 	 data:=new(datastruct.TestData)
@@ -34,6 +36,7 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
+	dbHandler = db.CreateDBHandler()
 	r := gin.Default()
 	r.Use(cors())
 	r.Use(version())
