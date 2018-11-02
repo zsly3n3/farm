@@ -41,6 +41,6 @@ func main() {
 	r.Use(cors())
 	r.Use(version())
 	getTest(r)
-	r.Run("192.168.0.176:8080") // listen and serve on 0.0.0.0:8080
+	r.Run("192.168.0.161:8080")//listen and serve on 0.0.0.0:8080
 }
 
