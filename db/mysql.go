@@ -14,7 +14,7 @@ const DB_UserName = "root"
 const DB_Pwd = "Zsly3n@s"
 
 type DBHandler struct {
-	 dbEngine *xorm.Engine
+	 mysqlEngine *xorm.Engine
 }
 
 func CreateDBHandler()*DBHandler{
@@ -30,7 +30,7 @@ func CreateDBHandler()*DBHandler{
 	engine.SetMaxIdleConns(1)
     resetDB(engine)
     initData(engine)
-	dbHandler.dbEngine = engine
+	dbHandler.mysqlEngine = engine
     return dbHandler
 }
 

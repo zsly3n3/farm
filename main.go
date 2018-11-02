@@ -4,9 +4,11 @@ import (
 	"github.com/gin-gonic/gin"
 	"farm/datastruct"
 	"farm/db"
+	"farm/cache"
 )
 
 var dbHandler *db.DBHandler
+var cacheHandler *cache.CACHEHandler
 
 func getTest(r *gin.Engine) {
 	 data:=new(datastruct.TestData)
@@ -37,6 +39,7 @@ func cors() gin.HandlerFunc {
 
 func main() {
 	dbHandler = db.CreateDBHandler()
+	cacheHandler = cache.CreateCACHEHandler()
 	r := gin.Default()
 	r.Use(cors())
 	r.Use(version())
