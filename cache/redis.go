@@ -24,14 +24,14 @@ func getRedisPool() *redis.Pool{
         IdleTimeout: 180 * time.Second,
         Dial: func() (redis.Conn, error) {
 			log.Debug("----bbb---")
-			c, err := redis.Dial("tcp",DB_IP)
+			conn, err := redis.Dial("tcp",DB_IP)
 			errhandle(err)
 			if _, err := conn.Do("AUTH", DB_Pwd); err != nil {		
 			 conn.Close()
 			 errhandle(err)
 			}	
             // c.Do("SELECT",DB_NAME)
-            return c, nil
+            return conn, nil
         },
 	}
 	log.Debug("----ccc---")
