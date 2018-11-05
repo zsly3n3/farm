@@ -40,15 +40,18 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 			 case 0:
 				tmp:= v.([]byte)
 				rs.HoneyCount = tools.ByteArrToInt64(&tmp)
-				log.Debug("%v",rs.HoneyCount)
-			//  case 1:
-			// 	rs.HoneyCount = v.(int64)
-			//  case 2:
-			// 	rs.IsAuth = v.(int64)
-			//  case 3:
-			// 	rs.CreatedAt = v.(int64)
-			//  case 4:
-			// 	rs.UpdateTime = v.(int64)
+			 case 1:
+				tmp:= v.([]byte)
+				rs.HoneyCount = tools.ByteArrToInt64(&tmp)
+			 case 2:
+				tmp:= v.([]byte)
+				rs.IsAuth = tools.ByteArrToBool(&tmp)
+			 case 3:
+				tmp:= v.([]byte)
+				rs.CreatedAt = tools.ByteArrToInt64(&tmp)
+			 case 4:
+				tmp:= v.([]byte)
+				rs.UpdateTime = tools.ByteArrToInt64(&tmp)
 		   }
 	   }
 	}
