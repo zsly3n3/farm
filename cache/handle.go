@@ -52,6 +52,7 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 		   }
 	   }
 	}
+	rs.IdentityId = key
 	return rs
 }
 
