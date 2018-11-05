@@ -21,10 +21,12 @@ func (handle *EventHandler) Login(c *gin.Context){
 			code=datastruct.JsonParseFailedFromPostBody
 		 }
 		 if code == datastruct.NULLError{
-		   //var isExist bool
+		   var isExist bool
 		   var p_data *datastruct.PlayerData
-		   //data,isExist=find in redis 
-		   //data,tf=find in mysql
+		   p_data,isExist = handle.cacheHandler.GetPlayerData(body.Code) //find in redis 
+		   if !isExist{
+			  //data,tf=find in mysql
+		   }
 		   //create in redis
 		   c.JSON(200, gin.H{
 			"code":code,

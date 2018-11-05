@@ -8,7 +8,7 @@ import (
 
 const DB_IP = "localhost:6379"
 const DB_NAME = "farm"
-const DB_Pwd = "Zsly3n@s1"
+const DB_Pwd = "Zsly3n@s"
 
 
 type CACHEHandler struct {
@@ -38,7 +38,6 @@ func getRedisPool() *redis.Pool{
 func CreateCACHEHandler()*CACHEHandler {
 	cacheHandler:=new(CACHEHandler)
 	cacheHandler.redisClient = getRedisPool()
-	cacheHandler.redisClient.Get()
 	return cacheHandler
 }
 
