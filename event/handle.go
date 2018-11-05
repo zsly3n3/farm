@@ -11,12 +11,12 @@ func (handle *EventHandler) Login(c *gin.Context){
 	err:=c.BindJSON(&body)
 	code:=datastruct.NULLError
 	if err == nil {
-		 switch body.PlatformId{
+		switch body.PlatformId{
 		 case datastruct.PC_Platform:
-			body.Code = "test2"
+			  fallthrough
 		 case datastruct.WX_Platform:
 			if body.Code == ""{
-			 code=datastruct.JsonParseFailedFromPostBody
+				code=datastruct.JsonParseFailedFromPostBody
 			}
 		 default:
 			code=datastruct.JsonParseFailedFromPostBody
@@ -57,7 +57,7 @@ func createUser(code string,isAuth bool)*datastruct.PlayerData{
 	 player.CreatedAt = timestamp
 	 player.UpdateTime = timestamp
 	 player.IdentityId = code
-	 player.GoldCount = 0
-	 player.HoneyCount = 0
+	 player.GoldCount = 10
+	 player.HoneyCount = 10
 	 return player
 }
