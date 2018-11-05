@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"farm/datastruct"
 	"farm/log"
@@ -41,7 +40,7 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 			 case 0:
 				tmp:= v.([]byte)
 				rs.HoneyCount = tools.ByteArrToInt64(&tmp)
-				log.Debug(rs.HoneyCount)
+				log.Debug("%v",rs.HoneyCount)
 			//  case 1:
 			// 	rs.HoneyCount = v.(int64)
 			//  case 2:
