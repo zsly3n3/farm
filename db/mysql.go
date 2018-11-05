@@ -35,10 +35,15 @@ func CreateDBHandler()*DBHandler{
 }
 
 func resetDB(engine *xorm.Engine){
-	test:=&datastruct.TestTable{}
-	err:=engine.DropTables(test)
+	user:=&datastruct.UserInfo{}
+	player:=&datastruct.PlayerInfo{}
+	alltables:=make([]interface{},0)
+	alltables=append(alltables,user)
+	alltables=append(alltables,player)
+	
+	err:=engine.DropTables(alltables)
     errhandle(err)
-	err=engine.CreateTables(test)
+	err=engine.CreateTables(alltables)
     errhandle(err)
 }
 
