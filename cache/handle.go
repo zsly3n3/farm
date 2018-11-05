@@ -25,7 +25,7 @@ func (handle *CACHEHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	defer conn.Close()
 	key:=p_data.IdentityId
 	//add
-	_, err := conn.Do("hmset", key, datastruct.GoldField, p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.IsAuthField, p_data.IsAuth,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
+	_, err := conn.Do("hmset", key, datastruct.GoldField,tools.Int64ToString(p_data.GoldCount), datastruct.HoneyField, tools.Int64ToString(p_data.HoneyCount), datastruct.IsAuthField, tools.BoolToString(p_data.IsAuth),datastruct.CreatedAtField,tools.Int64ToString(p_data.CreatedAt),datastruct.UpdateTimeField,tools.Int64ToString(p_data.UpdateTime))
 	if err == nil {
 	}
 }
@@ -36,22 +36,19 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 	value, err := redis.Values(conn.Do("hmget",key, datastruct.GoldField, datastruct.HoneyField, datastruct.IsAuthField, datastruct.CreatedAtField,datastruct.UpdateTimeField))
 	if err == nil {
 	   for index, v := range value {
+		   tmp:= v.([]byte)
+		   str:= string(tmp[:])
 		   switch index{
 			 case 0:
-				tmp:= v.([]byte)
-				rs.HoneyCount = tools.ByteArrToInt64(&tmp)
+				rs.HoneyCount = tools.StringToInt64(str)
 			 case 1:
-				tmp:= v.([]byte)
-				rs.HoneyCount = tools.ByteArrToInt64(&tmp)
+				rs.HoneyCount = tools.StringToInt64(str)
 			 case 2:
-				tmp:= v.([]byte)
-				rs.IsAuth = tools.ByteArrToBool(&tmp)
+				rs.IsAuth = tools.StringToBool(str)
 			 case 3:
-				tmp:= v.([]byte)
-				rs.CreatedAt = tools.ByteArrToInt64(&tmp)
+				rs.CreatedAt = tools.StringToInt64(str)
 			 case 4:
-				tmp:= v.([]byte)
-				rs.UpdateTime = tools.ByteArrToInt64(&tmp)
+				rs.UpdateTime = tools.StringToInt64(str)
 		   }
 	   }
 	}
