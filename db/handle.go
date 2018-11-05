@@ -4,6 +4,6 @@ import(
 	"farm/datastruct"
 )
 
-func (handle *DBHandler) login(p datastruct.Platform){
-	  
+func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool){
+	 return nil,false
 }

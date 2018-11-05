@@ -51,6 +51,15 @@ type PlayerInfo struct {
 }
 
 
+type UserLogin struct{
+	 PlatformId Platform //平台
+	 Code string //身份标识
+}
+
+type PlayerData struct{
+	GoldCount int64 //金币数量
+	HoneyCount int64 //蜂蜜数量
+}
 
 
 

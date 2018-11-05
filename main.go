@@ -3,12 +3,11 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"farm/datastruct"
-	"farm/db"
-	"farm/cache"
+	"farm/event"
 )
 
-var dbHandler *db.DBHandler
-var cacheHandler *cache.CACHEHandler
+
+var eventHandler *event.EventHandler
 
 func getTest(r *gin.Engine) {
 	 data:=new(datastruct.TestData)
@@ -21,13 +20,12 @@ func getTest(r *gin.Engine) {
 	})
 }
 
-//添加版本号
-func version()gin.HandlerFunc{
-	return func(c *gin.Context) {
-		c.Writer.Header().Add("Version", "1.0")
-		c.Next()
-	}
+func login(r *gin.Engine) {
+  r.POST("/login", func(c *gin.Context) {
+	eventHandler.Login(c)
+  })
 }
+
 
 //跨域
 func cors() gin.HandlerFunc {
@@ -38,12 +36,11 @@ func cors() gin.HandlerFunc {
 }
 
 func main() {
-	dbHandler = db.CreateDBHandler()
-	cacheHandler = cache.CreateCACHEHandler()
+	eventHandler=event.CreateEventHandler()
 	r := gin.Default()
 	r.Use(cors())
-	r.Use(version())
 	getTest(r)
+	login(r)
 	r.Run("192.168.0.161:8080")//listen and serve on 0.0.0.0:8080
 }
 
