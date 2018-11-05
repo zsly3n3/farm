@@ -29,7 +29,7 @@ func (handle *EventHandler) Login(c *gin.Context){
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
 			 if !isExistMysql{
-				p_data = createUser(body.Code,false)
+				p_data = createUser(body.Code,true)
 			 }
 			 handle.cacheHandler.SetPlayerData(p_data)
 		   }
@@ -57,7 +57,7 @@ func createUser(code string,isAuth bool)*datastruct.PlayerData{
 	 player.CreatedAt = timestamp
 	 player.UpdateTime = timestamp
 	 player.IdentityId = code
-	 player.GoldCount = 10
-	 player.HoneyCount = 10
+	 player.GoldCount = 100
+	 player.HoneyCount = 100
 	 return player
 }
