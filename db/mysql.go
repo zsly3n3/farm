@@ -37,13 +37,9 @@ func CreateDBHandler()*DBHandler{
 func resetDB(engine *xorm.Engine){
 	user:=&datastruct.UserInfo{}
 	player:=&datastruct.PlayerInfo{}
-	alltables:=make([]interface{},0)
-	alltables=append(alltables,user)
-	alltables=append(alltables,player)
-	
-	err:=engine.DropTables(alltables)
+	err:=engine.DropTables(user,player)
     errhandle(err)
-	err=engine.CreateTables(alltables)
+	err=engine.CreateTables(user,player)
     errhandle(err)
 }
 
