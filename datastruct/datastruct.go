@@ -37,6 +37,10 @@ const (
 
 const GoldField = "GoldCount"
 const HoneyField = "HoneyCount"
+const IsAuthField = "IsAuth"
+const CreatedAtField = "CreatedAt"
+const UpdateTimeField = "UpdateTime"
+const IdentityIdField = "IdentityId"
 
 type UserInfo struct {
 	Id    int       `xorm:"not null pk autoincr INT(11)"`
