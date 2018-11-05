@@ -40,7 +40,7 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 		   str:= string(tmp[:])
 		   switch index{
 			 case 0:
-				rs.HoneyCount = tools.StringToInt64(str)
+				rs.GoldCount = tools.StringToInt64(str)
 			 case 1:
 				rs.HoneyCount = tools.StringToInt64(str)
 			 case 2:
