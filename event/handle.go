@@ -13,7 +13,7 @@ func (handle *EventHandler) Login(c *gin.Context){
 	if err == nil {
 		 switch body.PlatformId{
 		 case datastruct.PC_Platform:
-			body.Code = "test2"
+			body.Code = "test1"
 		 case datastruct.WX_Platform:
 			if body.Code == ""{
 			 code=datastruct.JsonParseFailedFromPostBody
