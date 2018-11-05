@@ -35,6 +35,9 @@ const (
     PC_Platform //pc平台
 )
 
+const GoldField = "GoldCount"
+const HoneyField = "HoneyCount"
+
 type UserInfo struct {
 	Id    int       `xorm:"not null pk autoincr INT(11)"`
 	IdentityId string   `xorm:"VARCHAR(128) not null"` //标识id
@@ -55,6 +58,7 @@ type UserLogin struct{
 	 PlatformId Platform //平台
 	 Code string //身份标识
 }
+
 
 type PlayerData struct{
 	GoldCount int64 //金币数量
