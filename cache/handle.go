@@ -10,7 +10,7 @@ func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,b
 	isExist:=false
 	var rs *datastruct.PlayerData
 	ilen, err := handle.redisClient.Get().Do("hlen", code)
-    if err == nil || ((ilen.(int64)) > 0){
+    if err == nil && (ilen.(int64)) > 0{
 	   isExist = true
 	   //add
     } 
