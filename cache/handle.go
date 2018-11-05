@@ -3,7 +3,7 @@ package cache
 import (
 	"github.com/gomodule/redigo/redis"
 	"farm/datastruct"
-	//"farm/log"
+	"farm/log"
 )
 
 func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool){
@@ -38,14 +38,14 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 		   switch index{
 			 case 0:
 				rs.GoldCount = v.(int64)
-			 case 1:
-				rs.HoneyCount = v.(int64)
-			 case 2:
-				rs.IsAuth = v.(bool)
-			 case 3:
-				rs.CreatedAt = v.(int64)
-			 case 4:
-				rs.UpdateTime = v.(int64)
+			//  case 1:
+			// 	rs.HoneyCount = v.(int64)
+			//  case 2:
+			// 	rs.IsAuth = v.(int64)
+			//  case 3:
+			// 	rs.CreatedAt = v.(int64)
+			//  case 4:
+			// 	rs.UpdateTime = v.(int64)
 		   }
 	   }
 	}
