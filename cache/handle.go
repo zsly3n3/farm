@@ -16,3 +16,7 @@ func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,b
     } 
 	return rs,isExist
 }
+
+func (handle *CACHEHandler) SetPlayerData(p_data *datastruct.PlayerData) {
+     
+}

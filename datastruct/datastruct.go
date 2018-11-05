@@ -47,20 +47,21 @@ type UserInfo struct {
 }
 
 type PlayerInfo struct {
-	Id    int       `xorm:"not null pk autoincr INT(11)"`
-	IdentityId string   `xorm:"VARCHAR(128) not null"` //标识id
+	Id    int       `xorm:"not null pk INT(11)"` //关联UserInfo中id
 	HoneyCount int64 `xorm:"bigint not null"`//蜂蜜数量
 	GoldCount int64 `xorm:"bigint not null"`//金币数量
 }
-
 
 type UserLogin struct{
 	 PlatformId Platform //平台
 	 Code string //身份标识
 }
 
-
 type PlayerData struct{
+	IsAuth bool //是否授权
+	IdentityId string //标识id
+	CreatedAt int64 //创建用户的时间
+	UpdateTime int64 //最近一次登录的时间
 	GoldCount int64 //金币数量
 	HoneyCount int64 //蜂蜜数量
 }
