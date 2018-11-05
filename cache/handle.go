@@ -11,7 +11,7 @@ func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,b
     if err != nil {
 	   log.Debug("hexist failed", err.Error())
     } else {
-	   log.Debug("count:", ilen.(int64))
+	   log.Debug("count:%d", ilen.(int64))
     }
      
 
