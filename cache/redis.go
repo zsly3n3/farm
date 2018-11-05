@@ -26,10 +26,10 @@ func getRedisPool() *redis.Pool{
 			log.Debug("----bbb---")
 			c, err := redis.Dial("tcp",DB_IP)
 			errhandle(err)
-			// if _, err := conn.Do("AUTH", DB_Pwd); err != nil {		
-			//  conn.Close()
-			//  errhandle(err)
-			// }	
+			if _, err := conn.Do("AUTH", DB_Pwd); err != nil {		
+			 conn.Close()
+			 errhandle(err)
+			}	
             // c.Do("SELECT",DB_NAME)
             return c, nil
         },
