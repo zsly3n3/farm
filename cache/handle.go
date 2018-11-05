@@ -7,11 +7,11 @@ import (
 )
 
 func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool){
-	isExist, err := handle.redisClient.Get().Do("hexists", code, datastruct.GoldField)
+	ilen, err := handle.redisClient.Get().Do("hlen", code)
     if err != nil {
-		log.Debug("hexist failed", err.Error())
+	   log.Debug("hexist failed", err.Error())
     } else {
-		log.Debug("exist or not:", isExist)
+	   log.Debug("count:", ilen.(int))
     }
      
 
