@@ -2,6 +2,7 @@ package db
 
 import(
 	"farm/datastruct"
+	"farm/log"
 )
 
 func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool){
@@ -12,6 +13,7 @@ func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool
 	 if has{
 		isExist = true
 		//add
+		log.Debug("DBHandler GetPlayerData true")
 	 }
 	 return rs,isExist
 }
