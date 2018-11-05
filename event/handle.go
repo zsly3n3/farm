@@ -13,7 +13,7 @@ func (handle *EventHandler) Login(c *gin.Context){
 	if err == nil {
 		 switch body.PlatformId{
 		 case datastruct.PC_Platform:
-			body.Code = "test1"
+			body.Code = "test2"
 		 case datastruct.WX_Platform:
 			if body.Code == ""{
 			 code=datastruct.JsonParseFailedFromPostBody
@@ -29,7 +29,7 @@ func (handle *EventHandler) Login(c *gin.Context){
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
 			 if !isExistMysql{
-				p_data = createUser(body.Code,false)
+				p_data = createUser(body.Code,true)
 			 }
 			 handle.cacheHandler.SetPlayerData(p_data)
 		   }
@@ -57,7 +57,7 @@ func createUser(code string,isAuth bool)*datastruct.PlayerData{
 	 player.CreatedAt = timestamp
 	 player.UpdateTime = timestamp
 	 player.IdentityId = code
-	 player.GoldCount = 0
-	 player.HoneyCount = 0
+	 player.GoldCount = 10
+	 player.HoneyCount = 10
 	 return player
 }
