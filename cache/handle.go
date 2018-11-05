@@ -25,7 +25,7 @@ func (handle *CACHEHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	defer conn.Close()
 	key:=p_data.IdentityId
 	//add
-	_, err := conn.Do("hmset", key, datastruct.GoldField,tools.Int64ToString(p_data.GoldCount), datastruct.HoneyField, tools.Int64ToString(p_data.HoneyCount), datastruct.IsAuthField, tools.BoolToString(p_data.IsAuth),datastruct.CreatedAtField,tools.Int64ToString(p_data.CreatedAt),datastruct.UpdateTimeField,tools.Int64ToString(p_data.UpdateTime))
+	_, err := conn.Do("hmset", key, p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.IsAuthField, p_data.IsAuth,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
 	if err == nil {
 	}
 }
