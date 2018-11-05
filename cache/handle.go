@@ -39,7 +39,8 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 		   switch index{
 			 case 0:
 				xt:=fmt.Sprintf("%d",v.([]byte))
-                log.Debug(xt)
+				log.Debug(xt)
+	
 			//  case 1:
 			// 	rs.HoneyCount = v.(int64)
 			//  case 2:
