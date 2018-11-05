@@ -8,7 +8,7 @@ import (
 
 const DB_IP = "localhost:6379"
 const DB_NAME = "farm"
-const DB_Pwd = "Zsly3n@s"
+const DB_Pwd = "Zsly3n@s1"
 
 
 type CACHEHandler struct {
