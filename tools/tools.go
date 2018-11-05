@@ -6,9 +6,9 @@ import (
 )
 
 
-func ByteArrToInt64(b *[]byte) int64{
+func ByteArrToInt64(b *[]byte) int32{
 	b_buf := bytes.NewBuffer(*b)
-	var x int64
+	var x int32
 	binary.Read(b_buf, binary.BigEndian, &x)
 	return x  
 }
