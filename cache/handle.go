@@ -3,7 +3,7 @@ package cache
 import (
 	"github.com/gomodule/redigo/redis"
 	"farm/datastruct"
-	"farm/log"
+	//"farm/log"
 )
 
 func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool){
