@@ -4,7 +4,7 @@ import(
 	"github.com/go-xorm/xorm"
 	"farm/datastruct"
 	"farm/log"
-	"fmt"
+	//"fmt"
 )
 
 func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool){
