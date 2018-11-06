@@ -52,7 +52,6 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	userinfo.IsAuth = isauth
 	userinfo.UpdateTime = p_data.UpdateTime
 	
-	
 	var err error
 	if p_data.Id <= 0{
 		_, err = session.Insert(&userinfo)  	

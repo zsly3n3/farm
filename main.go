@@ -2,36 +2,12 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"farm/datastruct"
 	"farm/event"
+	"farm/routes"
 )
 
 
 var eventHandler *event.EventHandler
-
-func getTest(r *gin.Engine) {
-	 data:=new(datastruct.TestData)
-	 data.UserName = "user1"
-	 data.Avatar="avatar1"
-	 r.GET("/test", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-		  "data": data,
-		})
-	})
-}
-
-func login(r *gin.Engine) {
-  r.POST("/login", func(c *gin.Context) {
-	eventHandler.Login(c)
-  })
-}
-
-func Test1(r *gin.Engine) {
-  r.POST("/Test1", func(c *gin.Context) {
-	eventHandler.Test1(c)
-  })
-}
-
 
 //跨域
 func cors() gin.HandlerFunc {
@@ -45,9 +21,7 @@ func main() {
 	eventHandler=event.CreateEventHandler()
 	r := gin.Default()
 	r.Use(cors())
-	getTest(r)
-	login(r)
-	Test1(r)
+  routes.Register(r,eventHandler)
 	r.Run("192.168.0.161:8080")//listen and serve on 0.0.0.0:8080
 }
 
