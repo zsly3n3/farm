@@ -1,9 +1,9 @@
 package event
 
 import(
-	"time"
 	"farm/datastruct"
 	"github.com/gin-gonic/gin"
+	"farm/log"
 )
 
 func (handle *EventHandler) Login(c *gin.Context){
@@ -22,17 +22,19 @@ func (handle *EventHandler) Login(c *gin.Context){
 			code=datastruct.JsonParseFailedFromPostBody
 		 }
 		 if code == datastruct.NULLError{
-		   var isExistRedis bool
+		   //var isExistRedis bool  //test
 		   var isExistMysql bool
 		   var p_data *datastruct.PlayerData
-		   p_data,isExistRedis = handle.cacheHandler.GetPlayerData(body.Code) //find in redis 
-		   if !isExistRedis{
+		   //p_data,isExistRedis = handle.cacheHandler.GetPlayerData(body.Code) //find in redis test
+		   // if !isExistRedis{ test
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
+			 log.Debug("%v",p_data) //test
 			 if !isExistMysql{
-				p_data = createUser(body.Code,true)
+				p_data = datastruct.CreateUser(body.Code,false)
 			 }
 			 handle.cacheHandler.SetPlayerData(p_data)
-		   }
+		   //} test
+		   handle.fromRedisToMysql(body.Code) //test
 		   c.JSON(200, gin.H{
 			"code":code,
 			"data":p_data,
@@ -50,14 +52,9 @@ func (handle *EventHandler) Login(c *gin.Context){
 	}
 }
 
-func createUser(code string,isAuth bool)*datastruct.PlayerData{
-	 player:=new(datastruct.PlayerData)
-	 timestamp:=time.Now().Unix()
-	 player.IsAuth = isAuth
-	 player.CreatedAt = timestamp
-	 player.UpdateTime = timestamp
-	 player.IdentityId = code
-	 player.GoldCount = 100
-	 player.HoneyCount = 100
-	 return player
+func (handle *EventHandler)fromRedisToMysql(token string){
+	conn:=handle.cacheHandler.GetConn()
+	defer conn.Close()
+	p_data:=handle.cacheHandler.ReadPlayerData(conn,token)
+	handle.dbHandler.SetPlayerData(p_data)
 }

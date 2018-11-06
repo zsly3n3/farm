@@ -1,6 +1,7 @@
 package datastruct
 
 import (
+	"time"
 )
 
 
@@ -63,7 +64,7 @@ type UserLogin struct{
 
 type PlayerData struct{
 	IsAuth bool //是否授权
-	IdentityId string //标识id
+	Token string //标识id IdentityId
 	CreatedAt int64 //创建用户的时间
 	UpdateTime int64 //最近一次登录的时间
 	GoldCount int64 //金币数量
@@ -74,4 +75,14 @@ type PlayerData struct{
 
 
 
-
+func CreateUser(code string,isAuth bool)*PlayerData{
+	player:=new(PlayerData)
+	timestamp:=time.Now().Unix()
+	player.IsAuth = isAuth
+	player.CreatedAt = timestamp
+	player.UpdateTime = timestamp
+	player.Token = code
+	player.GoldCount = 0
+	player.HoneyCount = 0
+	return player
+}

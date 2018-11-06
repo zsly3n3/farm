@@ -14,23 +14,28 @@ func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,b
 	ilen, err := conn.Do("hlen", code)
     if err == nil && (ilen.(int64)) > 0{
 	   isExist = true
-	   rs = readPlayerData(conn,code)
+	   rs = handle.ReadPlayerData(conn,code)
 	}
 	conn.Close()
 	return rs,isExist
 }
 
+func (handle *CACHEHandler)GetConn() redis.Conn{
+	 conn:=handle.redisClient.Get()
+	 return conn
+}
+
 func (handle *CACHEHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	conn:=handle.redisClient.Get()
 	defer conn.Close()
-	key:=p_data.IdentityId
+	key:=p_data.Token
 	//add
 	_, err := conn.Do("hmset", key, p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.IsAuthField, p_data.IsAuth,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
 	if err == nil {
 	}
 }
 
-func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
+func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 	rs := new(datastruct.PlayerData)
 	//add
 	value, err := redis.Values(conn.Do("hmget",key, datastruct.GoldField, datastruct.HoneyField, datastruct.IsAuthField, datastruct.CreatedAtField,datastruct.UpdateTimeField))
@@ -52,7 +57,9 @@ func readPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 		   }
 	   }
 	}
-	rs.IdentityId = key
+	rs.Token = key
 	return rs
 }
+
+
 
