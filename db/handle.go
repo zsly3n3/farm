@@ -51,9 +51,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	}
 	userinfo.IsAuth = isauth
 	userinfo.UpdateTime = p_data.UpdateTime
-	p_data.Id = 1
-	p_data.GoldCount = 101
-	p_data.HoneyCount = 201
+	// p_data.Id = 1
+	// userinfo.Id = p_data.Id
 	var err error
 	if p_data.Id <= 0{
 		_, err = session.Insert(&userinfo)  	
