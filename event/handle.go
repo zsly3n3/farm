@@ -4,7 +4,7 @@ import(
 	"time"
 	"farm/datastruct"
 	"github.com/gin-gonic/gin"
-	//"farm/log"
+	"farm/log"
 )
 
 func (handle *EventHandler) Login(c *gin.Context){
@@ -66,6 +66,8 @@ func (handle *EventHandler)fromRedisToMysql(token string){
 	defer conn.Close()
 	p_data:=handle.cacheHandler.ReadPlayerData(conn,token)
 	user_id:=handle.dbHandler.SetPlayerData(p_data)
+	log.Debug("p_data.Id:%d",p_data.Id)
+	log.Debug("user_id:%d",user_id)
 	if p_data.Id<=0 && user_id > 0{
 	  handle.cacheHandler.SetPlayerID(conn,token,user_id)
 	}
