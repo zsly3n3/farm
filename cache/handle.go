@@ -12,8 +12,8 @@ func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,b
 	var rs *datastruct.PlayerData
 	conn:=handle.redisClient.Get()
 	ilen, err := conn.Do("hlen", code)
+	log.Debug("len:%d,token:%s",ilen,code)
     if err == nil && (ilen.(int64)) > 0{
-	   log.Debug("len:%d,token:%s",ilen,code)
 	   isExist = true
 	   rs = handle.ReadPlayerData(conn,code)
 	}
