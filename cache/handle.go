@@ -3,7 +3,7 @@ package cache
 import (
 	"github.com/gomodule/redigo/redis"
 	"farm/datastruct"
-	//farm/log"
+	"farm/log"
 	"farm/tools"
 )
 
@@ -13,6 +13,7 @@ func (handle *CACHEHandler) GetPlayerData(code string) (*datastruct.PlayerData,b
 	conn:=handle.redisClient.Get()
 	ilen, err := conn.Do("hlen", code)
     if err == nil && (ilen.(int64)) > 0{
+	   log.Debug("len:%d,token:%s",ilen,code)
 	   isExist = true
 	   rs = handle.ReadPlayerData(conn,code)
 	}
