@@ -38,6 +38,9 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	engine:=handle.mysqlEngine
 	session := engine.NewSession()
 	defer session.Close()
+	log.Debug("%v",engine)
+	log.Debug("%v",session)
+	/*
 	session.Begin()
 	//add
 	var userinfo datastruct.UserInfo
@@ -71,6 +74,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	err=session.Commit()
 	str:=fmt.Sprintf("DBHandler->SetPlayerData Commit :%s",err.Error())
 	rollback(str,session)
+	*/
 }
 
 func rollback(err_str string,session *xorm.Session){
