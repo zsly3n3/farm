@@ -26,6 +26,12 @@ func login(r *gin.Engine) {
   })
 }
 
+func Test1(r *gin.Engine) {
+  r.POST("/Test1", func(c *gin.Context) {
+	eventHandler.Test1(c)
+  })
+}
+
 
 //跨域
 func cors() gin.HandlerFunc {
@@ -41,6 +47,7 @@ func main() {
 	r.Use(cors())
 	getTest(r)
 	login(r)
+	Test1(r)
 	r.Run("192.168.0.161:8080")//listen and serve on 0.0.0.0:8080
 }
 

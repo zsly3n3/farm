@@ -59,13 +59,15 @@ func refreshPlayerData(p_data *datastruct.PlayerData){
 	p_data.UpdateTime = time.Now().Unix()   
 }
 
-func test(){
-	//handle.fromRedisToMysql(body.Code) //test
-}
-
 func (handle *EventHandler)fromRedisToMysql(token string){
 	conn:=handle.cacheHandler.GetConn()
 	defer conn.Close()
 	p_data:=handle.cacheHandler.ReadPlayerData(conn,token)
 	handle.dbHandler.SetPlayerData(p_data)
+}
+
+func (handle *EventHandler)Test1(c *gin.Context){
+	var body datastruct.UserLogin
+	c.BindJSON(&body)
+	handle.fromRedisToMysql(body.Code)
 }
