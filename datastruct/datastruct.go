@@ -63,6 +63,7 @@ type UserLogin struct{
 }
 
 type PlayerData struct{
+	Id int //对应数据库中userinfo表中的id
 	IsAuth bool //是否授权
 	Token string //标识id IdentityId
 	CreatedAt int64 //创建用户的时间

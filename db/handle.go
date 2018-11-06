@@ -49,14 +49,18 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	   isauth = 1
 	}
 	userinfo.IsAuth = isauth
-    userinfo.UpdateTime = p_data.UpdateTime
-	_, err := session.Update(&userinfo)
+	userinfo.UpdateTime = p_data.UpdateTime
+	var err error
+	if p_data.Id <= 0{
+		_, err = session.Insert(&userinfo)  	
+	} else {
+		_, err = session.Id(p_data.Id).Update(&userinfo)
+	}
 	if err != nil{
 		str:=fmt.Sprintf("DBHandler->SetPlayerData Update UserInfo :%s",err.Error())
 		rollback(str,session)
 	    return
 	}
-	log.Debug("userinfo_id:%d",userinfo.Id)
 	sql:=fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count)VALUES(%d,%d,%d)",userinfo.Id,p_data.HoneyCount,p_data.GoldCount)
 	_, err=session.Exec(sql)
 	if err != nil{
