@@ -7,7 +7,7 @@ import (
 )
 
 const DB_IP = "localhost:6379"
-const DB_NAME = "farm"
+const DB_NAME = "0"
 const DB_Pwd = "Zsly3n@s"
 
 
