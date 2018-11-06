@@ -50,9 +50,9 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	}
 	userinfo.IsAuth = isauth
     userinfo.UpdateTime = p_data.UpdateTime
-	_, err := session.Insert(&userinfo)
+	_, err := session.Update(&userinfo)
 	if err != nil{
-		str:=fmt.Sprintf("DBHandler->SetPlayerData Insert UserInfo :%s",err.Error())
+		str:=fmt.Sprintf("DBHandler->SetPlayerData Update UserInfo :%s",err.Error())
 		rollback(str,session)
 	    return
 	}
@@ -60,9 +60,9 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	playerinfo.Id = userinfo.Id
 	playerinfo.HoneyCount = p_data.HoneyCount
 	playerinfo.GoldCount = p_data.GoldCount
-	_, err = session.Insert(&playerinfo)
+	_, err = session.Update(&playerinfo)
 	if err != nil{
-	  str:=fmt.Sprintf("DBHandler->SetPlayerData Insert PlayerInfo :%s",err.Error())
+	  str:=fmt.Sprintf("DBHandler->SetPlayerData Update PlayerInfo :%s",err.Error())
 	  rollback(str,session)
 	  return
 	}

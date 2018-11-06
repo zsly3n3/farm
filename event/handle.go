@@ -1,9 +1,10 @@
 package event
 
 import(
+	"time"
 	"farm/datastruct"
 	"github.com/gin-gonic/gin"
-	"farm/log"
+	//"farm/log"
 )
 
 func (handle *EventHandler) Login(c *gin.Context){
@@ -22,19 +23,21 @@ func (handle *EventHandler) Login(c *gin.Context){
 			code=datastruct.JsonParseFailedFromPostBody
 		 }
 		 if code == datastruct.NULLError{
-		   //var isExistRedis bool  //test
+		   var isExistRedis bool
 		   var isExistMysql bool
 		   var p_data *datastruct.PlayerData
-		   //p_data,isExistRedis = handle.cacheHandler.GetPlayerData(body.Code) //find in redis test
-		   // if !isExistRedis{ test
+		   p_data,isExistRedis = handle.cacheHandler.GetPlayerData(body.Code) //find in redis
+		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
-			 log.Debug("%v",p_data) //test
 			 if !isExistMysql{
 				p_data = datastruct.CreateUser(body.Code,false)
+			 } else {
+				refreshPlayerData(p_data)
 			 }
 			 handle.cacheHandler.SetPlayerData(p_data)
-		   //} test
-		   handle.fromRedisToMysql(body.Code) //test
+		   } else {
+			 refreshPlayerData(p_data)
+		   }
 		   c.JSON(200, gin.H{
 			"code":code,
 			"data":p_data,
@@ -50,6 +53,14 @@ func (handle *EventHandler) Login(c *gin.Context){
 		"code":code,
 	   })
 	}
+}
+
+func refreshPlayerData(p_data *datastruct.PlayerData){
+	p_data.UpdateTime = time.Now().Unix()   
+}
+
+func test(){
+	//handle.fromRedisToMysql(body.Code) //test
 }
 
 func (handle *EventHandler)fromRedisToMysql(token string){
