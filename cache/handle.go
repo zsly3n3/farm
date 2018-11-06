@@ -71,6 +71,10 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 				rs.CreatedAt = tools.StringToInt64(str)
 			 case 5:
 				rs.UpdateTime = tools.StringToInt64(str)
+			 case 6:
+				rs.NickName = str
+			 case 7:
+				rs.Avatar = str
 		   }
 	   }
 	}
