@@ -39,7 +39,7 @@ const (
 const IdField = "Id"
 const GoldField = "GoldCount"
 const HoneyField = "HoneyCount"
-const IsAuthField = "IsAuth"
+const PermissionIdField = "PermissionId"
 const CreatedAtField = "CreatedAt"
 const UpdateTimeField = "UpdateTime"
 const IdentityIdField = "IdentityId"
@@ -47,9 +47,14 @@ const IdentityIdField = "IdentityId"
 type UserInfo struct {
 	Id    int       `xorm:"not null pk autoincr INT(11)"`
 	IdentityId string   `xorm:"VARCHAR(128) not null"` //标识id
-	IsAuth int8 `xorm:"TINYINT(1) not null"` //是否授权
+	PermissionId int `xorm:"not null INT(11)"` //权限id
 	CreatedAt int64 `xorm:"bigint not null"` //创建用户的时间
 	UpdateTime int64 `xorm:"bigint not null"` //最近一次登录的时间
+}
+
+type Permission struct {
+	Id    int       `xorm:"not null pk autoincr INT(11)"`
+	Name  string   `xorm:"VARCHAR(32) not null"` //权限名称
 }
 
 type PlayerInfo struct {
@@ -65,7 +70,7 @@ type UserLogin struct{
 
 type PlayerData struct{
 	Id int //对应数据库中userinfo表中的id
-	IsAuth bool //是否授权
+	PermissionId int //权限id
 	Token string //标识id IdentityId
 	CreatedAt int64 //创建用户的时间
 	UpdateTime int64 //最近一次登录的时间
@@ -77,10 +82,10 @@ type PlayerData struct{
 
 
 
-func CreateUser(code string,isAuth bool)*PlayerData{
+func CreateUser(code string,permissionId int)*PlayerData{
 	player:=new(PlayerData)
 	timestamp:=time.Now().Unix()
-	player.IsAuth = isAuth
+	player.PermissionId = permissionId
 	player.CreatedAt = timestamp
 	player.UpdateTime = timestamp
 	player.Token = code

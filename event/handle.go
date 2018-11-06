@@ -32,7 +32,7 @@ func (handle *EventHandler) Login(c *gin.Context){
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
 			 if !isExistMysql{
-				p_data = datastruct.CreateUser(body.Code,false)
+				p_data = datastruct.CreateUser(body.Code,1)
 			 } else {
 				refreshPlayerData(p_data)
 			 }

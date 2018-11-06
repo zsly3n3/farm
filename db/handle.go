@@ -20,20 +20,6 @@ func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool
 	 return rs,isExist
 }
 
-type UserInfo struct {
-	Id    int       `xorm:"not null pk autoincr INT(11)"`
-	IdentityId string   `xorm:"VARCHAR(128) not null"` //标识id
-	IsAuth int8 `xorm:"TINYINT(1) not null"` //是否授权
-	CreatedAt int64 `xorm:"bigint not null"` //创建用户的时间
-	UpdateTime int64 `xorm:"bigint not null"` //最近一次登录的时间
-}
-
-type PlayerInfo struct {
-	Id    int       `xorm:"not null pk INT(11)"` //关联UserInfo中id
-	HoneyCount int64 `xorm:"bigint not null"`//蜂蜜数量
-	GoldCount int64 `xorm:"bigint not null"`//金币数量
-}
-
 func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	engine:=handle.mysqlEngine
 	session := engine.NewSession()
@@ -44,12 +30,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	var userinfo datastruct.UserInfo
 	userinfo.IdentityId = p_data.Token
 	userinfo.CreatedAt = p_data.CreatedAt
-	var isauth int8
-	isauth = 0
-	if p_data.IsAuth {
-	   isauth = 1
-	}
-	userinfo.IsAuth = isauth
+	userinfo.PermissionId = p_data.PermissionId
 	userinfo.UpdateTime = p_data.UpdateTime
 	
 	var err error

@@ -37,13 +37,30 @@ func CreateDBHandler()*DBHandler{
 func resetDB(engine *xorm.Engine){
 	user:=&datastruct.UserInfo{}
 	player:=&datastruct.PlayerInfo{}
-	err:=engine.DropTables(user,player)
+	perm:=&datastruct.Permission{}
+	err:=engine.DropTables(user,player,perm)
     errhandle(err)
-	err=engine.CreateTables(user,player)
+	err=engine.CreateTables(user,player,perm)
     errhandle(err)
 }
 
 func initData(engine *xorm.Engine){
+	data:=createPermissionData()
+	_, err := engine.Insert(&data)
+	errhandle(err)
+}
+
+func createPermissionData()[]datastruct.Permission{
+	a:= datastruct.Permission{
+		Name:"游客",
+	}
+	b:= datastruct.Permission{
+		Name:"普通玩家",
+	}
+	// c:= datastruct.Permission{
+	// 	Name:"会员",
+	// }
+	return []datastruct.Permission{a,b}
 }
 
 func errhandle(err error){

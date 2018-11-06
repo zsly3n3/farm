@@ -33,7 +33,7 @@ func (handle *CACHEHandler) SetPlayerID(conn redis.Conn,key string,p_id int){
 func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,p_data *datastruct.PlayerData) {
 	key:=p_data.Token
 	//add
-	_, err := conn.Do("hmset", key,datastruct.IdField,p_data.Id,datastruct.GoldField,p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.IsAuthField, p_data.IsAuth,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
+	_, err := conn.Do("hmset", key,datastruct.IdField,p_data.Id,datastruct.GoldField,p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.PermissionIdField, p_data.PermissionId,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
 	if err != nil {
 	  log.Debug("CACHEHandler SetPlayerData err:%s",err.Error())
 	}
@@ -42,7 +42,7 @@ func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,p_data *datastruct.Play
 func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 	rs := new(datastruct.PlayerData)
 	//add
-	value, err := redis.Values(conn.Do("hmget",key,datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, datastruct.IsAuthField, datastruct.CreatedAtField,datastruct.UpdateTimeField))
+	value, err := redis.Values(conn.Do("hmget",key,datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, datastruct.PermissionIdField, datastruct.CreatedAtField,datastruct.UpdateTimeField))
 	if err == nil {
 	   for index, v := range value {
 		   tmp:= v.([]byte)
@@ -55,7 +55,7 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 			 case 2:
 				rs.HoneyCount = tools.StringToInt64(str)
 			 case 3:
-				rs.IsAuth = tools.StringToBool(str)
+				rs.PermissionId = tools.StringToInt(str)
 			 case 4:
 				rs.CreatedAt = tools.StringToInt64(str)
 			 case 5:
