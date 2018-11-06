@@ -23,10 +23,12 @@ func (handle *EventHandler) Login(c *gin.Context){
 			code=datastruct.JsonParseFailedFromPostBody
 		 }
 		 if code == datastruct.NULLError{
+		  conn:=handle.cacheHandler.GetConn()
+		  defer conn.Close()
 		   var isExistRedis bool
 		   var isExistMysql bool
 		   var p_data *datastruct.PlayerData
-		   p_data,isExistRedis = handle.cacheHandler.GetPlayerData(body.Code) //find in redis
+		   p_data,isExistRedis = handle.cacheHandler.GetPlayerData(conn,body.Code) //find in redis
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
 			 if !isExistMysql{
@@ -34,10 +36,10 @@ func (handle *EventHandler) Login(c *gin.Context){
 			 } else {
 				refreshPlayerData(p_data)
 			 }
-			 handle.cacheHandler.SetPlayerData(p_data)
 		   } else {
 			 refreshPlayerData(p_data)
 		   }
+		   handle.cacheHandler.SetPlayerData(conn,p_data)
 		   c.JSON(200, gin.H{
 			"code":code,
 			"data":p_data,
