@@ -32,7 +32,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	userinfo.CreatedAt = p_data.CreatedAt
 	userinfo.PermissionId = p_data.PermissionId
 	userinfo.UpdateTime = p_data.UpdateTime
-	
+	userinfo.Avatar = p_data.Avatar
+	userinfo.NickName = p_data.NickName
 	var err error
 	if p_data.Id <= 0{
 		_, err = session.Insert(&userinfo)  	
