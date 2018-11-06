@@ -36,6 +36,7 @@ const (
     PC_Platform //pc平台
 )
 
+const IdField = "Id"
 const GoldField = "GoldCount"
 const HoneyField = "HoneyCount"
 const IsAuthField = "IsAuth"

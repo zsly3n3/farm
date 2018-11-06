@@ -25,12 +25,19 @@ func (handle *CACHEHandler)GetConn() redis.Conn{
 	 return conn
 }
 
+func (handle *CACHEHandler) SetPlayerID(conn redis.Conn,key string,p_id int){
+	_, err := conn.Do("hset", key,datastruct.IdField,p_id)
+	if err != nil {
+		log.Debug("CACHEHandler SetPlayerID err:%s",err.Error())
+	}
+}
+
 func (handle *CACHEHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	conn:=handle.redisClient.Get()
 	defer conn.Close()
 	key:=p_data.Token
 	//add
-	_, err := conn.Do("hmset", key,datastruct.GoldField,p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.IsAuthField, p_data.IsAuth,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
+	_, err := conn.Do("hmset", key,datastruct.IdField,p_data.Id,datastruct.GoldField,p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.IsAuthField, p_data.IsAuth,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
 	if err != nil {
 		log.Debug("CACHEHandler SetPlayerData err:%s",err.Error())
 	}
@@ -39,21 +46,23 @@ func (handle *CACHEHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 	rs := new(datastruct.PlayerData)
 	//add
-	value, err := redis.Values(conn.Do("hmget",key, datastruct.GoldField, datastruct.HoneyField, datastruct.IsAuthField, datastruct.CreatedAtField,datastruct.UpdateTimeField))
+	value, err := redis.Values(conn.Do("hmget",key,datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, datastruct.IsAuthField, datastruct.CreatedAtField,datastruct.UpdateTimeField))
 	if err == nil {
 	   for index, v := range value {
 		   tmp:= v.([]byte)
 		   str:= string(tmp[:])
 		   switch index{
 			 case 0:
-				rs.GoldCount = tools.StringToInt64(str)
+				rs.Id = tools.StringToInt(str)
 			 case 1:
-				rs.HoneyCount = tools.StringToInt64(str)
+				rs.GoldCount = tools.StringToInt64(str)
 			 case 2:
-				rs.IsAuth = tools.StringToBool(str)
+				rs.HoneyCount = tools.StringToInt64(str)
 			 case 3:
-				rs.CreatedAt = tools.StringToInt64(str)
+				rs.IsAuth = tools.StringToBool(str)
 			 case 4:
+				rs.CreatedAt = tools.StringToInt64(str)
+			 case 5:
 				rs.UpdateTime = tools.StringToInt64(str)
 		   }
 	   }

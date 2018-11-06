@@ -34,7 +34,7 @@ type PlayerInfo struct {
 	GoldCount int64 `xorm:"bigint not null"`//金币数量
 }
 
-func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
+func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	engine:=handle.mysqlEngine
 	session := engine.NewSession()
 	defer session.Close()
@@ -51,31 +51,32 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	}
 	userinfo.IsAuth = isauth
 	userinfo.UpdateTime = p_data.UpdateTime
-	// p_data.Id = 1
-	// userinfo.Id = p_data.Id
+    
 	var err error
 	if p_data.Id <= 0{
 		_, err = session.Insert(&userinfo)  	
 	} else {
+		userinfo.Id = p_data.Id
 		_, err = session.Id(p_data.Id).Update(&userinfo)
 	}
 	if err != nil{
 		str:=fmt.Sprintf("DBHandler->SetPlayerData Update UserInfo :%s",err.Error())
 		rollback(str,session)
-	    return
+	    return userinfo.Id
 	}
 	sql:=fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count)VALUES(%d,%d,%d)",userinfo.Id,p_data.HoneyCount,p_data.GoldCount)
 	_, err=session.Exec(sql)
 	if err != nil{
 	  str:=fmt.Sprintf("DBHandler->SetPlayerData Update PlayerInfo :%s",err.Error())
 	  rollback(str,session)
-	  return
+	  return userinfo.Id
 	}
 	err=session.Commit()
 	if err != nil{
 	  str:=fmt.Sprintf("DBHandler->SetPlayerData Commit :%s",err.Error())
 	  rollback(str,session)	
 	}
+	return userinfo.Id
 }
 
 func rollback(err_str string,session *xorm.Session){

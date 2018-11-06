@@ -63,7 +63,11 @@ func (handle *EventHandler)fromRedisToMysql(token string){
 	conn:=handle.cacheHandler.GetConn()
 	defer conn.Close()
 	p_data:=handle.cacheHandler.ReadPlayerData(conn,token)
-	handle.dbHandler.SetPlayerData(p_data)
+	user_id:=handle.dbHandler.SetPlayerData(p_data)
+	if p_data.Id<=0 && user_id > 0{
+	  handle.cacheHandler.SetPlayerID(conn,token,user_id)
+	}
+	
 }
 
 func (handle *EventHandler)Test1(c *gin.Context){
