@@ -57,13 +57,14 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		_, err = session.Insert(&userinfo)  	
 	} else {
 		userinfo.Id = p_data.Id
-		_, err = session.Id(p_data.Id).Update(&userinfo)
+		_, err = session.Where("id=?",userinfo.Id) .Update(&userinfo)
 	}
 	if err != nil{
 		str:=fmt.Sprintf("DBHandler->SetPlayerData Update UserInfo :%s",err.Error())
 		rollback(str,session)
 	    return userinfo.Id
 	}
+
 	sql:=fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count)VALUES(%d,%d,%d)",userinfo.Id,p_data.HoneyCount,p_data.GoldCount)
 	_, err=session.Exec(sql)
 	if err != nil{
