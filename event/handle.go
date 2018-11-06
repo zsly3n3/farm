@@ -75,7 +75,11 @@ func (handle *EventHandler)fromRedisToMysql(token string){
 }
 
 func getPermissionId(isauth int) int{
-	return 0
+	rs:= 1
+	if isauth == 1{
+		rs = 2
+	}
+	return rs
 }
 
 func (handle *EventHandler)Test1(c *gin.Context){
