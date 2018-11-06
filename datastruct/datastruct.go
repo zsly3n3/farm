@@ -43,6 +43,8 @@ const PermissionIdField = "PermissionId"
 const CreatedAtField = "CreatedAt"
 const UpdateTimeField = "UpdateTime"
 const IdentityIdField = "IdentityId"
+const NickNameField = "NickName"
+const AvatarField = "Avatar"
 
 type UserInfo struct {
 	Id    int       `xorm:"not null pk autoincr INT(11)"`
@@ -50,6 +52,8 @@ type UserInfo struct {
 	PermissionId int `xorm:"not null INT(11)"` //权限id
 	CreatedAt int64 `xorm:"bigint not null"` //创建用户的时间
 	UpdateTime int64 `xorm:"bigint not null"` //最近一次登录的时间
+	NickName string `xorm:"VARCHAR(256) not null"` //昵称
+	Avatar string `xorm:"VARCHAR(256) not null"`//头像
 }
 
 type Permission struct {
@@ -76,10 +80,9 @@ type PlayerData struct{
 	UpdateTime int64 //最近一次登录的时间
 	GoldCount int64 //金币数量
 	HoneyCount int64 //蜂蜜数量
+	NickName string
+	Avatar string
 }
-
-
-
 
 
 func CreateUser(code string,permissionId int)*PlayerData{
@@ -91,5 +94,7 @@ func CreateUser(code string,permissionId int)*PlayerData{
 	player.Token = code
 	player.GoldCount = 0
 	player.HoneyCount = 0
+	player.NickName = "test1"
+	player.Avatar = "avatar"
 	return player
 }
