@@ -4,7 +4,7 @@ import(
 	"github.com/go-xorm/xorm"
 	"farm/datastruct"
 	"farm/log"
-	//"fmt"
+	"fmt"
 )
 
 func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool){
@@ -38,10 +38,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	engine:=handle.mysqlEngine
 	session := engine.NewSession()
 	defer session.Close()
-	log.Debug("%v",engine)
-	log.Debug("%v",session)
-	/*
 	session.Begin()
+	
 	//add
 	var userinfo datastruct.UserInfo
 	userinfo.IdentityId = p_data.Token
@@ -72,9 +70,10 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	  return
 	}
 	err=session.Commit()
-	str:=fmt.Sprintf("DBHandler->SetPlayerData Commit :%s",err.Error())
-	rollback(str,session)
-	*/
+	if err != nil{
+	  str:=fmt.Sprintf("DBHandler->SetPlayerData Commit :%s",err.Error())
+	  rollback(str,session)	
+	}
 }
 
 func rollback(err_str string,session *xorm.Session){
