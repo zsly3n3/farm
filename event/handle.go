@@ -70,4 +70,7 @@ func (handle *EventHandler)Test1(c *gin.Context){
 	var body datastruct.UserLogin
 	c.BindJSON(&body)
 	handle.fromRedisToMysql(body.Code)
+	c.JSON(200, gin.H{
+		"code": 0,
+	})
 }
