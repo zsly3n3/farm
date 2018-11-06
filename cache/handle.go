@@ -32,7 +32,8 @@ func (handle *CACHEHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	key:=p_data.Token
 	//add
 	_, err := conn.Do("hmset", key, p_data.GoldCount, datastruct.HoneyField, p_data.HoneyCount, datastruct.IsAuthField, p_data.IsAuth,datastruct.CreatedAtField,p_data.CreatedAt,datastruct.UpdateTimeField,p_data.UpdateTime)
-	if err == nil {
+	if err != nil {
+		log.Debug("CACHEHandler SetPlayerData err:%s",err.Error())
 	}
 }
 
