@@ -39,7 +39,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	session := engine.NewSession()
 	defer session.Close()
 	session.Begin()
-	
+
 	//add
 	var userinfo datastruct.UserInfo
 	userinfo.IdentityId = p_data.Token
@@ -51,6 +51,9 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 	}
 	userinfo.IsAuth = isauth
 	userinfo.UpdateTime = p_data.UpdateTime
+	
+	p_data.GoldCount = 101
+	p_data.HoneyCount = 201
 	var err error
 	if p_data.Id <= 0{
 		_, err = session.Insert(&userinfo)  	
