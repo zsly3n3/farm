@@ -61,7 +61,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		var has bool
 		has, err = session.Where("id=?",p_data.Id).Get(&tmp)
 	    if has {
-		  _, err = session.Where("id=?",p_data.Id) .Update(&userinfo)
+		  userinfo.Id = p_data.Id
+		  _, err = session.Where("id=?",p_data.Id).Update(&userinfo)
 		} else {
 		  _, err = session.Insert(&userinfo)
 		}
