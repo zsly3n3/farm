@@ -56,11 +56,9 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) {
 		rollback(str,session)
 	    return
 	}
-	var playerinfo datastruct.PlayerInfo
-	playerinfo.Id = userinfo.Id
-	playerinfo.HoneyCount = p_data.HoneyCount
-	playerinfo.GoldCount = p_data.GoldCount
-	_, err = session.Update(&playerinfo)
+	log.Debug("userinfo_id:%d",userinfo.Id)
+	sql:=fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count)VALUES(%d,%d,%d)",userinfo.Id,p_data.HoneyCount,p_data.GoldCount)
+	_, err=session.Exec(sql)
 	if err != nil{
 	  str:=fmt.Sprintf("DBHandler->SetPlayerData Update PlayerInfo :%s",err.Error())
 	  rollback(str,session)
