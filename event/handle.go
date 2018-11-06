@@ -7,7 +7,7 @@ import(
 	//"farm/log"
 )
 
-func (handle *EventHandler) Login(c *gin.Context){
+func (handle *EventHandler)Login(c *gin.Context){
 	var body datastruct.UserLogin
 	err:=c.BindJSON(&body)
 	code:=datastruct.NULLError
@@ -17,7 +17,7 @@ func (handle *EventHandler) Login(c *gin.Context){
 			  fallthrough
 		 case datastruct.WX_Platform:
 			if body.Code == ""{
-				code=datastruct.JsonParseFailedFromPostBody
+			  code=datastruct.JsonParseFailedFromPostBody
 			}
 		 default:
 			code=datastruct.JsonParseFailedFromPostBody
@@ -32,12 +32,12 @@ func (handle *EventHandler) Login(c *gin.Context){
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
 			 if !isExistMysql{
-				p_data = datastruct.CreateUser(body.Code,1)
+				p_data = datastruct.CreateUser(body.Code,getPermissionId(body.IsAuth))
 			 } else {
-				refreshPlayerData(p_data)
+				refreshPlayerData(p_data,body.IsAuth)
 			 }
 		   } else {
-			 refreshPlayerData(p_data)
+			 refreshPlayerData(p_data,body.IsAuth)
 		   }
 		   handle.cacheHandler.SetPlayerData(conn,p_data)
 		   c.JSON(200, gin.H{
@@ -57,7 +57,10 @@ func (handle *EventHandler) Login(c *gin.Context){
 	}
 }
 
-func refreshPlayerData(p_data *datastruct.PlayerData){
+func refreshPlayerData(p_data *datastruct.PlayerData,isauth int){
+	if isauth == 1 && p_data.PermissionId == int(datastruct.Guest){
+		p_data.PermissionId = int(datastruct.Player)
+	}
 	p_data.UpdateTime = time.Now().Unix()   
 }
 
@@ -69,6 +72,10 @@ func (handle *EventHandler)fromRedisToMysql(token string){
 	if p_data.Id<=0 && user_id > 0{
 	  handle.cacheHandler.SetPlayerID(conn,token,user_id)
 	}
+}
+
+func getPermissionId(isauth int) int{
+	return 0
 }
 
 func (handle *EventHandler)Test1(c *gin.Context){

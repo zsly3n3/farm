@@ -30,6 +30,11 @@ const (
 	JsonParseFailedFromPostBody//来自post请求中的Body解析json失败
 )
 
+
+
+
+
+
 type Platform int //平台
 const (
 	WX_Platform Platform = iota //微信平台
@@ -70,6 +75,9 @@ type PlayerInfo struct {
 type UserLogin struct{
 	 PlatformId Platform //平台
 	 Code string //身份标识
+	 IsAuth int //是否授权
+	 NickName string
+	 Avatar string
 }
 
 type PlayerData struct{
@@ -84,6 +92,12 @@ type PlayerData struct{
 	Avatar string
 }
 
+
+type PermissionType int //错误码
+const (
+	Guest PermissionType = 1 +iota //游客
+	Player //普通玩家
+)
 
 func CreateUser(code string,permissionId int)*PlayerData{
 	player:=new(PlayerData)
