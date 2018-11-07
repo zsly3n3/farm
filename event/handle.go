@@ -23,23 +23,27 @@ func (handle *EventHandler)Login(c *gin.Context){
 			code=datastruct.JsonParseFailedFromPostBody
 		 }
 		 if code == datastruct.NULLError{
-		  conn:=handle.cacheHandler.GetConn()
-		  defer conn.Close()
 		   var isExistRedis bool
 		   var isExistMysql bool
 		   var p_data *datastruct.PlayerData
+		   conn:=handle.cacheHandler.GetConn()
+		   defer conn.Close()
+		   args:=make([]interface{},0,10)
+		   openid:=getOpenId(body.Code)
+		   args=append(args,openid)
 		   p_data,isExistRedis = handle.cacheHandler.GetPlayerData(conn,body.Code) //find in redis
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
 			 if !isExistMysql{
 				p_data = datastruct.CreateUser(body.Code,getPermissionId(body.IsAuth))
 			 } else {
-				refreshPlayerData(p_data,body.IsAuth)
+				args=refreshPlayerData(p_data,body.IsAuth,args)
 			 }
+			 args=playerDataArgsAppend(p_data,args)
 		   } else {
-			 refreshPlayerData(p_data,body.IsAuth)
+			 args = refreshPlayerData(p_data,body.IsAuth,args)
 		   }
-		   handle.cacheHandler.SetPlayerData(conn,p_data)
+		   handle.cacheHandler.SetPlayerData(conn,args)
 		   c.JSON(200, gin.H{
 			"code":code,
 			"data":p_data,
@@ -57,11 +61,41 @@ func (handle *EventHandler)Login(c *gin.Context){
 	}
 }
 
-func refreshPlayerData(p_data *datastruct.PlayerData,isauth int){
+func getOpenId(code string) string{
+	 return code
+}
+
+func playerDataArgsAppend(p_data *datastruct.PlayerData,args []interface{})[]interface{}{
+	args=append(args,datastruct.IdField)
+	args=append(args,p_data.Id)
+
+	args=append(args,datastruct.GoldField)
+	args=append(args,p_data.GoldCount)
+
+	args=append(args,datastruct.HoneyField)
+	args=append(args,p_data.HoneyCount)
+
+	args=append(args,datastruct.CreatedAtField)
+	args=append(args,p_data.CreatedAt)
+
+	args=append(args,datastruct.NickNameField)
+	args=append(args,p_data.NickName)
+
+	args=append(args,datastruct.AvatarField)
+	args=append(args,p_data.Avatar)
+	return args
+}
+
+func refreshPlayerData(p_data *datastruct.PlayerData,isauth int,args []interface{})[]interface{}{
 	if isauth == 1 && p_data.PermissionId == int(datastruct.Guest){
-		p_data.PermissionId = int(datastruct.Player)
+	  p_data.PermissionId = int(datastruct.Player)
 	}
 	p_data.UpdateTime = time.Now().Unix()
+	args=append(args,datastruct.PermissionIdField)
+	args=append(args,p_data.PermissionId)
+	args=append(args,datastruct.UpdateTimeField)
+	args=append(args,p_data.UpdateTime)
+	return args
 }
 
 func (handle *EventHandler)fromRedisToMysql(token string){
