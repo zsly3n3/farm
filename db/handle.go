@@ -11,10 +11,23 @@ func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool
 	 isExist:=false
 	 var rs *datastruct.PlayerData
 	 user := new(datastruct.UserInfo)
-	 has, _ := handle.mysqlEngine.Where("identity_id=?", code).Get(user)
+	 engine:=handle.mysqlEngine
+	 has, _ := engine.Where("identity_id=?", code).Get(user)
 	 if has{
 		isExist = true
 		//add
+		rs = new(datastruct.PlayerData)
+		rs.Avatar = user.Avatar
+		rs.CreatedAt = user.CreatedAt
+		rs.Id = user.Id
+		rs.NickName = user.NickName
+		rs.PermissionId = user.PermissionId
+		rs.Token = user.IdentityId
+		rs.UpdateTime = user.UpdateTime
+		var playerInfo datastruct.PlayerInfo
+		engine.Id(rs.Id).Get(&playerInfo)
+		rs.GoldCount = playerInfo.GoldCount
+		rs.HoneyCount = playerInfo.HoneyCount
 		log.Debug("DBHandler GetPlayerData true")
 	 }
 	 return rs,isExist
