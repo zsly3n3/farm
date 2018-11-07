@@ -74,13 +74,13 @@ type PlayerInfo struct {
 
 //植物类型表
 type PlantClass struct {
-	Id   int       `xorm:"not null pk INT(11)"` 
+	Id   int       `xorm:"not null pk autoincr INT(11)"` 
 	Desc string `xorm:"VARCHAR(32) not null"`//描述
 }
 
 //植物表
 type Plants struct {
-	Id    int       `xorm:"not null pk INT(11)"`
+	Id    int       `xorm:"not null pk autoincr INT(11)"`
     Name  string   `xorm:"VARCHAR(64) not null"` //植物名称
 	Price int `xorm:"not null INT(11)"`//价格
 	Income int `xorm:"not null INT(11)"`//初始收益
