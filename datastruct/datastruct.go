@@ -120,7 +120,7 @@ const (
 	Player //普通玩家
 )
 
-func CreateUser(code string,permissionId int)*PlayerData{
+func CreateUser(code string,permissionId int,args []interface{})(*PlayerData,[]interface{}){
 	player:=new(PlayerData)
 	timestamp:=time.Now().Unix()
 	player.PermissionId = permissionId
@@ -131,5 +131,9 @@ func CreateUser(code string,permissionId int)*PlayerData{
 	player.HoneyCount = 0
 	player.NickName = "test1"
 	player.Avatar = "avatar"
-	return player
+	args=append(args,PermissionIdField)
+	args=append(args,permissionId)
+	args=append(args,UpdateTimeField)
+	args=append(args,timestamp)
+	return player,args
 }

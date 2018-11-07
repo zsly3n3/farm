@@ -28,14 +28,14 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   var p_data *datastruct.PlayerData
 		   conn:=handle.cacheHandler.GetConn()
 		   defer conn.Close()
-		   args:=make([]interface{},0,10)
+		   args:=make([]interface{},0,20)
 		   openid:=getOpenId(body.Code)
 		   args=append(args,openid)
 		   p_data,isExistRedis = handle.cacheHandler.GetPlayerData(conn,body.Code) //find in redis
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
 			 if !isExistMysql{
-				p_data = datastruct.CreateUser(body.Code,getPermissionId(body.IsAuth))
+				p_data,args= datastruct.CreateUser(body.Code,getPermissionId(body.IsAuth),args)
 			 } else {
 				args=refreshPlayerData(p_data,body.IsAuth,args)
 			 }
