@@ -72,6 +72,33 @@ type PlayerInfo struct {
 	GoldCount int64 `xorm:"bigint not null"`//金币数量
 }
 
+//植物类型表
+type PlantClass struct {
+	Id   int       `xorm:"not null pk INT(11)"` 
+	Desc string `xorm:"VARCHAR(32) not null"`//描述
+}
+
+//植物表
+type Plants struct {
+	Id    int       `xorm:"not null pk INT(11)"`
+    Name  string   `xorm:"VARCHAR(64) not null"` //植物名称
+	Price int `xorm:"not null INT(11)"`//价格
+	Income int `xorm:"not null INT(11)"`//初始收益
+	ExpForAnimal int `xorm:"not null INT(11)"`//增加动物经验
+	ClassId int `xorm:"not null INT(11)"` //关联PlantClass中id
+}
+
+type PlantData struct{
+	Id int //植物id
+	C int //类型id
+	N string //植物名称
+	P int //价格
+	I int //初始收益
+	E int //增加动物经验
+}
+
+
+
 type UserLogin struct{
 	 PlatformId Platform //平台
 	 Code string //身份标识

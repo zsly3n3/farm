@@ -5,6 +5,7 @@ import (
 	"github.com/go-xorm/xorm"
 	"farm/datastruct"
 	"farm/log"
+	"farm/tools"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -38,19 +39,41 @@ func resetDB(engine *xorm.Engine){
 	user:=&datastruct.UserInfo{}
 	player:=&datastruct.PlayerInfo{}
 	perm:=&datastruct.Permission{}
-	err:=engine.DropTables(user,player,perm)
+	plants:=&datastruct.Plants{}
+	plantClass:=&datastruct.PlantClass{}
+	err:=engine.DropTables(user,player,perm,plants,plantClass)
     errhandle(err)
-	err=engine.CreateTables(user,player,perm)
+	err=engine.CreateTables(user,player,perm,plants,plantClass)
     errhandle(err)
 }
 
 func initData(engine *xorm.Engine){
-	data:=createPermissionData()
-	_, err := engine.Insert(&data)
-	errhandle(err)
+	createPermissionData(engine)
+	createPlantClass(engine)
+	createPlant(engine)
 }
 
-func createPermissionData()[]datastruct.Permission{
+func createPlantClass(engine *xorm.Engine){
+	 a:= datastruct.PlantClass{
+		Desc:"普通类植物",
+	 }
+	 b:= datastruct.PlantClass{
+		Desc:"仙类植物",
+	 }
+	 data:=make([]datastruct.PlantClass,0)
+	 data = append(data,a)
+	 data = append(data,b)
+	 _, err := engine.Insert(&data)
+	 errhandle(err)
+}
+
+func createPlant(engine *xorm.Engine){
+	  data:=tools.GetPlantsInfo()
+	  _, err := engine.Insert(&data)
+	  errhandle(err)
+}
+
+func createPermissionData(engine *xorm.Engine){
 	a:= datastruct.Permission{
 		Name:"游客",
 	}
@@ -60,7 +83,11 @@ func createPermissionData()[]datastruct.Permission{
 	// c:= datastruct.Permission{
 	// 	Name:"会员",
 	// }
-	return []datastruct.Permission{a,b}
+	data:=make([]datastruct.Permission,0)
+	data = append(data,a)
+	data = append(data,b)
+	_, err := engine.Insert(&data)
+	errhandle(err)
 }
 
 func errhandle(err error){

@@ -61,7 +61,7 @@ func refreshPlayerData(p_data *datastruct.PlayerData,isauth int){
 	if isauth == 1 && p_data.PermissionId == int(datastruct.Guest){
 		p_data.PermissionId = int(datastruct.Player)
 	}
-	p_data.UpdateTime = time.Now().Unix()   
+	p_data.UpdateTime = time.Now().Unix()
 }
 
 func (handle *EventHandler)fromRedisToMysql(token string){

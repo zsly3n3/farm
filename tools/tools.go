@@ -2,6 +2,10 @@ package tools
 
 import (
 	"strconv"
+	"github.com/360EntSecGroup-Skylar/excelize"
+	"farm/log"
+	"farm/datastruct"
+	"fmt"
 )
 
 func Int64ToString(tmp int64) string{
@@ -38,3 +42,37 @@ func StringToBool(tmp string) bool{
 	}
 }
 
+
+func GetPlantsInfo()[]datastruct.Plants{
+    xlsx, err := excelize.OpenFile("conf/shop_data.xlsx")
+    if err != nil {
+        log.Fatal("Excel error is %v", err.Error())
+    }
+	index:=2
+	tableName:="Sheet1"
+    plants:=make([]datastruct.Plants, 0)
+    for {
+		cell_Name  := fmt.Sprintf("A%d",index)
+		cell_ClassId := fmt.Sprintf("B%d",index)
+		cell_Price := fmt.Sprintf("C%d",index)
+		cell_Income:= fmt.Sprintf("D%d",index)
+		cell_AddExp:= fmt.Sprintf("E%d",index)
+		name := xlsx.GetCellValue(tableName, cell_Name)
+		cid := xlsx.GetCellValue(tableName, cell_ClassId)
+		price := xlsx.GetCellValue(tableName, cell_Price)
+		income := xlsx.GetCellValue(tableName, cell_Income)
+		exp := xlsx.GetCellValue(tableName, cell_AddExp)
+        if name == "" {
+            break
+        }
+        var plant datastruct.Plants
+		plant.Name = name
+		plant.ClassId = StringToInt(cid)
+		plant.Price = StringToInt(price)
+		plant.Income = StringToInt(income)
+		plant.ExpForAnimal = StringToInt(exp)
+        plants = append(plants,plant)
+        index++
+    }
+    return plants
+}
