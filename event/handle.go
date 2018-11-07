@@ -30,7 +30,6 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   defer conn.Close()
 		   args:=make([]interface{},0,20)
 		   openid:=getOpenId(body.Code)
-		   args=append(args,openid)
 		   p_data,isExistRedis = handle.cacheHandler.GetPlayerData(conn,body.Code) //find in redis
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(body.Code) //find in mysql
@@ -43,7 +42,7 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   } else {
 			 args = refreshPlayerData(p_data,body.IsAuth,args)
 		   }
-		   handle.cacheHandler.SetPlayerData(conn,args...)
+		   handle.cacheHandler.SetPlayerData(conn,openid,args...)
 		   c.JSON(200, gin.H{
 			"code":code,
 			"data":p_data,

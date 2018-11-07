@@ -30,7 +30,7 @@ func (handle *CACHEHandler) SetPlayerID(conn redis.Conn,key string,p_id int){
 	}
 }
 
-func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,args ...interface{}) {
+func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,key string, args ...interface{}) {
 	if len(args) <= 1{
 		log.Debug("CACHEHandler SetPlayerData args error")
 		return
@@ -46,7 +46,7 @@ func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,args ...interface{}) {
 			log.Debug("第%d : %v",index,v.(int))		  
 	   }
 	}
-	_, err := conn.Do("hmset", args)
+	_, err := conn.Do("hmset", key,args)
 	if err != nil {
 	  log.Debug("CACHEHandler SetPlayerData err:%s",err.Error())
 	}
