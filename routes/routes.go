@@ -8,14 +8,15 @@ import (
 
 func getTest(r *gin.Engine,eventHandler *event.EventHandler) {
 	r.GET("/test", func(c *gin.Context) {
-    if checkVersion(c){
-			data:=new(datastruct.TestData)
-			data.UserName = "user1"
-			data.Avatar="avatar1"
-			c.JSON(200, gin.H{
-			"data": data,
-			})
+		if !checkVersion(c,eventHandler){
+			return
 		}
+		data:=new(datastruct.TestData)
+		data.UserName = "user1"
+		data.Avatar="avatar1"
+		c.JSON(200, gin.H{
+			"data": data,
+		})
   })
 }
 
@@ -44,11 +45,11 @@ func test2(r *gin.Engine,eventHandler *event.EventHandler) {
 	})
 }
 
-func checkVersion(c *gin.Context) bool{
+func checkVersion(c *gin.Context,eventHandler *event.EventHandler) bool{
 	  //map[string][]string
 		version,isExist:=c.Request.Header["Version"]
 		tf:=false
-		if isExist && version[0] == "1.0"{
+		if isExist && version[0] == eventHandler.Version{
 			 tf = true
 		} else {
 			c.JSON(200, gin.H{
