@@ -72,3 +72,14 @@ func rollback(err_str string,session *xorm.Session){
 	log.Debug("will rollback,err_str:%v",err_str)
 	session.Rollback()
 }
+
+
+func(handle *DBHandler)GetPlantsData()(datastruct.CodeType,[]datastruct.PlantData){
+	engine:=handle.mysqlEngine
+	plants := make([]datastruct.PlantData, 0)
+	err := engine.Find(&plants)
+	if err != nil{
+	   return datastruct.GetDataFailed,nil 
+	}
+    return datastruct.NULLError,plants
+}

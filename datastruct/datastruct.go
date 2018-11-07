@@ -28,6 +28,7 @@ const (
 	ParamError//参数错误,数据为空或者类型不对等
 	LoginFailed//登录失败,如无此账号或者密码错误等
 	JsonParseFailedFromPostBody//来自post请求中的Body解析json失败
+	GetDataFailed//获取数据失败
 )
 
 
@@ -99,7 +100,7 @@ type PlantData struct{
 
 
 type ShopData struct{
-	Plant []PlantData
+	Plants []PlantData
 }
 
 

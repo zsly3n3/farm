@@ -85,8 +85,10 @@ func getPermissionId(isauth int) int{
 
 func (handle *EventHandler)GetShopData(c *gin.Context){
 	 var data datastruct.ShopData
+	 code,plants:= handle.dbHandler.GetPlantsData()
+	 data.Plants = plants 
 	 c.JSON(200, gin.H{
-		"code":0,
+		"code":int(code),
 		"data":data,
 	})
 }
