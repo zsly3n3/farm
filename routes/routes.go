@@ -21,38 +21,42 @@ func getTest(r *gin.Engine,eventHandler *event.EventHandler) {
 }
 
 func login(r *gin.Engine,eventHandler *event.EventHandler) {
+	
+ r.POST("/login", func(c *gin.Context) {
 	if !checkVersion(c,eventHandler){
 		return
 	}
- r.POST("/login", func(c *gin.Context) {
    eventHandler.Login(c)
  })
 }
 
 func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
-	if !checkVersion(c,eventHandler){
-		return
-	}
+	
 	r.GET("/shop", func(c *gin.Context) {
+		if !checkVersion(c,eventHandler){
+			return
+		}
 		eventHandler.GetShopData(c)
    })
 }
 
 
 func test1(r *gin.Engine,eventHandler *event.EventHandler) {
+	
+ r.POST("/Test1", func(c *gin.Context) {
 	if !checkVersion(c,eventHandler){
 		return
 	}
- r.POST("/Test1", func(c *gin.Context) {
    eventHandler.Test1(c)
  })
 }
 
 func test2(r *gin.Engine,eventHandler *event.EventHandler) {
-	if !checkVersion(c,eventHandler){
-		return
-	}
+	
 	r.POST("/Test2", func(c *gin.Context) {
+		if !checkVersion(c,eventHandler){
+			return
+		}
 	  eventHandler.Test2(c)
 	})
 }
