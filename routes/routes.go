@@ -46,9 +46,9 @@ func test2(r *gin.Engine,eventHandler *event.EventHandler) {
 
 func checkVersion(c *gin.Context) bool{
 	  //map[string][]string
-		version:=c.Request.Header["Version"]
+		version,isExist:=c.Request.Header["Version"]
 		tf:=false
-		if version[0] == "1.0"{
+		if isExist && version[0] == "1.0"{
 			 tf = true
 		} else {
 			c.JSON(200, gin.H{
