@@ -82,11 +82,11 @@ type PlantClass struct {
 //植物表
 type Plant struct {
 	Id int    `xorm:"not null pk autoincr INT(11)"`
-    N  string `xorm:"VARCHAR(64) not null 'Name'"` //植物名称
-	P int `xorm:"not null INT(11) 'Price'"`//价格
-	I int `xorm:"not null INT(11) 'income'"`//初始收益
-	E int `xorm:"not null INT(11) 'ExpForAnimal'"`//增加动物经验
-	C int `xorm:"not null INT(11) 'ClassId'"` //关联PlantClass中id
+    N  string `xorm:"VARCHAR(64) not null 'name'"` //植物名称
+	P int `xorm:"not null INT(11) 'price'"`//价格
+	I int `xorm:"not null INT(11) 'in_come'"`//初始收益
+	E int `xorm:"not null INT(11) 'exp_for_animal'"`//增加动物经验
+	C int `xorm:"not null INT(11) 'class_id'"` //关联PlantClass中id
 }
 
 type ShopData struct{
