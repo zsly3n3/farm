@@ -7,14 +7,16 @@ import (
 )
 
 func getTest(r *gin.Engine,eventHandler *event.EventHandler) {
-	data:=new(datastruct.TestData)
-	data.UserName = "user1"
-	data.Avatar="avatar1"
 	r.GET("/test", func(c *gin.Context) {
-	   c.JSON(200, gin.H{
-		 "data": data,
-	   })
-   })
+    if checkVersion(c){
+			data:=new(datastruct.TestData)
+			data.UserName = "user1"
+			data.Avatar="avatar1"
+			c.JSON(200, gin.H{
+			"data": data,
+			})
+		}
+  })
 }
 
 func login(r *gin.Engine,eventHandler *event.EventHandler) {
@@ -40,6 +42,20 @@ func test2(r *gin.Engine,eventHandler *event.EventHandler) {
 	r.POST("/Test2", func(c *gin.Context) {
 	  eventHandler.Test2(c)
 	})
+}
+
+func checkVersion(c *gin.Context) bool{
+	  //map[string][]string
+		version:=c.Request.Header["Version"]
+		tf:=false
+		if version[0] == "1.0"{
+			 tf = true
+		} else {
+			c.JSON(200, gin.H{
+				"code": datastruct.VersionError,
+			})
+		}
+		return tf
 }
 
 func Register(r *gin.Engine,eventHandler *event.EventHandler){

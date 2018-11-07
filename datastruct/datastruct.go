@@ -29,11 +29,9 @@ const (
 	LoginFailed//登录失败,如无此账号或者密码错误等
 	JsonParseFailedFromPostBody//来自post请求中的Body解析json失败
 	GetDataFailed//获取数据失败
+	PutDataFailed//修改数据失败
+	VersionError//客户端与服务器版本不一致
 )
-
-
-
-
 
 
 type Platform int //平台

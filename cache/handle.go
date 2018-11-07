@@ -95,8 +95,21 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	return rs
 }
 
+func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastruct.CodeType{
+	conn:=handle.GetConn()
+	defer conn.Close()
+	_, err := conn.Do("hset", key,datastruct.PermissionIdField,permissionId)
+	code:=datastruct.NULLError
+	if err != nil {
+	   code = datastruct.PutDataFailed
+	   log.Debug("CACHEHandler UpdatePermisson err:%s",err.Error())
+	}
+	return code
+}
+
 func (handle *CACHEHandler)TestMoney(key string){
 	conn:=handle.GetConn()
+	defer conn.Close()
 	_, err := conn.Do("hmset", key,datastruct.GoldField,100, datastruct.HoneyField,200)
 	if err != nil {
 		log.Debug("CACHEHandler TestMoney err:%s",err.Error())

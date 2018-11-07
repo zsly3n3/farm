@@ -28,7 +28,6 @@ func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData,bool
 		engine.Id(rs.Id).Get(&playerInfo)
 		rs.GoldCount = playerInfo.GoldCount
 		rs.HoneyCount = playerInfo.HoneyCount
-		log.Debug("DBHandler GetPlayerData true")
 	 }
 	 return rs,isExist
 }
