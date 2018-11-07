@@ -30,7 +30,7 @@ func (handle *CACHEHandler) SetPlayerID(conn redis.Conn,key string,p_id int){
 	}
 }
 
-func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,args []interface{}) {
+func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,args ...interface{}) {
 	if len(args) <= 1{
 		log.Debug("CACHEHandler SetPlayerData args error")
 		return

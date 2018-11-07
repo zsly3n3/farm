@@ -43,7 +43,7 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   } else {
 			 args = refreshPlayerData(p_data,body.IsAuth,args)
 		   }
-		   handle.cacheHandler.SetPlayerData(conn,args)
+		   handle.cacheHandler.SetPlayerData(conn,args...)
 		   c.JSON(200, gin.H{
 			"code":code,
 			"data":p_data,
