@@ -80,27 +80,27 @@ type PlantClass struct {
 }
 
 //植物表
-type Plants struct {
+type Plant struct {
 	Id    int       `xorm:"not null pk autoincr INT(11)"`
-    Name  string   `xorm:"VARCHAR(64) not null"` //植物名称
-	Price int `xorm:"not null INT(11)"`//价格
-	Income int `xorm:"not null INT(11)"`//初始收益
-	ExpForAnimal int `xorm:"not null INT(11)"`//增加动物经验
-	ClassId int `xorm:"not null INT(11)"` //关联PlantClass中id
+    N  string   `xorm:"VARCHAR(64) not null 'name'"` //植物名称
+	P int `xorm:"not null INT(11) 'price'"`//价格
+	I int `xorm:"not null INT(11) 'in_come'"`//初始收益
+	E int `xorm:"not null INT(11) 'exp_for_animal'"`//增加动物经验
+	C int `xorm:"not null INT(11) 'class_id'"` //关联PlantClass中id
 }
 
-type PlantData struct{
-	Id int //植物id
-	C int //类型id
-	N string //植物名称
-	P int //价格
-	I int //初始收益
-	E int //增加动物经验
-}
+// type PlantData struct{
+// 	Id int //植物id
+// 	C int //类型id
+// 	N string //植物名称
+// 	P int //价格
+// 	I int //初始收益
+// 	E int //增加动物经验
+// }
 
 
 type ShopData struct{
-	Plants []PlantData
+	Plants []Plant
 }
 
 

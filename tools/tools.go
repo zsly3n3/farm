@@ -43,14 +43,14 @@ func StringToBool(tmp string) bool{
 }
 
 
-func GetPlantsInfo()[]datastruct.Plants{
+func GetPlantsInfo()[]datastruct.Plant{
     xlsx, err := excelize.OpenFile("conf/shop_data.xlsx")
     if err != nil {
         log.Fatal("Excel error is %v", err.Error())
     }
 	index:=2
 	tableName:="Sheet1"
-    plants:=make([]datastruct.Plants, 0)
+    plants:=make([]datastruct.Plant, 0)
     for {
 		cell_Name  := fmt.Sprintf("A%d",index)
 		cell_ClassId := fmt.Sprintf("B%d",index)
@@ -65,12 +65,12 @@ func GetPlantsInfo()[]datastruct.Plants{
         if name == "" {
             break
         }
-        var plant datastruct.Plants
-		plant.Name = name
-		plant.ClassId = StringToInt(cid)
-		plant.Price = StringToInt(price)
-		plant.Income = StringToInt(income)
-		plant.ExpForAnimal = StringToInt(exp)
+        var plant datastruct.Plant
+		plant.N = name
+		plant.C = StringToInt(cid)
+		plant.P = StringToInt(price)
+		plant.I = StringToInt(income)
+		plant.E = StringToInt(exp)
         plants = append(plants,plant)
         index++
     }

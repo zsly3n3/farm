@@ -39,7 +39,7 @@ func resetDB(engine *xorm.Engine){
 	user:=&datastruct.UserInfo{}
 	player:=&datastruct.PlayerInfo{}
 	perm:=&datastruct.Permission{}
-	plants:=&datastruct.Plants{}
+	plants:=&datastruct.Plant{}
 	plantClass:=&datastruct.PlantClass{}
 	err:=engine.DropTables(user,player,perm,plants,plantClass)
     errhandle(err)
