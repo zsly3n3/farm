@@ -35,6 +35,17 @@ func (handle *CACHEHandler)SetPlayerData(conn redis.Conn,args []interface{}) {
 		log.Debug("CACHEHandler SetPlayerData args error")
 		return
 	}
+	for i,v := range args{
+	   index:=i+1
+	   switch v.(type){
+		 case string:
+			log.Debug("第%d : %v",index,v.(string))
+		 case int64:
+			log.Debug("第%d : %v",index,v.(int64))
+		 case int:
+			log.Debug("第%d : %v",index,v.(int))		  
+	   }
+	}
 	_, err := conn.Do("hmset", args)
 	if err != nil {
 	  log.Debug("CACHEHandler SetPlayerData err:%s",err.Error())
