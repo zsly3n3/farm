@@ -29,7 +29,6 @@ func getRedisPool() *redis.Pool{
 			 errhandle(err)
 			}	
 			conn.Do("SELECT",DB_NAME)
-			conn.Do("flushdb")
             return conn, nil
         },
 	}
@@ -39,8 +38,10 @@ func getRedisPool() *redis.Pool{
 func CreateCACHEHandler()*CACHEHandler {
 	cacheHandler:=new(CACHEHandler)
 	cacheHandler.redisClient = getRedisPool()
+	cacheHandler.clearData()
 	return cacheHandler
 }
+
 
 
 func errhandle(err error){

@@ -106,6 +106,13 @@ func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastru
 	return code
 }
 
+func (handle *CACHEHandler)clearData(){
+	conn:=handle.GetConn()
+	defer conn.Close()
+	conn.Do("flushdb")
+}
+
+
 func (handle *CACHEHandler)TestMoney(key string){
 	conn:=handle.GetConn()
 	defer conn.Close()
