@@ -11,7 +11,6 @@ func (handle *CACHEHandler) GetPlayerData(conn redis.Conn,code string) (*datastr
 	isExist:=false
 	var rs *datastruct.PlayerData
 	ilen, err := conn.Do("hlen", code)
-	log.Debug("ilen:%d",ilen)
     if err == nil && (ilen.(int64)) > 0{
 	   isExist = true
 	   rs = handle.ReadPlayerData(conn,code)

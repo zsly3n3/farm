@@ -29,6 +29,7 @@ func getRedisPool() *redis.Pool{
 			 errhandle(err)
 			}	
 			conn.Do("SELECT",DB_NAME)
+			conn.Do("flushdb")
             return conn, nil
         },
 	}
