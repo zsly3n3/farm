@@ -98,6 +98,10 @@ type PlantData struct{
 }
 
 
+type ShopData struct{
+	Plant []PlantData
+}
+
 
 type UserLogin struct{
 	 PlatformId Platform //平台

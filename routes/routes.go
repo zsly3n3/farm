@@ -23,6 +23,13 @@ func login(r *gin.Engine,eventHandler *event.EventHandler) {
  })
 }
 
+func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
+	r.GET("/shop", func(c *gin.Context) {
+		eventHandler.GetShopData(c)
+   })
+}
+
+
 func test1(r *gin.Engine,eventHandler *event.EventHandler) {
  r.POST("/Test1", func(c *gin.Context) {
    eventHandler.Test1(c)
@@ -37,6 +44,7 @@ func test2(r *gin.Engine,eventHandler *event.EventHandler) {
 
 func Register(r *gin.Engine,eventHandler *event.EventHandler){
 	 getTest(r,eventHandler)
+	 getShopData(r,eventHandler)
 	 login(r,eventHandler)
 	 test1(r,eventHandler)
 	 test2(r,eventHandler)

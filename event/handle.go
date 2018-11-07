@@ -82,6 +82,20 @@ func getPermissionId(isauth int) int{
 	return rs
 }
 
+
+func (handle *EventHandler)GetShopData(c *gin.Context){
+	 var data datastruct.ShopData
+	 c.JSON(200, gin.H{
+		"code":0,
+		"data":data,
+	})
+}
+
+
+
+
+
+
 func (handle *EventHandler)Test1(c *gin.Context){
 	var body datastruct.UserLogin
 	c.BindJSON(&body)
