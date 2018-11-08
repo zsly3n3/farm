@@ -95,6 +95,21 @@ type Plant struct {
 	L int `xorm:"not null INT(11) 'level'"` //植物等级
 }
 
+//动物表
+type Animal struct {
+    Id int    `xorm:"not null pk autoincr INT(11)"`
+    N  string `xorm:"VARCHAR(64) not null 'name'"` //名称
+	I int `xorm:"not null INT(11) 'in_come'"`//增益系数
+	E int `xorm:"not null INT(11) 'exp'"`//升级所需经验
+	C int `xorm:"not null INT(11) 'class_id'"` //关联AnimalClass中id
+	L int `xorm:"not null INT(11) 'level'"` //动物等级
+}
+
+//动物类型表
+type AnimalClass struct {
+	Id   int       `xorm:"not null pk autoincr INT(11)"` 
+	Desc string `xorm:"VARCHAR(32) not null"`//描述
+}
 
 type ShopData struct{
 	Plants []Plant

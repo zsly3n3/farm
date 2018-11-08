@@ -41,9 +41,11 @@ func resetDB(engine *xorm.Engine){
 	perm:=&datastruct.Permission{}
 	plants:=&datastruct.Plant{}
 	plantClass:=&datastruct.PlantClass{}
-	err:=engine.DropTables(user,player,perm,plants,plantClass)
+	animal:=&datastruct.Animal{}
+	animalClass:=&datastruct.AnimalClass{}
+	err:=engine.DropTables(user,player,perm,plants,plantClass,animal,animalClass)
     errhandle(err)
-	err=engine.CreateTables(user,player,perm,plants,plantClass)
+	err=engine.CreateTables(user,player,perm,plants,plantClass,animal,animalClass)
     errhandle(err)
 }
 
@@ -51,26 +53,57 @@ func initData(engine *xorm.Engine){
 	createPermissionData(engine)
 	createPlantClass(engine)
 	createPlant(engine)
+	createAnimalClass(engine)
+	//createAnimal(engine)
 }
 
-func createPlantClass(engine *xorm.Engine){
-	 a:= datastruct.PlantClass{
-		Desc:"普通类植物",
+func createAnimalClass(engine *xorm.Engine){
+	 a:= datastruct.AnimalClass{
+		Desc:"海",
 	 }
-	 b:= datastruct.PlantClass{
-		Desc:"仙类植物",
+	 b:= datastruct.AnimalClass{
+		Desc:"陆",
 	 }
-	 data:=make([]datastruct.PlantClass,0)
+	 c:= datastruct.AnimalClass{
+		Desc:"空",
+	 }
+	 d:= datastruct.AnimalClass{
+		Desc:"神",
+	 }
+	 data:=make([]datastruct.AnimalClass,0)
 	 data = append(data,a)
 	 data = append(data,b)
+	 data = append(data,c)
+	 data = append(data,d)
 	 _, err := engine.Insert(&data)
 	 errhandle(err)
 }
 
+func createPlantClass(engine *xorm.Engine){
+	a:= datastruct.PlantClass{
+	   Desc:"普通类植物",
+	}
+	b:= datastruct.PlantClass{
+	   Desc:"仙类植物",
+	}
+	data:=make([]datastruct.PlantClass,0)
+	data = append(data,a)
+	data = append(data,b)
+	_, err := engine.Insert(&data)
+	errhandle(err)
+}
+
+
 func createPlant(engine *xorm.Engine){
-	  data:=tools.GetPlantsInfo()
-	  _, err := engine.Insert(&data)
-	  errhandle(err)
+	data:=tools.GetPlantsInfo()
+	_, err := engine.Insert(&data)
+	errhandle(err)
+}
+
+func createAnimal(engine *xorm.Engine){
+	data:=tools.GetPlantsInfo()
+	_, err := engine.Insert(&data)
+	errhandle(err)
 }
 
 func createPermissionData(engine *xorm.Engine){
