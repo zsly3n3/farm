@@ -77,9 +77,12 @@ func test2(r *gin.Engine,eventHandler *event.EventHandler) {
 func checkToken(c *gin.Context) (string,bool){
 	  tokens,isExist:=c.Request.Header["Token"]
 		tf:=false
-		token:=tokens[0]
-		if isExist && token != ""{
-			 tf = true
+		var token string
+		if isExist{
+			 token=tokens[0]
+			 if token != "" {
+				  tf = true 
+			 }
 		} else{
 			c.JSON(200, gin.H{
 				"code": datastruct.TokenNull,
