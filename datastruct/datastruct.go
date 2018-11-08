@@ -82,8 +82,7 @@ type Soil struct{
 	Price int `xorm:"not null INT(11) "`//初始价格
 	InCome int `xorm:"not null INT(11) "`//初始收益
 	DefaultLevel int `xorm:"not null INT(11) "` //默认等级
- }
-
+}
 
 //植物表
 type Plant struct {
@@ -93,7 +92,9 @@ type Plant struct {
 	I int `xorm:"not null INT(11) 'in_come'"`//初始收益
 	E int `xorm:"not null INT(11) 'exp_for_animal'"`//增加动物经验
 	C int `xorm:"not null INT(11) 'class_id'"` //关联PlantClass中id
+	L int `xorm:"not null INT(11) 'level'"` //植物等级
 }
+
 
 type ShopData struct{
 	Plants []Plant

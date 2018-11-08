@@ -96,3 +96,13 @@ func(handle *DBHandler)GetPlantsData()(datastruct.CodeType,[]datastruct.Plant){
 	}
     return datastruct.NULLError,plants
 }
+
+func(handle *DBHandler)GetPlantsMap()map[int64]*datastruct.Plant{
+	engine:=handle.mysqlEngine
+	plants := make(map[int64]*datastruct.Plant)
+    err := engine.Find(&plants)
+	if err != nil{
+	   log.Debug("GetPlantsMap error:%v",err.Error())
+	}
+	return plants
+}
