@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"farm/datastruct"
 	"farm/event"
-	"farm/log"
+	//"farm/log"
 )
 
 func getTest(r *gin.Engine,eventHandler *event.EventHandler) {
@@ -76,7 +76,7 @@ func test2(r *gin.Engine,eventHandler *event.EventHandler) {
 }
 
 func checkToken(c *gin.Context) (string,bool){
-	  tokens,isExist:=c.Request.Header["Token"]
+	  tokens,isExist:=c.Request.Header["Apptoken"]
 		tf:=false
 		var token string
 		if isExist{
@@ -94,10 +94,7 @@ func checkToken(c *gin.Context) (string,bool){
 
 func checkVersion(c *gin.Context,eventHandler *event.EventHandler) bool{
 	  //map[string][]string
-		version,isExist:=c.Request.Header["appversion"]
-		for k,v :=range c.Request.Header{
-		   log.Debug("key:%v, value:%v",k,v[0])
-		}
+		version,isExist:=c.Request.Header["Appversion"]
 		tf:=false
 		if isExist && version[0] == eventHandler.Version{
 			 tf = true
