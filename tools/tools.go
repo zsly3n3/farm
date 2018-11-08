@@ -80,7 +80,7 @@ func GetPlantsInfo()[]datastruct.Plant{
 
 
 func GetSoildInfo()[]datastruct.SoilData{
-	xlsx, err := excelize.OpenFile("conf/shop_data.xlsx")
+	xlsx, err := excelize.OpenFile("conf/soil_data.xlsx")
     if err != nil {
         log.Fatal("Excel error is %v", err.Error())
     }
