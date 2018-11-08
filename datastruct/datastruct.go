@@ -1,10 +1,5 @@
 package datastruct
 
-import (
-	"time"
-)
-
-
 const NULLSTRING = ""
 const NULLID = -1
 
@@ -78,6 +73,15 @@ type PlantClass struct {
 	Desc string `xorm:"VARCHAR(32) not null"`//描述
 }
 
+type Soil struct{
+	Id   int       `xorm:"not null pk autoincr INT(11)"` 
+	Index int `xorm:"VARCHAR(32) not null"`//土地位置索引
+	Price int `xorm:"not null INT(11) "`//初始价格
+	InCome int `xorm:"not null INT(11) "`//初始收益
+	DefaultLevel int `xorm:"not null INT(11) "` //默认等级
+ }
+
+
 //植物表
 type Plant struct {
 	Id int    `xorm:"not null pk autoincr INT(11)"`
@@ -110,7 +114,19 @@ type PlayerData struct{
 	HoneyCount int64 //蜂蜜数量
 	NickName string
 	Avatar string
+	Soil []SoilData //玩家土地信息
 }
+
+type SoilData struct{
+	Index int //土地索引
+	Level int //土地等级
+	Isbought int//是否购买
+	PlantID int //0表示没有种植
+	Price int  //当前价格
+	Factor int //生产系数
+}
+
+
 
 type PermissionType int //错误码
 const (
@@ -118,16 +134,3 @@ const (
 	Player //普通玩家
 )
 
-func CreateUser(code string,permissionId int)*PlayerData{
-	player:=new(PlayerData)
-	timestamp:=time.Now().Unix()
-	player.PermissionId = permissionId
-	player.CreatedAt = timestamp
-	player.UpdateTime = timestamp
-	player.Token = code
-	player.GoldCount = 0
-	player.HoneyCount = 0
-	player.NickName = "test1"
-	player.Avatar = "avatar"
-	return player
-}

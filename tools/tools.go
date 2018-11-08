@@ -6,6 +6,7 @@ import (
 	"farm/log"
 	"farm/datastruct"
 	"fmt"
+	"time"
 )
 
 func Int64ToString(tmp int64) string{
@@ -75,4 +76,52 @@ func GetPlantsInfo()[]datastruct.Plant{
         index++
     }
     return plants
+}
+
+
+func GetSoildInfo()[]datastruct.SoilData{
+	xlsx, err := excelize.OpenFile("conf/shop_data.xlsx")
+    if err != nil {
+        log.Fatal("Excel error is %v", err.Error())
+    }
+	index:=2
+	tableName:="Sheet1"
+	soils:=make([]datastruct.SoilData, 0)
+    for {
+		cell_index  := fmt.Sprintf("A%d",index)
+		cell_price := fmt.Sprintf("B%d",index)
+		cell_factor := fmt.Sprintf("C%d",index)
+		location := xlsx.GetCellValue(tableName, cell_index)
+		price := xlsx.GetCellValue(tableName, cell_price)
+		factor := xlsx.GetCellValue(tableName, cell_factor)
+        if location == "" {
+            break
+		}
+		var soil datastruct.SoilData
+		soil.Index = StringToInt(location)
+		soil.Price = StringToInt(price)
+		soil.Factor = StringToInt(factor)
+		soil.Level = 1
+		soil.Isbought = 0
+		soil.PlantID =0
+        soils = append(soils,soil)
+        index++
+    }
+	return soils
+}
+
+
+func CreateUser(code string,permissionId int)*datastruct.PlayerData{
+	player:=new(datastruct.PlayerData)
+	timestamp:=time.Now().Unix()
+	player.PermissionId = permissionId
+	player.CreatedAt = timestamp
+	player.UpdateTime = timestamp
+	player.Token = code
+	player.GoldCount = 0
+	player.HoneyCount = 0
+	player.NickName = "test1"
+	player.Avatar = "avatar"
+	player.Soil = GetSoildInfo()
+	return player
 }
