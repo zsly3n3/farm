@@ -15,6 +15,6 @@ func CreateEventHandler()*EventHandler{
 	 eventHandler:=new(EventHandler)
 	 eventHandler.cacheHandler = cache.CreateCACHEHandler() 
 	 eventHandler.dbHandler = db.CreateDBHandler() 
-	 eventHandler.Version = "1.0"
+	 eventHandler.Version = "1.0.0.0"
 	 return eventHandler
 }

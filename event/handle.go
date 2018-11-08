@@ -66,7 +66,6 @@ func getOpenId(code string) string{
 }
 
 
-
 func refreshPlayerData(p_data *datastruct.PlayerData,isauth int){
 	if isauth == 1 && p_data.PermissionId == int(datastruct.Guest){
 	  p_data.PermissionId = int(datastruct.Player)
@@ -90,6 +89,11 @@ func getPermissionId(isauth int) int{
 		rs = 2
 	}
 	return rs
+}
+
+func (handle *EventHandler)UpdatePermisson(key string,permissionId int) datastruct.CodeType{
+	code:=handle.cacheHandler.UpdatePermisson(key,permissionId)
+	return code
 }
 
 

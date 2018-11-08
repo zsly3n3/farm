@@ -31,6 +31,7 @@ const (
 	GetDataFailed//获取数据失败
 	PutDataFailed//修改数据失败
 	VersionError//客户端与服务器版本不一致
+	TokenNull//没有Token或者值为空
 )
 
 
@@ -55,7 +56,7 @@ type UserInfo struct {
 	IdentityId string   `xorm:"VARCHAR(128) not null"` //标识id
 	PermissionId int `xorm:"not null INT(11)"` //权限id
 	CreatedAt int64 `xorm:"bigint not null"` //创建用户的时间
-	UpdateTime int64 `xorm:"bigint not null"` //最近一次登录的时间
+	UpdateTime int64 `xorm:"bigint not null"` //最近一次离开或者登陆的时间
 	NickName string `xorm:"VARCHAR(256) not null"` //昵称
 	Avatar string `xorm:"VARCHAR(256) not null"`//头像
 }
@@ -110,7 +111,6 @@ type PlayerData struct{
 	NickName string
 	Avatar string
 }
-
 
 type PermissionType int //错误码
 const (
