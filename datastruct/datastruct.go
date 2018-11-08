@@ -123,7 +123,7 @@ type SoilData struct{
 	Isbought int//是否购买
 	PlantID int //0表示没有种植
 	Price int  //当前价格
-	Factor int //生产系数
+	Factor float64 //生产系数
 }
 
 

@@ -27,6 +27,11 @@ rs,_:=strconv.Atoi(tmp)
 return rs
 }
 
+func StringToFloat64(tmp string)float64{
+	rs,_ := strconv.ParseFloat(tmp,64)
+	return rs
+}
+
 func BoolToString(tmp bool) string{
 	if tmp == false{
 		return "0"	
@@ -100,7 +105,7 @@ func GetSoildInfo()[]datastruct.SoilData{
 		var soil datastruct.SoilData
 		soil.Index = StringToInt(location)
 		soil.Price = StringToInt(price)
-		soil.Factor = StringToInt(factor)
+		soil.Factor = StringToFloat64(factor)
 		soil.Level = 1
 		soil.Isbought = 0
 		soil.PlantID =0
