@@ -93,7 +93,7 @@ func checkToken(c *gin.Context) (string,bool){
 
 func checkVersion(c *gin.Context,eventHandler *event.EventHandler) bool{
 	  //map[string][]string
-		version,isExist:=c.Request.Header["Version"]
+		version,isExist:=c.Request.Header["AppVersion"]
 		tf:=false
 		if isExist && version[0] == eventHandler.Version{
 			 tf = true
