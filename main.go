@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"farm/event"
 	"farm/routes"
-	"strings"
-	"fmt"
-	"net/http"
+	// "strings"
+	// "fmt"
+	// "net/http"
 )
 
 
@@ -15,9 +15,10 @@ var eventHandler *event.EventHandler
 //跨域
 func cors() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
-		// c.Next()
-
+		c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Add("Access-Control-Allow-Headers", "appversion,apptoken")
+		c.Next()
+        /*
 		method := c.Request.Method
 
         origin := c.Request.Header.Get("Origin")
@@ -35,7 +36,7 @@ func cors() gin.HandlerFunc {
             //下面的都是乱添加的-_-~
             // c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
             c.Header("Access-Control-Allow-Origin", "*")
-            c.Header("Access-Control-Allow-Headers", headerStr)
+            c.Header("Access-Control-Allow-Headers", "appversion,apptoken")
             c.Header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
             // c.Header("Access-Control-Allow-Headers", "Authorization, Content-Length, X-CSRF-Token, Accept, Origin, Host, Connection, Accept-Encoding, Accept-Language,DNT, X-CustomHeader, Keep-Alive, User-Agent, X-Requested-With, If-Modified-Since, Cache-Control, Content-Type, Pragma")
             c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
@@ -49,7 +50,7 @@ func cors() gin.HandlerFunc {
             c.JSON(http.StatusOK, "Options Request!")
         }
 
-        c.Next()
+        c.Next()*/
 	}
 }
 
