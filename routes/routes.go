@@ -106,6 +106,7 @@ func Register(r *gin.Engine,eventHandler *event.EventHandler){
 	 getTest(r,eventHandler)
 	 getShopData(r,eventHandler)
 	 login(r,eventHandler)
+	 updatePermisson(r,eventHandler)
 	 test1(r,eventHandler)
 	 test2(r,eventHandler)
 }
