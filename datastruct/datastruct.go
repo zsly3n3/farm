@@ -148,10 +148,10 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	   return nil
 	}
 	mp:=make(map[string]interface{})
-	mp["PermissionId"] = p_data.PermissionId
-	mp["Token"] = p_data.Token
-	mp["GoldCount"] = p_data.GoldCount
-	mp["HoneyCount"] = p_data.HoneyCount
+	mp["PermissionId"] = &p_data.PermissionId
+	mp["Token"] = &p_data.Token
+	mp["GoldCount"] = &p_data.GoldCount
+	mp["HoneyCount"] = &p_data.HoneyCount
 	mp["Soil"] = p_data.Soil
 	return mp
 }
