@@ -127,6 +127,7 @@ func CreateUser(code string,permissionId int)*datastruct.PlayerData{
 	player.HoneyCount = 0
 	player.NickName = "test1"
 	player.Avatar = "avatar"
+	player.PlantLevel = 1
 	player.Soil = GetSoildInfo()
 	return player
 }

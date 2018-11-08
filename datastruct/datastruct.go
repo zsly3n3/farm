@@ -46,6 +46,8 @@ const IdentityIdField = "IdentityId"
 const NickNameField = "NickName"
 const AvatarField = "Avatar"
 
+//plantlevel , soil 保存到redis和mysql
+
 type UserInfo struct {
 	Id    int       `xorm:"not null pk autoincr INT(11)"`
 	IdentityId string   `xorm:"VARCHAR(128) not null"` //标识id
@@ -64,7 +66,8 @@ type Permission struct {
 type PlayerInfo struct {
 	Id    int       `xorm:"not null pk INT(11)"` //关联UserInfo中id
 	HoneyCount int64 `xorm:"bigint not null"`//蜂蜜数量
-	GoldCount int64 `xorm:"bigint not null"`//金币数量
+	GoldCount  int64 `xorm:"bigint not null"`//金币数量
+	PlantLevel int `xorm:"not null INT(11) "`//可购买商店植物的等级
 }
 
 //植物类型表
@@ -114,6 +117,7 @@ type PlayerData struct{
 	HoneyCount int64 //蜂蜜数量
 	NickName string
 	Avatar string
+	PlantLevel int //可购买商店植物的等级
 	Soil []SoilData //玩家土地信息
 }
 
@@ -134,14 +138,6 @@ const (
 	Player //普通玩家
 )
 
-
-// type ReponseLoginData struct{
-// 	PermissionId int //权限id
-// 	Token string //标识id IdentityId
-// 	GoldCount int64 //金币数量
-// 	HoneyCount int64 //蜂蜜数量
-// 	Soil []SoilData //玩家土地信息
-// }
 
 func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	if p_data == nil{
