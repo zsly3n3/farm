@@ -123,7 +123,7 @@ type SoilData struct{
 	Isbought int//是否购买
 	PlantID int //0表示没有种植
 	Price int  //当前价格
-	Factor float64 //生产系数
+	Factor int //生产系数
 }
 
 
@@ -133,4 +133,26 @@ const (
 	Guest PermissionType = 1 +iota //游客
 	Player //普通玩家
 )
+
+
+// type ReponseLoginData struct{
+// 	PermissionId int //权限id
+// 	Token string //标识id IdentityId
+// 	GoldCount int64 //金币数量
+// 	HoneyCount int64 //蜂蜜数量
+// 	Soil []SoilData //玩家土地信息
+// }
+
+func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
+	if p_data == nil{
+	   return nil
+	}
+	mp:=make(map[string]interface{})
+	mp["PermissionId"] = p_data.PermissionId
+	mp["Token"] = p_data.Token
+	mp["GoldCount"] = p_data.GoldCount
+	mp["HoneyCount"] = p_data.HoneyCount
+	mp["Soil"] = p_data.Soil
+	return mp
+}
 

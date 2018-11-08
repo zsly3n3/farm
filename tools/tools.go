@@ -105,7 +105,7 @@ func GetSoildInfo()[]datastruct.SoilData{
 		var soil datastruct.SoilData
 		soil.Index = StringToInt(location)
 		soil.Price = StringToInt(price)
-		soil.Factor = StringToFloat64(factor)
+		soil.Factor = StringToInt(factor)
 		soil.Level = 1
 		soil.Isbought = 0
 		soil.PlantID =0

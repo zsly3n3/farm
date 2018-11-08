@@ -44,10 +44,9 @@ func (handle *EventHandler)Login(c *gin.Context){
 			 refreshPlayerData(p_data,body.IsAuth)
 			 handle.cacheHandler.SetPlayerSomeData(conn,p_data)
 		   }
-		   
 		   c.JSON(200, gin.H{
 			"code":code,
-			"data":p_data,
+			"data":datastruct.ReponseLoginData(p_data),
 		   })
 		 } else {
 			c.JSON(200, gin.H{
@@ -107,11 +106,6 @@ func (handle *EventHandler)GetShopData(c *gin.Context){
 		"data":data,
 	})
 }
-
-
-
-
-
 
 func (handle *EventHandler)Test1(c *gin.Context){
 	var body datastruct.UserLogin
