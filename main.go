@@ -25,7 +25,7 @@ func cors() gin.HandlerFunc {
  
 		//放行所有OPTIONS方法
 		if method == "OPTIONS" {
-		   c.AbortWithStatus(http.StatusNoContent)
+		   c.AbortWithStatus(204)
 		}
 		// 处理请求
 		c.Next()
