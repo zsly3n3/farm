@@ -32,10 +32,10 @@ func login(r *gin.Engine,eventHandler *event.EventHandler) {
 
 func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
 	r.GET("/shop", func(c *gin.Context) {
-		if !checkVersion(c,eventHandler){
-			return
-		}
-		eventHandler.GetShopData(c)
+	if !checkVersion(c,eventHandler){
+	 return
+	}
+	eventHandler.GetShopData(c)
   })
 }
 

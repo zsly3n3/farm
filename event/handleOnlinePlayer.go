@@ -48,7 +48,8 @@ func (handle *EventHandler)createUser(code string,permissionId int)*datastruct.P
     player.SoilLevel = 1
     player.Soil = createSoil(handle.soils)
     player.PetBar = createPetbar(handle.petbars)
-	return player
+    player.OwnPlants = createOwnPlants()
+    return player
 }
 
 func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
@@ -81,4 +82,9 @@ func createPetbar(petbars []datastruct.PetbarData)[]datastruct.PlayerPetbar{
         rs = append(rs,tmp)
     }
     return rs
+}
+
+func createOwnPlants()[]int{
+     rs:=make([]int,0)
+     return rs 
 }

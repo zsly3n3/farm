@@ -67,7 +67,8 @@ type PlayerInfo struct {
 	Id    int       `xorm:"not null pk INT(11)"` //关联UserInfo中id
 	HoneyCount int64 `xorm:"bigint not null"`//蜂蜜数量
 	GoldCount  int64 `xorm:"bigint not null"`//金币数量
-	PlantLevel int `xorm:"not null INT(11) "`//可购买商店植物的等级
+	PlantLevel int `xorm:"not null INT(11) "`//玩家的种植等级
+	AnimalLevel int `xorm:"not null INT(11) "`//玩家的饲养等级
 }
 
 //植物类型表
@@ -76,13 +77,6 @@ type PlantClass struct {
 	Desc string `xorm:"VARCHAR(32) not null"`//描述
 }
 
-type Soil struct{
-	Id   int       `xorm:"not null pk autoincr INT(11)"` 
-	Index int `xorm:"VARCHAR(32) not null"`//土地位置索引
-	Price int `xorm:"not null INT(11) "`//初始价格
-	InCome int `xorm:"not null INT(11) "`//初始收益
-	DefaultLevel int `xorm:"not null INT(11) "` //默认等级
-}
 
 //植物表
 type Plant struct {
@@ -92,8 +86,11 @@ type Plant struct {
 	I int `xorm:"not null INT(11) 'in_come'"`//初始收益
 	E int `xorm:"not null INT(11) 'exp_for_animal'"`//增加动物经验
 	C int `xorm:"not null INT(11) 'class_id'"` //关联PlantClass中id
-	L int `xorm:"not null INT(11) 'level'"` //植物等级
+	L int `xorm:"not null INT(11) 'level'"` //要求玩家种植等级
 }
+
+
+
 
 //动物表
 type Animal struct {
@@ -102,7 +99,7 @@ type Animal struct {
 	I int `xorm:"not null INT(11) 'in_come'"`//增益系数
 	E int `xorm:"not null INT(11) 'exp'"`//升级所需经验
 	C int `xorm:"not null INT(11) 'class_id'"` //关联AnimalClass中id
-	L int `xorm:"not null INT(11) 'level'"` //动物等级
+	L int `xorm:"not null INT(11) 'level'"` //要求玩家饲养等级
 }
 
 //动物类型表
@@ -124,6 +121,7 @@ type UserLogin struct{
 	 Avatar string
 }
 
+//save reids,save mysql 
 type PlayerData struct{
 	Id int //对应数据库中userinfo表中的id
 	PermissionId int //权限id
@@ -138,6 +136,7 @@ type PlayerData struct{
 	SoilLevel int //可购买土地或宠物栏的等级
 	Soil []PlayerSoil //玩家土地信息
 	PetBar []PlayerPetbar //宠物栏信息
+	OwnPlants []int //已购买的植物ID
 }
 
 type SoilData struct{
@@ -196,6 +195,8 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp[HoneyField] = &(p_data.HoneyCount)
 	mp["Soil"] = p_data.Soil
 	mp["Petbar"] = p_data.PetBar
+	mp["PlantLevel"] = p_data.PlantLevel
+	mp["OwnPlants"] = p_data.OwnPlants
 	return mp
 }
 
