@@ -135,28 +135,48 @@ type PlayerData struct{
 	NickName string
 	Avatar string
 	PlantLevel int //可购买商店植物的等级
-	Soil []SoilData //玩家土地信息
-	PetBar []PetbarData //宠物栏信息
+	SoilLevel int //可购买土地或宠物栏的等级
+	Soil []PlayerSoil //玩家土地信息
+	PetBar []PlayerPetbar //宠物栏信息
 }
 
 type SoilData struct{
 	Index int //土地索引
 	Level int //土地等级
-	Isbought int//是否购买
-	PlantId int //0表示没有种植
 	Price int  //当前价格
 	Factor int //生产系数
 	Require int //开启条件
 }
 
+type GoodsState int 
+const (
+	Locked GoodsState = iota //有锁
+	Unlocked//解锁未购买
+	Owned//已拥有
+)
+
+type PlayerSoil struct{
+	Index int //土地索引
+	Level int //土地等级
+	PlantId int //0表示没有种植
+	Price int  //当前价格
+	Factor int //生产系数
+	State GoodsState
+}
 
 type PetbarData struct{
 	Index int //土地索引
-	Isbought int//是否购买
-	AnimalId int //0表示没有养宠物
 	Price int  //当前价格
 	Require int //开启条件
 }
+
+type PlayerPetbar struct{
+	Index int //土地索引
+	AnimalId int //0表示没有养宠物
+	Price int  //当前价格
+	State GoodsState
+}
+
 
 type PermissionType int //错误码
 const (
@@ -174,7 +194,6 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp["Token"] = &(p_data.Token)
 	mp[GoldField] = &(p_data.GoldCount)
 	mp[HoneyField] = &(p_data.HoneyCount)
-	mp["PlantLevel"] = &(p_data.PlantLevel)
 	mp["Soil"] = p_data.Soil
 	mp["Petbar"] = p_data.PetBar
 	return mp

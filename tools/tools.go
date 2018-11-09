@@ -145,12 +145,10 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
 		soil.Factor = StringToInt(factor)
 		soil.Require = StringToInt(require)
 		soil.Level = 1
-		soil.Isbought = 0
-		soil.PlantId =0
         soils = append(soils,soil)
         index++
 	}
-	
+
 	index=2
 	petbarTableName:="Sheet2"
 	petbars:=make([]datastruct.PetbarData, 0,4)
@@ -168,8 +166,6 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
 		petbar.Index = StringToInt(location)
 		petbar.Price = StringToInt(price)
 		petbar.Require = StringToInt(require)
-		petbar.Isbought = 0
-		petbar.AnimalId = 0
         petbars = append(petbars,petbar)
         index++
     }

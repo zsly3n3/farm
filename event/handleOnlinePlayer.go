@@ -45,11 +45,44 @@ func (handle *EventHandler)createUser(code string,permissionId int)*datastruct.P
 	player.NickName = "test1"
 	player.Avatar = "avatar"
     player.PlantLevel = 1
-    soils:=handle.soils
-    petbars:=handle.petbars
-    player.Soil=make([]datastruct.SoilData,len(soils),len(soils))
-    player.PetBar=make([]datastruct.PetbarData,len(petbars),len(petbars))
-    copy(player.Soil,soils)
-    copy(player.PetBar,petbars)
+    player.SoilLevel = 1
+    player.Soil = createSoil(handle.soils)
+    player.PetBar = createPetbar(handle.petbars)
 	return player
+}
+
+func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
+    rs:=make([]datastruct.PlayerSoil,0,len(soils))
+    for i,v := range soils{
+        var tmp datastruct.PlayerSoil
+        state:=datastruct.Locked
+        if i == 0{
+          state = datastruct.Unlocked
+        }
+        tmp.Index = v.Index
+        tmp.Factor = v.Factor
+        tmp.Level = v.Level
+        tmp.PlantId = 0
+        tmp.Price = v.Price
+        tmp.State = state
+        rs = append(rs,tmp)
+    }
+    return rs
+}
+
+func createPetbar(petbars []datastruct.PetbarData)[]datastruct.PlayerPetbar{
+    rs:=make([]datastruct.PlayerPetbar,0,len(petbars))
+    for i,v := range petbars{
+        var tmp datastruct.PlayerPetbar
+        state:=datastruct.Locked
+        if i == 0{
+          state = datastruct.Unlocked
+        }
+        tmp.Index = v.Index
+        tmp.AnimalId = 0
+        tmp.Price = v.Price
+        tmp.State = state
+        rs = append(rs,tmp)
+    }
+    return rs
 }
