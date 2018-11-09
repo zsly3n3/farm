@@ -4,7 +4,7 @@ import(
 	"time"
 	"farm/datastruct"
 	"github.com/gin-gonic/gin"
-	"farm/tools"
+	//"farm/tools"
 	//"farm/log"
 )
 
@@ -35,7 +35,7 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
 			 if !isExistMysql{
-				p_data= tools.CreateUser(openid,getPermissionId(body.IsAuth))
+				p_data=handle.createUser(openid,getPermissionId(body.IsAuth))
 			 } else {
 				refreshPlayerData(p_data,body.IsAuth)
 			 }

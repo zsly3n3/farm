@@ -5,6 +5,7 @@ import(
 	"farm/cache"
 	"time"
 	"farm/datastruct"
+	"farm/tools"
 	//"farm/log"
 )
 
@@ -14,7 +15,11 @@ type EventHandler struct {
 	Version string //当前服务端版本号
 	ticker *time.Ticker
 	isExistTicker bool
-	Plants map[int64]*datastruct.Plant 
+	plants map[int64]datastruct.Plant
+	animals map[int64]datastruct.Animal
+	petbars []datastruct.PetbarData
+	soils []datastruct.SoilData
+	
 }
 
 func CreateEventHandler()*EventHandler{
@@ -23,7 +28,9 @@ func CreateEventHandler()*EventHandler{
 	 eventHandler.dbHandler = db.CreateDBHandler() 
 	 eventHandler.createTicker(5*time.Minute)
 	 eventHandler.Version = "1.0.0.0"
-	 eventHandler.Plants = eventHandler.dbHandler.GetPlantsMap()
+	 eventHandler.plants = eventHandler.dbHandler.GetPlantsMap()
+	 eventHandler.animals = eventHandler.dbHandler.GetAnimalsMap()
+	 eventHandler.soils,eventHandler.petbars=tools.GetSoildInfo()
 	 return eventHandler
 }
 

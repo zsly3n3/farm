@@ -136,18 +136,27 @@ type PlayerData struct{
 	Avatar string
 	PlantLevel int //可购买商店植物的等级
 	Soil []SoilData //玩家土地信息
+	PetBar []PetbarData //宠物栏信息
 }
 
 type SoilData struct{
 	Index int //土地索引
 	Level int //土地等级
 	Isbought int//是否购买
-	PlantID int //0表示没有种植
+	PlantId int //0表示没有种植
 	Price int  //当前价格
 	Factor int //生产系数
+	Require int //开启条件
 }
 
 
+type PetbarData struct{
+	Index int //土地索引
+	Isbought int//是否购买
+	AnimalId int //0表示没有养宠物
+	Price int  //当前价格
+	Require int //开启条件
+}
 
 type PermissionType int //错误码
 const (

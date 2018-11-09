@@ -6,7 +6,6 @@ import (
 	"farm/log"
 	"farm/datastruct"
 	"fmt"
-	"time"
 )
 
 func Int64ToString(tmp int64) string{
@@ -120,21 +119,23 @@ func GetAnimalInfo()[]datastruct.Animal{
 }
 
 
-func GetSoildInfo()[]datastruct.SoilData{
+func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
 	xlsx, err := excelize.OpenFile("conf/soil_data.xlsx")
     if err != nil {
         log.Fatal("Excel error is %v", err.Error())
     }
 	index:=2
-	tableName:="Sheet1"
-	soils:=make([]datastruct.SoilData, 0)
+	soildtTableName:="Sheet1"
+	soils:=make([]datastruct.SoilData, 0,5)
     for {
 		cell_index  := fmt.Sprintf("A%d",index)
 		cell_price := fmt.Sprintf("B%d",index)
 		cell_factor := fmt.Sprintf("C%d",index)
-		location := xlsx.GetCellValue(tableName, cell_index)
-		price := xlsx.GetCellValue(tableName, cell_price)
-		factor := xlsx.GetCellValue(tableName, cell_factor)
+		cell_require := fmt.Sprintf("D%d",index)
+		location := xlsx.GetCellValue(soildtTableName, cell_index)
+		price := xlsx.GetCellValue(soildtTableName, cell_price)
+		factor := xlsx.GetCellValue(soildtTableName, cell_factor)
+		require := xlsx.GetCellValue(soildtTableName, cell_require)
         if location == "" {
             break
 		}
@@ -142,28 +143,34 @@ func GetSoildInfo()[]datastruct.SoilData{
 		soil.Index = StringToInt(location)
 		soil.Price = StringToInt(price)
 		soil.Factor = StringToInt(factor)
+		soil.Require = StringToInt(require)
 		soil.Level = 1
 		soil.Isbought = 0
-		soil.PlantID =0
+		soil.PlantId =0
         soils = append(soils,soil)
         index++
+	}
+	
+	petbarTableName:="Sheet2"
+	petbars:=make([]datastruct.PetbarData, 0,4)
+    for {
+		cell_index  := fmt.Sprintf("A%d",index)
+		cell_price := fmt.Sprintf("B%d",index)
+		cell_require := fmt.Sprintf("C%d",index)
+		location := xlsx.GetCellValue(petbarTableName, cell_index)
+		price := xlsx.GetCellValue(petbarTableName, cell_price)
+		require := xlsx.GetCellValue(petbarTableName, cell_require)
+        if location == "" {
+            break
+		}
+		var petbar datastruct.PetbarData
+		petbar.Index = StringToInt(location)
+		petbar.Price = StringToInt(price)
+		petbar.Require = StringToInt(require)
+		petbar.Isbought = 0
+		petbar.AnimalId = 0
+        petbars = append(petbars,petbar)
+        index++
     }
-	return soils
-}
-
-
-func CreateUser(code string,permissionId int)*datastruct.PlayerData{
-	player:=new(datastruct.PlayerData)
-	timestamp:=time.Now().Unix()
-	player.PermissionId = permissionId
-	player.CreatedAt = timestamp
-	player.UpdateTime = timestamp
-	player.Token = code
-	player.GoldCount = 0
-	player.HoneyCount = 0
-	player.NickName = "test1"
-	player.Avatar = "avatar"
-	player.PlantLevel = 1
-	player.Soil = GetSoildInfo()
-	return player
+	return soils,petbars
 }

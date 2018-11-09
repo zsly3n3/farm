@@ -108,12 +108,22 @@ func(handle *DBHandler)GetShopData()(datastruct.CodeType,*datastruct.ShopData){
 }
 
 
-func(handle *DBHandler)GetPlantsMap()map[int64]*datastruct.Plant{
+func(handle *DBHandler)GetPlantsMap()map[int64]datastruct.Plant{
 	engine:=handle.mysqlEngine
-	plants := make(map[int64]*datastruct.Plant)
+	plants := make(map[int64]datastruct.Plant)
     err := engine.Find(&plants)
 	if err != nil{
 	   log.Debug("GetPlantsMap error:%v",err.Error())
 	}
 	return plants
+}
+
+func(handle *DBHandler)GetAnimalsMap()map[int64]datastruct.Animal{
+	engine:=handle.mysqlEngine
+	animals:= make(map[int64]datastruct.Animal)
+    err := engine.Find(&animals)
+	if err != nil{
+	   log.Debug("GetAnimalsMap error:%v",err.Error())
+	}
+	return animals
 }
