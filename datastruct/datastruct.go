@@ -207,7 +207,7 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp["Petbar"] = p_data.PetBar
 	mp["PlantLevel"] = p_data.PlantLevel
 	mp["OwnPlants"] = p_data.OwnPlants
-	mp["SoilLevel"]=p_data.SoilLevel//test
+	mp["SoilLevel"] = p_data.SoilLevel//test
 	return mp
 }
 
