@@ -140,7 +140,7 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
             break
 		}
 		var soil datastruct.SoilData
-		soil.Index = StringToInt(location)
+		soil.Id = StringToInt(location)
 		soil.Price = StringToInt(price)
 		soil.Factor = StringToInt(factor)
 		soil.Require = StringToInt(require)
@@ -163,7 +163,7 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
             break
 		}
 		var petbar datastruct.PetbarData
-		petbar.Index = StringToInt(location)
+		petbar.Id = StringToInt(location)
 		petbar.Price = StringToInt(price)
 		petbar.Require = StringToInt(require)
         petbars = append(petbars,petbar)

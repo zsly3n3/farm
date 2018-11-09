@@ -150,7 +150,7 @@ type PlayerData struct{
 }
 
 type SoilData struct{
-	Index int //土地索引
+	Id int //土地id
 	Level int //土地等级
 	Price int  //当前价格
 	Factor int //生产系数
@@ -165,7 +165,7 @@ const (
 )
 
 type PlayerSoil struct{
-	Index int //土地索引
+	Id int //土地id
 	Level int //土地等级
 	PlantId int //0表示没有种植
 	Price int  //当前价格
@@ -174,13 +174,13 @@ type PlayerSoil struct{
 }
 
 type PetbarData struct{
-	Index int //土地索引
+	Id int //宠物栏id
 	Price int  //当前价格
 	Require int //开启条件
 }
 
 type PlayerPetbar struct{
-	Index int //土地索引
+	Id int //宠物栏id
 	AnimalId int //0表示没有养宠物
 	Price int  //当前价格
 	State GoodsState
@@ -207,7 +207,6 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp["Petbar"] = p_data.PetBar
 	mp["PlantLevel"] = p_data.PlantLevel
 	mp["OwnPlants"] = p_data.OwnPlants
-	mp["SoilLevel"] = p_data.SoilLevel//test
 	return mp
 }
 
