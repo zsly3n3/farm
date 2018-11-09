@@ -48,6 +48,7 @@ const AvatarField = "Avatar"
 
 const PlantLevelField = "PlantLevel"
 const SoilLevelField = "SoilLevel"
+const PlayerSoilField = "PlayerSoil"
 
 //plantlevel , soil 保存到redis和mysql
 

@@ -45,6 +45,12 @@ func (handle *CACHEHandler)SetPlayerSomeData(conn redis.Conn,p_data *datastruct.
 func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.PlayerData) {
 	key:=p_data.Token
 	//add
+	var isError bool
+	var soils_str string
+	soils_str,isError=tools.PlayerSoilToString(p_data.Soil)
+    if isError{
+	   return
+	}
 	_, err := conn.Do("hmset", key,
 	datastruct.IdField,p_data.Id,
 	datastruct.GoldField,p_data.GoldCount,
@@ -55,7 +61,8 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	datastruct.NickNameField,p_data.NickName,
 	datastruct.AvatarField,p_data.Avatar,
 	datastruct.PlantLevelField,p_data.PlantLevel,
-	datastruct.SoilLevelField,p_data.SoilLevel)
+	datastruct.SoilLevelField,p_data.SoilLevel,
+    datastruct.PlayerSoilField,soils_str)
 	if err != nil {
 	  log.Debug("CACHEHandler SetPlayerData err:%s",err.Error())
 	}
@@ -68,12 +75,12 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, 
 	datastruct.PermissionIdField, datastruct.CreatedAtField,datastruct.UpdateTimeField,
 	datastruct.NickNameField,datastruct.AvatarField,
-	datastruct.PlantLevelField,datastruct.SoilLevelField))
+	datastruct.PlantLevelField,datastruct.SoilLevelField,datastruct.PlayerSoilField))
 	if err == nil {
-	   for index, v := range value {
-		   tmp:= v.([]byte)
+		for i:=0;i<len(value);i++{
+		   tmp:= value[i].([]byte)
 		   str:= string(tmp[:])
-		   switch index{
+		   switch i{
 			 case 0:
 				rs.Id = tools.StringToInt(str)
 			 case 1:
@@ -94,6 +101,8 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 				rs.PlantLevel = tools.StringToInt(str)
 			 case 9:
 				rs.SoilLevel = tools.StringToInt(str)
+			 case 10:
+				rs.Soil,_= tools.BytesToPlayerSoil([]byte(str))
 		   }
 	   }
 	}
@@ -118,12 +127,6 @@ func (handle *CACHEHandler)clearData(){
 	defer conn.Close()
 	conn.Do("flushdb")
 }
-
-
-// func (handle *CACHEHandler)SetSoild(conn redis.Conn,p_data *datastruct.PlayerData) {
-// 	key:=p_data.Token
-// }
-
 
 func (handle *CACHEHandler)TestMoney(key string){
 	conn:=handle.GetConn()
