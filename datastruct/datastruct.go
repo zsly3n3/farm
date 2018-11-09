@@ -113,6 +113,7 @@ type AnimalClass struct {
 
 type ShopData struct{
 	Plants []Plant
+	Animals []Animal
 }
 
 type UserLogin struct{

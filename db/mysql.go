@@ -54,7 +54,7 @@ func initData(engine *xorm.Engine){
 	createPlantClass(engine)
 	createPlant(engine)
 	createAnimalClass(engine)
-	//createAnimal(engine)
+	createAnimal(engine)
 }
 
 func createAnimalClass(engine *xorm.Engine){
@@ -101,7 +101,7 @@ func createPlant(engine *xorm.Engine){
 }
 
 func createAnimal(engine *xorm.Engine){
-	data:=tools.GetPlantsInfo()
+	data:=tools.GetAnimalInfo()
 	_, err := engine.Insert(&data)
 	errhandle(err)
 }

@@ -98,13 +98,11 @@ func (handle *EventHandler)UpdatePermisson(key string,permissionId int) datastru
 
 
 func (handle *EventHandler)GetShopData(c *gin.Context){
-	 var data datastruct.ShopData
-	 code,plants:= handle.dbHandler.GetPlantsData()
-	 data.Plants = plants 
+	 code,data:= handle.dbHandler.GetShopData()
 	 c.JSON(200, gin.H{
 		"code":int(code),
 		"data":data,
-	})
+	 })
 }
 
 func (handle *EventHandler)Test1(c *gin.Context){

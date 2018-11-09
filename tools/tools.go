@@ -85,6 +85,39 @@ func GetPlantsInfo()[]datastruct.Plant{
     }
     return plants
 }
+func GetAnimalInfo()[]datastruct.Animal{
+	xlsx, err := excelize.OpenFile("conf/shop_data.xlsx")
+    if err != nil {
+        log.Fatal("Excel error is %v", err.Error())
+    }
+	index:=2
+	tableName:="Sheet2"
+    animals:=make([]datastruct.Animal, 0)
+    for {
+		cell_Name  := fmt.Sprintf("A%d",index)
+		cell_ClassId := fmt.Sprintf("B%d",index)
+		cell_Income:= fmt.Sprintf("C%d",index)
+		cell_Exp:= fmt.Sprintf("D%d",index)
+		cell_Level:= fmt.Sprintf("E%d",index)
+		name := xlsx.GetCellValue(tableName, cell_Name)
+		cid := xlsx.GetCellValue(tableName, cell_ClassId)
+		income := xlsx.GetCellValue(tableName, cell_Income)
+		exp := xlsx.GetCellValue(tableName, cell_Exp)
+		level := xlsx.GetCellValue(tableName, cell_Level)
+        if name == "" {
+            break
+        }
+        var animal datastruct.Animal
+		animal.N = name
+		animal.C = StringToInt(cid)
+		animal.I = StringToInt(income)
+		animal.E = StringToInt(exp)
+		animal.L = StringToInt(level)
+        animals = append(animals,animal)
+        index++
+    }
+	return animals
+}
 
 
 func GetSoildInfo()[]datastruct.SoilData{
