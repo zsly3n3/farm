@@ -173,11 +173,22 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
 	return soils,petbars
 }
 
-func PlayerSoilToString(playerSoil *datastruct.PlayerSoil) *string{
-	 jsons, errs := json.Marshal(playerSoil) //转换成JSON返回的是byte[]
-	 if errs != nil {
-	  fmt.Println(errs.Error())
+func PlayerSoilToString(playerSoil *datastruct.PlayerSoil)(string,bool){
+	 jsons, err := json.Marshal(playerSoil) //转换成JSON返回的是byte[]
+	 if err != nil {
+		log.Debug("PlayerSoilToString error:%s",err.Error())
+		return "",true
 	 }
-	 fmt.Println(string(jsons)) 
-     return nil
+     return string(jsons),false
 }
+
+func BytesToPlayerSoil(bytes []byte)(*datastruct.PlayerSoil,bool){
+    playerSoil:= new(datastruct.PlayerSoil)
+    err := json.Unmarshal(bytes,playerSoil) 
+    if err != nil {
+        log.Debug("StringToPlayerSoil error:%s",err.Error())
+		return nil,true
+    }
+	return playerSoil,false
+}
+
