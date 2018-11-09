@@ -72,7 +72,7 @@ func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
 
 func createPetbar(petbars []datastruct.PetbarData)[]datastruct.PlayerPetbar{
     rs:=make([]datastruct.PlayerPetbar,0,len(petbars))
-    for i,v := range petbars{
+    for _,v := range petbars{
         var tmp datastruct.PlayerPetbar
         tmp.Index = v.Index
         tmp.AnimalId = 0
