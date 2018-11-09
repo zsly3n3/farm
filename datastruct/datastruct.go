@@ -176,6 +176,7 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp[HoneyField] = &(p_data.HoneyCount)
 	mp["PlantLevel"] = &(p_data.PlantLevel)
 	mp["Soil"] = p_data.Soil
+	mp["Petbar"] = p_data.PetBar
 	return mp
 }
 
