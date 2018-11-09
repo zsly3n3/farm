@@ -46,6 +46,9 @@ const IdentityIdField = "IdentityId"
 const NickNameField = "NickName"
 const AvatarField = "Avatar"
 
+const PlantLevelField = "PlantLevel"
+const SoilLevelField = "SoilLevel"
+
 //plantlevel , soil 保存到redis和mysql
 
 type UserInfo struct {
@@ -68,7 +71,14 @@ type PlayerInfo struct {
 	HoneyCount int64 `xorm:"bigint not null"`//蜂蜜数量
 	GoldCount  int64 `xorm:"bigint not null"`//金币数量
 	PlantLevel int `xorm:"not null INT(11) "`//玩家的种植等级
-	AnimalLevel int `xorm:"not null INT(11) "`//玩家的饲养等级
+	SoilLevel int `xorm:"not null INT(11) "`//玩家的土地等级
+}
+
+//玩家购买了哪些植物
+type PlantForPlayer struct {
+	Id int `xorm:"not null pk autoincr INT(11)"` //关联UserInfo中id
+	PlayerId int `xorm:"INT(11) not null"`//
+	PlantId  int `xorm:"INT(11) not null"`//
 }
 
 //植物类型表
@@ -197,6 +207,7 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp["Petbar"] = p_data.PetBar
 	mp["PlantLevel"] = p_data.PlantLevel
 	mp["OwnPlants"] = p_data.OwnPlants
+	mp["SoilLevel"]=p_data.SoilLevel//test
 	return mp
 }
 

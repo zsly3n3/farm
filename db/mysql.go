@@ -43,9 +43,10 @@ func resetDB(engine *xorm.Engine){
 	plantClass:=&datastruct.PlantClass{}
 	animal:=&datastruct.Animal{}
 	animalClass:=&datastruct.AnimalClass{}
-	err:=engine.DropTables(user,player,perm,plants,plantClass,animal,animalClass)
+    plantForPlayer:=&datastruct.PlantForPlayer{}
+	err:=engine.DropTables(user,player,perm,plants,plantClass,animal,animalClass,plantForPlayer)
     errhandle(err)
-	err=engine.CreateTables(user,player,perm,plants,plantClass,animal,animalClass)
+	err=engine.CreateTables(user,player,perm,plants,plantClass,animal,animalClass,plantForPlayer)
     errhandle(err)
 }
 

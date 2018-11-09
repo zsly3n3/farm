@@ -44,8 +44,8 @@ func (handle *EventHandler)createUser(code string,permissionId int)*datastruct.P
 	player.HoneyCount = 0
 	player.NickName = "test1"
 	player.Avatar = "avatar"
-    player.PlantLevel = 1
-    player.SoilLevel = 1
+    player.PlantLevel = 11
+    player.SoilLevel = 22
     player.Soil = createSoil(handle.soils)
     player.PetBar = createPetbar(handle.petbars)
     player.OwnPlants = createOwnPlants()
