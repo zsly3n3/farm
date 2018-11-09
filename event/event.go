@@ -19,7 +19,8 @@ type EventHandler struct {
 	animals map[int64]datastruct.Animal
 	petbars []datastruct.PetbarData
 	soils []datastruct.SoilData
-	
+	onlinePlayer_soilData map[string][]datastruct.SoilData //保存在线玩家土地数据
+	onlinePlayer_petbars map[string][]datastruct.PetbarData //保存在线玩家宠物栏数据
 }
 
 func CreateEventHandler()*EventHandler{
@@ -33,6 +34,7 @@ func CreateEventHandler()*EventHandler{
 	 eventHandler.animals = eventHandler.dbHandler.GetAnimalsMap()
 	 return eventHandler
 }
+
 
 
 

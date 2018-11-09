@@ -150,9 +150,9 @@ type PlayerData struct{
 }
 
 type SoilData struct{
-	Id int //土地id
-	Level int //土地等级
-	Price int  //当前价格
+	Id int //土地id 
+	Level int //土地当前等级
+	Price int //当前价格
 	Factor int //生产系数
 	Require int //开启条件
 }
@@ -164,13 +164,14 @@ const (
 	Owned//已拥有
 )
 
+//玩家种植表
 type PlayerSoil struct{
-	Id int //土地id
-	Level int //土地等级
-	PlantId int //0表示没有种植
-	Price int  //当前价格
-	Factor int //生产系数
-	State GoodsState
+	Id int `xorm:"not null pk INT(11)"`//土地id 
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 type PetbarData struct{
