@@ -68,11 +68,11 @@ func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
         tmp.PlantId = 0
         tmp.Price = v.Price
         tmp.State = state
-        str,_:=tools.PlayerSoilToString(&tmp)
-        tt,_:=tools.BytesToPlayerSoil([]byte(str))
-        log.Debug("--------:%v",tt)
         rs = append(rs,tmp)
     }
+    str,_:=tools.PlayerSoilToString(rs)
+    tt,_:=tools.BytesToPlayerSoil([]byte(str))
+    log.Debug("--------:%v",tt)
     return rs
 }
 
