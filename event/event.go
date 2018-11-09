@@ -24,13 +24,13 @@ type EventHandler struct {
 
 func CreateEventHandler()*EventHandler{
 	 eventHandler:=new(EventHandler)
+	 eventHandler.Version = "1.0.0.0"
+	 eventHandler.soils,eventHandler.petbars=tools.GetSoildInfo()
 	 eventHandler.cacheHandler = cache.CreateCACHEHandler() 
 	 eventHandler.dbHandler = db.CreateDBHandler() 
 	 eventHandler.createTicker(5*time.Minute)
-	 eventHandler.Version = "1.0.0.0"
 	 eventHandler.plants = eventHandler.dbHandler.GetPlantsMap()
 	 eventHandler.animals = eventHandler.dbHandler.GetAnimalsMap()
-	 eventHandler.soils,eventHandler.petbars=tools.GetSoildInfo()
 	 return eventHandler
 }
 

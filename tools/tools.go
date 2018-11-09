@@ -151,6 +151,7 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
         index++
 	}
 	
+	index=2
 	petbarTableName:="Sheet2"
 	petbars:=make([]datastruct.PetbarData, 0,4)
     for {
