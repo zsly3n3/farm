@@ -3,6 +3,7 @@ package event
 import(
     "time"
     "farm/datastruct"
+    "farm/tools"
 )
 
 func (handle *EventHandler)createTicker(times time.Duration){
@@ -66,6 +67,7 @@ func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
         tmp.PlantId = 0
         tmp.Price = v.Price
         tmp.State = state
+        tools.PlayerSoilToString(&tmp)
         rs = append(rs,tmp)
     }
     return rs

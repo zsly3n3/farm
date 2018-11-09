@@ -120,6 +120,11 @@ func (handle *CACHEHandler)clearData(){
 }
 
 
+// func (handle *CACHEHandler)SetSoild(conn redis.Conn,p_data *datastruct.PlayerData) {
+// 	key:=p_data.Token
+// }
+
+
 func (handle *CACHEHandler)TestMoney(key string){
 	conn:=handle.GetConn()
 	defer conn.Close()

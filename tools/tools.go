@@ -6,6 +6,7 @@ import (
 	"farm/log"
 	"farm/datastruct"
 	"fmt"
+	"encoding/json"
 )
 
 func Int64ToString(tmp int64) string{
@@ -170,4 +171,13 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
         index++
     }
 	return soils,petbars
+}
+
+func PlayerSoilToString(playerSoil *datastruct.PlayerSoil) *string{
+	 jsons, errs := json.Marshal(playerSoil) //转换成JSON返回的是byte[]
+	 if errs != nil {
+	  fmt.Println(errs.Error())
+	 }
+	 fmt.Println(string(jsons)) 
+     return nil
 }
