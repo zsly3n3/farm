@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"farm/datastruct"
 	"farm/log"
@@ -45,13 +46,9 @@ func (handle *CACHEHandler)SetPlayerSomeData(conn redis.Conn,p_data *datastruct.
 func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.PlayerData) {
 	key:=p_data.Token
 	//add
-	var isError bool
-	var soils_str string
-	soils_str,isError=tools.PlayerSoilToString(p_data.Soil)
-    if isError{
-	   return
-	}
-	_, err := conn.Do("hmset", key,
+
+	conn.Send("MULTI")
+	conn.Send("hmset", key,
 	datastruct.IdField,p_data.Id,
 	datastruct.GoldField,p_data.GoldCount,
 	datastruct.HoneyField,p_data.HoneyCount,
@@ -61,21 +58,35 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	datastruct.NickNameField,p_data.NickName,
 	datastruct.AvatarField,p_data.Avatar,
 	datastruct.PlantLevelField,p_data.PlantLevel,
-	datastruct.SoilLevelField,p_data.SoilLevel,
-    datastruct.PlayerSoilField,soils_str)
+	datastruct.SoilLevelField,p_data.SoilLevel)
+	
+	for i,v := range p_data.Soil{
+		soiltableName:=fmt.Sprintf("soil%d",i+1)
+		value,isError:=tools.PlayerSoilToString(&v)
+		if isError{
+		   log.Debug("CACHEHandler SetPlayerData PlayerSoilToString err:%s",soiltableName)	
+		   return
+		}
+		conn.Send("hset", soiltableName,key,value)
+	}
+	_, err := conn.Do("EXEC")
+	
 	if err != nil {
 	  log.Debug("CACHEHandler SetPlayerData err:%s",err.Error())
 	}
 }
 
+
+
 func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 	rs := new(datastruct.PlayerData)
 	//add
+
 	value, err := redis.Values(conn.Do("hmget",key,
 	datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, 
 	datastruct.PermissionIdField, datastruct.CreatedAtField,datastruct.UpdateTimeField,
 	datastruct.NickNameField,datastruct.AvatarField,
-	datastruct.PlantLevelField,datastruct.SoilLevelField,datastruct.PlayerSoilField))
+	datastruct.PlantLevelField,datastruct.SoilLevelField))
 	if err == nil {
 		for i:=0;i<len(value);i++{
 		   tmp:= value[i].([]byte)
@@ -101,10 +112,20 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 				rs.PlantLevel = tools.StringToInt(str)
 			 case 9:
 				rs.SoilLevel = tools.StringToInt(str)
-			 case 10:
-				rs.Soil,_= tools.BytesToPlayerSoil([]byte(str))
+			//  case 10:
+			// 	rs.Soil,_= tools.BytesToPlayerSoil([]byte(str))
 		   }
 	   }
+	}
+	len_soil:=5
+    rs.Soil=make([]datastruct.PlayerSoil,0,len_soil)
+	for i:=1;i<=len_soil;i++{
+		soiltableName:=fmt.Sprintf("soil%d",i)
+		value, err := redis.String(conn.Do("hget",soiltableName,key))
+		if err == nil{
+			tmp,_:=tools.BytesToPlayerSoil([]byte(value))
+			rs.Soil=append(rs.Soil,*tmp)
+		}
 	}
 	rs.Token = key
 	return rs
