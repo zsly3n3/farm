@@ -219,3 +219,23 @@ func BytesToPlayerPetbar(bytes []byte)(*datastruct.PlayerPetbar,bool){
     }
 	return tmp,false
 }
+
+
+func SliceIntToString(tmp []int)(string,bool){
+	jsons, err := json.Marshal(tmp) //转换成JSON返回的是byte[]
+	if err != nil {
+	   log.Debug("SliceIntToString error:%s",err.Error())
+	   return "",true
+	}
+	return string(jsons),false
+}
+
+func BytesToSliceInt(bytes []byte)([]int,bool){
+	var tmp []int
+    err := json.Unmarshal(bytes,tmp)
+    if err != nil {
+        log.Debug("BytesToSliceInt error:%s",err.Error())
+		return nil,true
+    }
+	return tmp,false
+}

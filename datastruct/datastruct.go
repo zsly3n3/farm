@@ -50,6 +50,8 @@ const PlantLevelField = "PlantLevel"
 const SoilLevelField = "SoilLevel"
 
 const PlayerPetbarField = "PlayerPetbar"
+const OwnPlantField = "OwnPlant"
+
 //plantlevel , soil 保存到redis和mysql
 
 type UserInfo struct {
@@ -237,6 +239,14 @@ type Petbar4 struct{
 	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
+//玩家已购买哪些植物
+type OwnPlant struct{
+	Id int `xorm:"not null pk autoincr INT(11)"` 
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	PlantId int  `xorm:"not null INT(11)"`//植物id
+}
+
+
 type PlayerSoil struct{
 	SId int //土地id
 	Level int //土地等级
@@ -271,7 +281,7 @@ const (
 func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	if p_data == nil{
 	   return nil
-	}
+	}  	
 	mp:=make(map[string]interface{})
 	mp[PermissionIdField] = &(p_data.PermissionId)
 	mp["Token"] = &(p_data.Token)
@@ -279,7 +289,7 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp[HoneyField] = &(p_data.HoneyCount)
 	mp["Soil"] = p_data.Soil
 	mp["Petbar"] = p_data.PetBar
-	mp["PlantLevel"] = p_data.PlantLevel
+	//mp["PlantLevel"] = p_data.PlantLevel
 	mp["OwnPlants"] = p_data.OwnPlants
 	return mp
 }
