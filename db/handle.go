@@ -47,6 +47,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	userinfo.Avatar = p_data.Avatar
 	userinfo.NickName = p_data.NickName
    
+
+
 	var err error
 	if p_data.Id <= 0{
 		_, err = session.Insert(&userinfo)  	
@@ -73,6 +75,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	  rollback(str,session)
 	  return userinfo.Id
 	}
+
+
 	err=session.Commit()
 	if err != nil{
 	  str:=fmt.Sprintf("DBHandler->SetPlayerData Commit :%s",err.Error())
@@ -119,12 +123,19 @@ func(handle *DBHandler)GetPlantsSlice()[]datastruct.Plant{
 	return plants
 }
 
-func(handle *DBHandler)GetAnimalsMap()map[int64]datastruct.Animal{
+func(handle *DBHandler)GetAnimalsMap()map[datastruct.AnimalType][]datastruct.Animal{
 	engine:=handle.mysqlEngine
-	animals:= make(map[int64]datastruct.Animal)
-    err := engine.Find(&animals)
-	if err != nil{
-	   log.Debug("GetAnimalsMap error:%v",err.Error())
+	mp:=make(map[datastruct.AnimalType][]datastruct.Animal)
+	start:=int(datastruct.Sea)
+	end:=int(datastruct.Deity)
+	for i:=start;i<=end;i++{
+		arr:= make([]datastruct.Animal, 0)
+		err:= engine.Where("class_id = ?",i).Find(&arr)
+		if err != nil{
+			log.Debug("GetAnimalsMap error:%v",err.Error())
+			return nil
+		}
+		mp[datastruct.AnimalType(i)]=arr
 	}
-	return animals
+	return mp
 }

@@ -84,6 +84,7 @@ func GetPlantsInfo()[]datastruct.Plant{
     }
     return plants
 }
+
 func GetAnimalInfo()[]datastruct.Animal{
 	xlsx, err := excelize.OpenFile("conf/shop_data.xlsx")
     if err != nil {
@@ -97,21 +98,21 @@ func GetAnimalInfo()[]datastruct.Animal{
 		cell_ClassId := fmt.Sprintf("B%d",index)
 		cell_Factor:= fmt.Sprintf("C%d",index)
 		cell_Exp:= fmt.Sprintf("D%d",index)
-		cell_Level:= fmt.Sprintf("E%d",index)
+		cell_Number:= fmt.Sprintf("E%d",index)
 		name := xlsx.GetCellValue(tableName, cell_Name)
 		cid := xlsx.GetCellValue(tableName, cell_ClassId)
 		factor := xlsx.GetCellValue(tableName, cell_Factor)
 		exp := xlsx.GetCellValue(tableName, cell_Exp)
-		level := xlsx.GetCellValue(tableName, cell_Level)
+		number := xlsx.GetCellValue(tableName, cell_Number)
         if name == "" {
             break
         }
         var animal datastruct.Animal
-		animal.N = name
-		animal.C = StringToInt(cid)
-		animal.F = StringToInt(factor)
-		animal.E = StringToInt(exp)
-		animal.L = StringToInt(level)
+		animal.Name = name
+		animal.ClassId = StringToInt(cid)
+		animal.Factor = StringToInt(factor)
+		animal.Exp = StringToInt(exp)
+		animal.Number = StringToInt(number)
         animals = append(animals,animal)
         index++
     }

@@ -43,8 +43,8 @@ func resetDB(engine *xorm.Engine){
 	plantClass:=&datastruct.PlantClass{}
 	animal:=&datastruct.Animal{}
 	animalClass:=&datastruct.AnimalClass{}
-	plantForPlayer:=&datastruct.PlantForPlayer{}
-	playerSoil:=&datastruct.PlayerSoil{}
+
+
 
 	soil1:=&datastruct.Soil1{}
 	soil2:=&datastruct.Soil2{}
@@ -55,9 +55,9 @@ func resetDB(engine *xorm.Engine){
 	petbar2:=&datastruct.Petbar2{}
 	petbar3:=&datastruct.Petbar3{}
 	petbar4:=&datastruct.Petbar4{}
-	err:=engine.DropTables(user,player,perm,plants,plantClass,animal,animalClass,plantForPlayer,playerSoil,soil1,soil2,soil3,soil4,soil5,petbar1,petbar2,petbar3,petbar4)
+	err:=engine.DropTables(user,player,perm,plants,plantClass,animal,animalClass,soil1,soil2,soil3,soil4,soil5,petbar1,petbar2,petbar3,petbar4)
     errhandle(err)
-	err=engine.CreateTables(user,player,perm,plants,plantClass,animal,animalClass,plantForPlayer,playerSoil,soil1,soil2,soil3,soil4,soil5,petbar1,petbar2,petbar3,petbar4)
+	err=engine.CreateTables(user,player,perm,plants,plantClass,animal,animalClass,soil1,soil2,soil3,soil4,soil5,petbar1,petbar2,petbar3,petbar4)
     errhandle(err)
 }
 
@@ -71,15 +71,19 @@ func initData(engine *xorm.Engine){
 
 func createAnimalClass(engine *xorm.Engine){
 	 a:= datastruct.AnimalClass{
+		Id:datastruct.Sea,
 		Desc:"海",
 	 }
 	 b:= datastruct.AnimalClass{
+		Id:datastruct.Land,
 		Desc:"陆",
 	 }
 	 c:= datastruct.AnimalClass{
+		Id:datastruct.Fly,
 		Desc:"空",
 	 }
 	 d:= datastruct.AnimalClass{
+		Id:datastruct.Deity,
 		Desc:"神",
 	 }
 	 data:=make([]datastruct.AnimalClass,0)

@@ -76,12 +76,7 @@ type PlayerInfo struct {
 	SoilLevel int `xorm:"not null INT(11) "`//玩家的土地等级
 }
 
-//玩家购买了哪些植物
-type PlantForPlayer struct {
-	Id int `xorm:"not null pk autoincr INT(11)"` //关联UserInfo中id
-	PlayerId int `xorm:"INT(11) not null"`//
-	PlantId  int `xorm:"INT(11) not null"`//
-}
+
 
 //植物类型表
 type PlantClass struct {
@@ -105,22 +100,21 @@ type Plant struct {
 //动物表
 type Animal struct {
     Id int    `xorm:"not null pk autoincr INT(11)"`
-    N  string `xorm:"VARCHAR(64) not null 'name'"` //名称
-	F int `xorm:"not null INT(11) 'factor'"`//增益系数
-	E int `xorm:"not null INT(11) 'exp'"`//升级所需经验
-	C int `xorm:"not null INT(11) 'class_id'"` //关联AnimalClass中id
-	L int `xorm:"not null INT(11) 'level'"` //要求玩家饲养等级
+    Name  string `xorm:"VARCHAR(64) not null "` //名称
+	Factor int `xorm:"not null INT(11) "`//增益系数
+	Exp int `xorm:"not null INT(11) "`//升级所需经验
+	ClassId int `xorm:"not null INT(11) "` //关联AnimalClass中id
+	Number int `xorm:"not null INT(11) "` //动物编号
 }
 
 //动物类型表
 type AnimalClass struct {
-	Id   int       `xorm:"not null pk autoincr INT(11)"` 
+	Id   AnimalType  `xorm:"not null pk INT(11)"` 
 	Desc string `xorm:"VARCHAR(32) not null"`//描述
 }
 
 type ShopData struct{
 	Plants []*ResponePlant
-	Animals []Animal
 }
 
 type UserLogin struct{
@@ -148,13 +142,8 @@ type PlayerData struct{
 	PetBar []PlayerPetbar //宠物栏信息
 }
 
-type SoilData struct{
-	Id int //土地id 
-	Level int //土地当前等级
-	Price int //当前价格
-	Factor int //生产系数
-	Require int //开启条件
-}
+
+
 
 type GoodsState int 
 const (
@@ -239,12 +228,20 @@ type Petbar4 struct{
 }
 
 
+type SoilData struct{
+	Id int //土地id 
+	Level int //土地当前等级
+	Price int //当前价格
+	Factor int //生产系数
+	Require int //开启条件
+}
+
 type PlayerSoil struct{
 	Id int //土地id
 	Level int //土地等级
-	PlantId int //0表示没有种植
 	Price int  //当前价格
 	Factor int //生产系数
+	PlantId int //0表示没有种植
 	State GoodsState //土地状态
 }
 
@@ -273,6 +270,15 @@ const (
 	Guest PermissionType = 1 +iota //游客
 	Player //普通玩家
 )
+
+type AnimalType int 
+const (
+	Sea AnimalType = iota + 1 //海
+	Land//陆
+	Fly//空
+	Deity//神
+)
+
 
 
 func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
