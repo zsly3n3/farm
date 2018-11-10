@@ -62,7 +62,7 @@ func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
         if i == 0{
           state = datastruct.Unlocked
         }
-        tmp.Id = v.Id
+        tmp.SId = v.Id
         tmp.Factor = v.Factor
         tmp.Level = v.Level
         tmp.PlantId = 0

@@ -50,6 +50,7 @@ const PlantLevelField = "PlantLevel"
 const SoilLevelField = "SoilLevel"
 const PlayerSoilField = "PlayerSoil"
 
+const PlayerPetbarField = "PlayerPetbar"
 //plantlevel , soil 保存到redis和mysql
 
 type UserInfo struct {
@@ -100,14 +101,11 @@ type Plant struct {
 	L int `xorm:"not null INT(11) 'level'"` //要求玩家种植等级
 }
 
-
-
-
 //动物表
 type Animal struct {
     Id int    `xorm:"not null pk autoincr INT(11)"`
     N  string `xorm:"VARCHAR(64) not null 'name'"` //名称
-	I int `xorm:"not null INT(11) 'in_come'"`//增益系数
+	F int `xorm:"not null INT(11) 'factor'"`//增益系数
 	E int `xorm:"not null INT(11) 'exp'"`//升级所需经验
 	C int `xorm:"not null INT(11) 'class_id'"` //关联AnimalClass中id
 	L int `xorm:"not null INT(11) 'level'"` //要求玩家饲养等级
@@ -165,15 +163,54 @@ const (
 	Owned//已拥有
 )
 
+//土地表1
+//土地表2
+//土地表3
+//土地表4
+
+type Soil1 struct{
+	 
+}
+
+type Soil2 struct{
+	 
+}
+
+type Soil3 struct{
+	 
+}
+
+type Soil4 struct{
+	 
+}
+
+
+//宠物栏1
+//宠物栏2
+//宠物栏3
+//宠物栏4
+
 //玩家种植表
 type PlayerSoil struct{
-	Id int `xorm:"not null pk INT(11)"`//土地id 
+	Id int  `xorm:"not null pk autoincr INT(11)"`
+	PId int `xorm:"not null INT(11)"` //玩家id
+	SId int `xorm:"not null INT(11)"`//土地id
 	Level int `xorm:"not null INT(11)"`//土地等级
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
 	Price int  `xorm:"not null INT(11)"`//当前价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
+
+// //玩家种植表
+// type Petbar struct{
+// 	Id int `xorm:"not null pk INT(11)"`//id 
+// 	Level int `xorm:"not null INT(11)"`//土地等级
+// 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+// 	Price int  `xorm:"not null INT(11)"`//当前价格
+// 	Factor int `xorm:"not null INT(11)"`//生产系数
+// 	State GoodsState `xorm:"not null INT(11)"` //土地状态
+// }
 
 type PetbarData struct{
 	Id int //宠物栏id
