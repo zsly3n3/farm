@@ -35,7 +35,7 @@ func (handle *EventHandler)checkOnlinePlayer(){
 
 }
 
-func (handle *EventHandler)createUser(code string,permissionId int)*datastruct.PlayerData{
+func (handle *EventHandler)createUser(code string,permissionId int,nickName string,avatar string)*datastruct.PlayerData{
 	player:=new(datastruct.PlayerData)
 	timestamp:=time.Now().Unix()
 	player.PermissionId = permissionId
@@ -44,14 +44,16 @@ func (handle *EventHandler)createUser(code string,permissionId int)*datastruct.P
 	player.Token = code
 	player.GoldCount = 0
 	player.HoneyCount = 0
-	player.NickName = "test1"
-	player.Avatar = "avatar"
+	player.NickName = nickName
+	player.Avatar = avatar
     player.PlantLevel = 0
     player.SoilLevel = 0
     player.Soil = createSoil(handle.soils)
     player.PetBar = createPetbar(handle.petbars)
     return player
 }
+
+
 
 func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
     rs:=make([]datastruct.PlayerSoil,0,len(soils))

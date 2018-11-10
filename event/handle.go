@@ -35,7 +35,7 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   if !isExistRedis{
 			 p_data,isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
 			 if !isExistMysql{
-				p_data=handle.createUser(openid,getPermissionId(body.IsAuth))
+				p_data=handle.createUser(openid,getPermissionId(body.IsAuth),"test","avatar")
 			 } else {
 				refreshPlayerData(p_data,body.IsAuth)
 			 }
