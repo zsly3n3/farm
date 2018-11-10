@@ -254,7 +254,7 @@ type PetbarData struct{
 }
 
 type PlayerPetbar struct{
-	Id int //宠物栏id
+	PetbarId int //宠物栏id
 	AnimalId int //0表示没有养宠物
 	Price int  //当前价格
 	State GoodsState

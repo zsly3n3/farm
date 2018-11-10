@@ -64,11 +64,22 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 		soiltableName:=fmt.Sprintf("soil%d",i+1)
 		value,isError:=tools.PlayerSoilToString(&v)
 		if isError{
-		   log.Debug("CACHEHandler SetPlayerData PlayerSoilToString err:%s",soiltableName)	
+		   log.Debug("CACHEHandler SetPlayerData PlayerSoilToString err:%s player:%s",soiltableName,key)	
 		   return
 		}
 		conn.Send("hset", soiltableName,key,value)
 	}
+
+	for i,v := range p_data.PetBar{
+		petbartableName:=fmt.Sprintf("petbar%d",i+1)
+		value,isError:=tools.PlayerPetbarToString(&v)
+		if isError{
+		   log.Debug("CACHEHandler SetPlayerData PlayerPetbarToString err:%s player:%s",petbartableName,key)	
+		   return
+		}
+		conn.Send("hset", petbartableName,key,value)
+	}
+
 	_, err := conn.Do("EXEC")
 	
 	if err != nil {
@@ -112,8 +123,6 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 				rs.PlantLevel = tools.StringToInt(str)
 			 case 9:
 				rs.SoilLevel = tools.StringToInt(str)
-			//  case 10:
-			// 	rs.Soil,_= tools.BytesToPlayerSoil([]byte(str))
 		   }
 	   }
 	}
@@ -127,6 +136,20 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 			rs.Soil=append(rs.Soil,*tmp)
 		}
 	}
+
+
+	len_petbar:=4
+    rs.PetBar=make([]datastruct.PlayerPetbar,0,len_petbar)
+	for i:=1;i<=len_petbar;i++{
+		petbartableName:=fmt.Sprintf("petbar%d",i)
+		value, err := redis.String(conn.Do("hget",petbartableName,key))
+		if err == nil{
+			tmp,_:=tools.BytesToPlayerPetbar([]byte(value))
+			rs.PetBar=append(rs.PetBar,*tmp)
+		}
+	}
+
+	
 	rs.Token = key
 	return rs
 }

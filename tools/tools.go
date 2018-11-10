@@ -182,8 +182,8 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
 //      return string(jsons),false
 // }
 
-func PlayerSoilToString(playerSoil *datastruct.PlayerSoil)(string,bool){
-	jsons, err := json.Marshal(playerSoil) //转换成JSON返回的是byte[]
+func PlayerSoilToString(tmp *datastruct.PlayerSoil)(string,bool){
+	jsons, err := json.Marshal(tmp) //转换成JSON返回的是byte[]
 	if err != nil {
 	   log.Debug("PlayerSoilToString error:%s",err.Error())
 	   return "",true
@@ -192,12 +192,30 @@ func PlayerSoilToString(playerSoil *datastruct.PlayerSoil)(string,bool){
 }
 
 func BytesToPlayerSoil(bytes []byte)(*datastruct.PlayerSoil,bool){
-	playerSoil:=new(datastruct.PlayerSoil)
-    err := json.Unmarshal(bytes,playerSoil)
+	tmp:=new(datastruct.PlayerSoil)
+    err := json.Unmarshal(bytes,tmp)
     if err != nil {
         log.Debug("StringToPlayerSoil error:%s",err.Error())
 		return nil,true
     }
-	return playerSoil,false
+	return tmp,false
 }
 
+func PlayerPetbarToString(tmp *datastruct.PlayerPetbar)(string,bool){
+	jsons, err := json.Marshal(tmp) //转换成JSON返回的是byte[]
+	if err != nil {
+	   log.Debug("PlayerPetbarToString error:%s",err.Error())
+	   return "",true
+	}
+	return string(jsons),false
+}
+
+func BytesToPlayerPetbar(bytes []byte)(*datastruct.PlayerPetbar,bool){
+	tmp:=new(datastruct.PlayerPetbar)
+    err := json.Unmarshal(bytes,tmp)
+    if err != nil {
+        log.Debug("StringToPlayerSoil error:%s",err.Error())
+		return nil,true
+    }
+	return tmp,false
+}
