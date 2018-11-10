@@ -48,7 +48,6 @@ func StringToBool(tmp string) bool{
 	}
 }
 
-
 func GetPlantsInfo()[]datastruct.Plant{
     xlsx, err := excelize.OpenFile("conf/shop_data.xlsx")
     if err != nil {
@@ -74,12 +73,12 @@ func GetPlantsInfo()[]datastruct.Plant{
             break
         }
         var plant datastruct.Plant
-		plant.N = name
-		plant.C = StringToInt(cid)
-		plant.P = StringToInt(price)
-		plant.I = StringToInt(income)
-		plant.E = StringToInt(exp)
-		plant.L = StringToInt(level)
+		plant.Name = name
+		plant.Classid = StringToInt(cid)
+		plant.Price = StringToInt(price)
+		plant.InCome = StringToInt(income)
+		plant.ExpForAnimal = StringToInt(exp)
+		plant.Level = StringToInt(level)
         plants = append(plants,plant)
         index++
     }

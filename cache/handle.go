@@ -61,13 +61,6 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	datastruct.PlantLevelField,p_data.PlantLevel,
 	datastruct.SoilLevelField,p_data.SoilLevel)
 	
-	
-	value,isError:=tools.SliceIntToString(p_data.OwnPlants)
-	if isError{
-	  log.Debug("CACHEHandler SetPlayerData SliceIntToString err:%s player:%s",datastruct.OwnPlantField,key)	
-	  return
-	}
-	conn.Send("hset", key,datastruct.OwnPlantField,value)
     
 	for i,v := range p_data.Soil{
 		soiltableName:=fmt.Sprintf("soil%d",i+1)
@@ -105,7 +98,7 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, 
 	datastruct.PermissionIdField,datastruct.CreatedAtField,datastruct.UpdateTimeField,
 	datastruct.NickNameField,datastruct.AvatarField,
-	datastruct.PlantLevelField,datastruct.SoilLevelField,datastruct.OwnPlantField))
+	datastruct.PlantLevelField,datastruct.SoilLevelField))
 	if err!=nil{	
 	   log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s",err.Error(),key)
 	   return rs
@@ -134,8 +127,6 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 				rs.PlantLevel = tools.StringToInt(str)
 			 case 9:
 				rs.SoilLevel = tools.StringToInt(str)
-			 case 10:
-				rs.OwnPlants,_= tools.BytesToSliceInt(tmp)
 		}
 	}
 
@@ -162,7 +153,6 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 		}
 	}
 
-
 	rs.Token = key
 	return rs
 }
@@ -184,6 +174,27 @@ func (handle *CACHEHandler)clearData(){
 	defer conn.Close()
 	conn.Do("flushdb")
 }
+
+func (handle *CACHEHandler)GetPlantLevel(key string)(int,datastruct.CodeType){
+	conn:=handle.GetConn()
+	defer conn.Close()
+	value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
+	code:=datastruct.NULLError
+	if err != nil {
+		code = datastruct.GetDataFailed
+		log.Debug("CACHEHandler GetPlantLevel err:%s",err.Error())
+		return -1,code
+	}
+	return tools.StringToInt(value),code
+}
+
+
+
+
+
+
+
+
 
 func (handle *CACHEHandler)TestMoney(key string){
 	conn:=handle.GetConn()

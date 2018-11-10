@@ -50,7 +50,6 @@ const PlantLevelField = "PlantLevel"
 const SoilLevelField = "SoilLevel"
 
 const PlayerPetbarField = "PlayerPetbar"
-const OwnPlantField = "OwnPlant"
 
 //plantlevel , soil 保存到redis和mysql
 
@@ -93,14 +92,15 @@ type PlantClass struct {
 
 //植物表
 type Plant struct {
-	Id int    `xorm:"not null pk autoincr INT(11)"`
-    N  string `xorm:"VARCHAR(64) not null 'name'"` //植物名称
-	P int `xorm:"not null INT(11) 'price'"`//价格
-	I int `xorm:"not null INT(11) 'in_come'"`//初始收益
-	E int `xorm:"not null INT(11) 'exp_for_animal'"`//增加动物经验
-	C int `xorm:"not null INT(11) 'class_id'"` //关联PlantClass中id
-	L int `xorm:"not null INT(11) 'level'"` //要求玩家种植等级
+	Id int    `xorm:"not null pk autoincr INT(11)" json:"id"` 
+    Name  string `xorm:"VARCHAR(64) not null" json:"name"`//植物名称
+	Price int `xorm:"not null INT(11)" json:"price"`//价格
+	InCome int `xorm:"not null INT(11)" json:"income"`//初始收益
+	ExpForAnimal int `xorm:"not null INT(11)" json:"exp"`//增加动物经验
+	Classid int `xorm:"not null INT(11)" json:"type"`//关联PlantClass中id
+	Level int `xorm:"not null INT(11)" json:"level"`//要求玩家种植等级
 }
+
 
 //动物表
 type Animal struct {
@@ -119,7 +119,7 @@ type AnimalClass struct {
 }
 
 type ShopData struct{
-	Plants []Plant
+	Plants []*ResponePlant
 	Animals []Animal
 }
 
@@ -146,7 +146,6 @@ type PlayerData struct{
 	SoilLevel int //可购买土地或宠物栏的等级
 	Soil []PlayerSoil //玩家土地信息
 	PetBar []PlayerPetbar //宠物栏信息
-	OwnPlants []int //已购买的植物ID
 }
 
 type SoilData struct{
@@ -239,15 +238,9 @@ type Petbar4 struct{
 	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
-//玩家已购买哪些植物
-type OwnPlant struct{
-	PId int `xorm:"not null pk INT(11)"` //玩家id
-	PlantId int `xorm:"not null pk INT(11)"`//植物id
-}
-
 
 type PlayerSoil struct{
-	SId int //土地id
+	Id int //土地id
 	Level int //土地等级
 	PlantId int //0表示没有种植
 	Price int  //当前价格
@@ -263,10 +256,15 @@ type PetbarData struct{
 }
 
 type PlayerPetbar struct{
-	PetbarId int //宠物栏id
+	Id int //宠物栏id
 	AnimalId int //0表示没有养宠物
 	Price int  //当前价格
 	State GoodsState
+}
+
+type ResponePlant struct{
+	Plant
+	State GoodsState `json:"state"`
 }
 
 

@@ -35,7 +35,11 @@ func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
 	if !checkVersion(c,eventHandler){
 	 return
 	}
-	eventHandler.GetShopData(c)
+	token,tf:= checkToken(c)
+	if !tf{
+	  return
+	}
+	eventHandler.GetShopData(c,token)
   })
 }
 
