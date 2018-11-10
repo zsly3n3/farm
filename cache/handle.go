@@ -117,8 +117,10 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 		rs.NickName = value[datastruct.NickNameField]
 	    rs.Avatar = value[datastruct.AvatarField]
 	    rs.PlantLevel = tools.StringToInt(value[datastruct.PlantLevelField])
-	    rs.SoilLevel = tools.StringToInt(value[datastruct.SoilLevelField])
-	    rs.OwnPlants,_= tools.BytesToSliceInt([]byte(value[datastruct.OwnPlantField]))
+		rs.SoilLevel = tools.StringToInt(value[datastruct.SoilLevelField])
+		ownplant_value,tf:=value[datastruct.OwnPlantField]
+		log.Debug("ownplant_value:%s , isExist:%d",ownplant_value,tf)
+	    rs.OwnPlants,_= tools.BytesToSliceInt([]byte(ownplant_value))
 
         /*
 		for i:=0;i<len(value);i++{
