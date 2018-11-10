@@ -101,7 +101,7 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 	rs := new(datastruct.PlayerData)
 	//add
-	//redis.StringMap
+	log.Debug("aaaaaaaaaaa")
 	value, err := redis.StringMap(conn.Do("hmget",key,
 	datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, 
 	datastruct.PermissionIdField,datastruct.CreatedAtField,datastruct.UpdateTimeField,
