@@ -169,19 +169,39 @@ const (
 //土地表4
 
 type Soil1 struct{
-	 
+	 PId int `xorm:"not null pk INT(11)"` //玩家id
+	 Level int `xorm:"not null INT(11)"`//土地等级
+	 PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	 Price int  `xorm:"not null INT(11)"`//当前价格
+	 Factor int `xorm:"not null INT(11)"`//生产系数
+	 State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 type Soil2 struct{
-	 
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 type Soil3 struct{
-	 
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 type Soil4 struct{
-	 
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 
