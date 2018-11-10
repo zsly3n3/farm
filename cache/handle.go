@@ -68,7 +68,7 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	  return
 	}
 	conn.Send("hset", key,datastruct.OwnPlantField,value)
-
+    
 	for i,v := range p_data.Soil{
 		soiltableName:=fmt.Sprintf("soil%d",i+1)
 		value,isError:=tools.PlayerSoilToString(&v)
@@ -102,12 +102,25 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	rs := new(datastruct.PlayerData)
 	//add
 	//redis.StringMap
-	value, err := redis.Values(conn.Do("hmget",key,
+	value, err := redis.StringMap(conn.Do("hmget",key,
 	datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, 
 	datastruct.PermissionIdField,datastruct.CreatedAtField,datastruct.UpdateTimeField,
 	datastruct.NickNameField,datastruct.AvatarField,
 	datastruct.PlantLevelField,datastruct.SoilLevelField,datastruct.OwnPlantField))
 	if err == nil {
+		rs.Id=tools.StringToInt(value[datastruct.IdField])
+		rs.GoldCount=tools.StringToInt64(value[datastruct.GoldField])
+		rs.HoneyCount=tools.StringToInt64(value[datastruct.HoneyField])
+		rs.PermissionId = tools.StringToInt(value[datastruct.PermissionIdField])
+		rs.CreatedAt = tools.StringToInt64(value[datastruct.CreatedAtField])
+		rs.UpdateTime = tools.StringToInt64(value[datastruct.UpdateTimeField])
+		rs.NickName = value[datastruct.NickNameField]
+	    rs.Avatar = value[datastruct.AvatarField]
+	    rs.PlantLevel = tools.StringToInt(value[datastruct.PlantLevelField])
+	    rs.SoilLevel = tools.StringToInt(value[datastruct.SoilLevelField])
+	    rs.OwnPlants,_= tools.BytesToSliceInt([]byte(value[datastruct.OwnPlantField]))
+
+        /*
 		for i:=0;i<len(value);i++{
 		   tmp:= value[i].([]byte)
 		   str:= string(tmp[:])
@@ -135,7 +148,7 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 			 case 10:
 				rs.OwnPlants,_= tools.BytesToSliceInt([]byte(str))
 		   }
-	   }
+	   }*/
 	}
 	len_soil:=5
     rs.Soil=make([]datastruct.PlayerSoil,0,len_soil)
