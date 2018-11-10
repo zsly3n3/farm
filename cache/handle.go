@@ -101,13 +101,17 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruct.PlayerData{
 	rs := new(datastruct.PlayerData)
 	//add
-	log.Debug("aaaaaaaaaaa")
+	
 	value, err := redis.StringMap(conn.Do("hmget",key,
 	datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, 
 	datastruct.PermissionIdField,datastruct.CreatedAtField,datastruct.UpdateTimeField,
 	datastruct.NickNameField,datastruct.AvatarField,
 	datastruct.PlantLevelField,datastruct.SoilLevelField,datastruct.OwnPlantField))
-	if err == nil {
+	if err!=nil{	
+	   log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s",err.Error(),key)
+	   return nil
+	}
+	
 		rs.Id=tools.StringToInt(value[datastruct.IdField])
 		rs.GoldCount=tools.StringToInt64(value[datastruct.GoldField])
 		rs.HoneyCount=tools.StringToInt64(value[datastruct.HoneyField])
@@ -151,7 +155,7 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 				rs.OwnPlants,_= tools.BytesToSliceInt([]byte(str))
 		   }
 	   }*/
-	}
+
 	len_soil:=5
     rs.Soil=make([]datastruct.PlayerSoil,0,len_soil)
 	for i:=1;i<=len_soil;i++{
