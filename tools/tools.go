@@ -232,7 +232,7 @@ func SliceIntToString(tmp []int)(string,bool){
 
 func BytesToSliceInt(bytes []byte)([]int,bool){
 	var tmp []int
-    err := json.Unmarshal(bytes,tmp)
+    err := json.Unmarshal(bytes,&tmp)
     if err != nil {
         log.Debug("BytesToSliceInt error:%s",err.Error())
 		return nil,true
