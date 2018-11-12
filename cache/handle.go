@@ -180,7 +180,7 @@ func (handle *CACHEHandler)GetPlantLevel(key string)(int,datastruct.CodeType){
 	defer conn.Close()
 	value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
 	code:=datastruct.NULLError
-	if err != nil {
+	if err != nil && value != "" {
 		code = datastruct.GetDataFailed
 		log.Debug("CACHEHandler GetPlantLevel err:%s",err.Error())
 		return -1,code
