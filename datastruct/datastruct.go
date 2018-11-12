@@ -304,8 +304,20 @@ func ResponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp[GoldField] = &(p_data.GoldCount)
 	mp[HoneyField] = &(p_data.HoneyCount)
 	mp["Soil"] = p_data.Soil
-	mp["Petbar"] = p_data.PetBar
-	p_data.PetBar
+	mp["Petbar"] = ResponsePetbarData(p_data)
 	return mp
+}
+
+func ResponsePetbarData(p_data *PlayerData)[]*ResponsePetbar{
+	 rs:=make([]*ResponsePetbar, 0,len(p_data.PetBar))
+	 for _,v:= range p_data.PetBar{
+		resp:=new(ResponsePetbar)
+		resp.Id = v.Id
+		resp.Price = v.Price
+		resp.State = v.State
+		resp.Animal = nil
+		rs = append(rs,resp)
+	 }
+	 return rs
 }
 
