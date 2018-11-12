@@ -189,8 +189,8 @@ func (handle *CACHEHandler)UpdatePlantLevel(key string,plant *datastruct.Plant) 
 		  case 1:
 			plantLevel = tools.StringToInt(str)
 	    } 
-    }
-    if gold>=int64(plant.Price){
+	}
+    if plantLevel < plant.Level && gold>=int64(plant.Price){
 	   gold=gold-int64(plant.Price)
 	   plantLevel+=1
 	} else{	
