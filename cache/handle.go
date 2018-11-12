@@ -9,11 +9,10 @@ import (
 )
 
 func (handle *CACHEHandler) GetPlayerData(conn redis.Conn,code string) (*datastruct.PlayerData,bool){
-	isExist:=false
 	var rs *datastruct.PlayerData
 	ilen, err := conn.Do("hlen", code)
-    if err == nil && (ilen.(int64)) > 0{
-	   isExist = true
+	isExist:=isExistUser(conn,code)
+	if isExist{
 	   rs = handle.ReadPlayerData(conn,code)
 	}
 	return rs,isExist
@@ -160,6 +159,9 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastruct.CodeType{
 	conn:=handle.GetConn()
 	defer conn.Close()
+	if !isExistUser(conn,key){
+       return datastruct.PutDataFailed
+	}
 	rep, err := conn.Do("hset", key,datastruct.PermissionIdField,permissionId)
 	log.Debug("rep:%v",rep)
 	code:=datastruct.NULLError
@@ -189,7 +191,14 @@ func (handle *CACHEHandler)GetPlantLevel(key string)(int,datastruct.CodeType){
 	return tools.StringToInt(value),code
 }
 
-
+func isExistUser(conn redis.Conn,key string)bool{
+	isExist:=false
+	ilen, err := conn.Do("hlen", key)
+	if err == nil && (ilen.(int64)) > 0{
+		isExist = true
+	}
+	return isExist
+}
 
 
 
