@@ -10,7 +10,6 @@ import (
 
 func (handle *CACHEHandler) GetPlayerData(conn redis.Conn,code string) (*datastruct.PlayerData,bool){
 	var rs *datastruct.PlayerData
-	ilen, err := conn.Do("hlen", code)
 	isExist:=isExistUser(conn,code)
 	if isExist{
 	   rs = handle.ReadPlayerData(conn,code)
