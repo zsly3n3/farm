@@ -116,7 +116,7 @@ func (handle *EventHandler)GetShopData(c *gin.Context,token string){
 	plantlevel,code:=handle.cacheHandler.GetPlantLevel(token)
     if code != datastruct.NULLError{
 	   c.JSON(200, gin.H{
-			"code":int(code),
+		"code":int(code),
 	   })
 	   return
 	}
