@@ -114,7 +114,7 @@ type AnimalClass struct {
 }
 
 type ShopData struct{
-	Plants []*ResponePlant
+	Plants []*ResponsePlant
 }
 
 type UserLogin struct{
@@ -254,12 +254,25 @@ type PetbarData struct{
 
 type PlayerPetbar struct{
 	Id int //宠物栏id
-	AnimalId int //0表示没有养宠物
+	AnimalId int//为0,表示没有养动物
 	Price int  //当前价格
 	State GoodsState
 }
 
-type ResponePlant struct{
+type ResponsePetbar struct{
+	Id int //宠物栏id
+	Animal *ResponseAnimal//为null,表示没有养动物
+	Price int  //当前价格
+	State GoodsState
+}
+
+type ResponseAnimal struct{
+	Name  string //名称
+	Factor int //增益系数
+	Exp int //升级所需经验
+}
+
+type ResponsePlant struct{
 	Plant
 	State GoodsState `json:"state"`
 }
@@ -281,7 +294,7 @@ const (
 
 
 
-func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
+func ResponseLoginData(p_data *PlayerData)map[string]interface{}{
 	if p_data == nil{
 	   return nil
 	}  	
@@ -292,8 +305,7 @@ func ReponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp[HoneyField] = &(p_data.HoneyCount)
 	mp["Soil"] = p_data.Soil
 	mp["Petbar"] = p_data.PetBar
-	//mp["PlantLevel"] = p_data.PlantLevel
-	//mp["OwnPlants"] = p_data.OwnPlants
+	p_data.PetBar
 	return mp
 }
 

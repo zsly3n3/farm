@@ -46,7 +46,7 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   }
 		   c.JSON(200, gin.H{
 			"code":code,
-			"data":datastruct.ReponseLoginData(p_data),
+			"data":datastruct.ResponseLoginData(p_data),
 		   })
 		 } else {
 			c.JSON(200, gin.H{
@@ -108,9 +108,9 @@ func (handle *EventHandler)GetShopData(c *gin.Context,token string){
 	len:=len(handle.plants)
 	index:=0
 	num:=40
-	plants:=make([]*datastruct.ResponePlant,0,num)
+	plants:=make([]*datastruct.ResponsePlant,0,num)
 	for i:=0;i<len;i++{
-		plant:=new(datastruct.ResponePlant)
+		plant:=new(datastruct.ResponsePlant)
 		plant.Plant = handle.plants[i]
 		if plantlevel >= plant.Level{
 		  plant.State = datastruct.Owned
@@ -124,7 +124,7 @@ func (handle *EventHandler)GetShopData(c *gin.Context,token string){
 	}
 
 	for i:=index;i<len;i++{
-		plant:=new(datastruct.ResponePlant)
+		plant:=new(datastruct.ResponsePlant)
 		plant.Plant=handle.plants[i]
 		plant.State = datastruct.Locked
 		plants=append(plants,plant)

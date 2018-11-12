@@ -6,7 +6,7 @@ import(
 	"time"
 	"farm/datastruct"
 	"farm/tools"
-	"farm/log"
+	//"farm/log"
 )
 
 type EventHandler struct {
@@ -30,12 +30,6 @@ func CreateEventHandler()*EventHandler{
 	 eventHandler.createTicker(5*time.Minute)
 	 eventHandler.plants = eventHandler.dbHandler.GetPlantsSlice()
 	 eventHandler.animals = eventHandler.dbHandler.GetAnimalsMap()
-	 log.Debug("-------")
-	 for k,v := range eventHandler.animals{
-		 log.Debug("k:%v",k)
-		 log.Debug("v:%v",v)
-		 log.Debug("-------")
-	 }
 	 return eventHandler
 }
 

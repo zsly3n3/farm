@@ -48,7 +48,6 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	userinfo.NickName = p_data.NickName
    
 
-
 	var err error
 	if p_data.Id <= 0{
 		_, err = session.Insert(&userinfo)  	
@@ -77,6 +76,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	}
 
 
+
 	err=session.Commit()
 	if err != nil{
 	  str:=fmt.Sprintf("DBHandler->SetPlayerData Commit :%s",err.Error())
@@ -89,29 +89,6 @@ func rollback(err_str string,session *xorm.Session){
 	log.Debug("will rollback,err_str:%v",err_str)
 	session.Rollback()
 }
-
-
-// func(handle *DBHandler)GetShopData()(datastruct.CodeType,*datastruct.ShopData){
-// 	engine:=handle.mysqlEngine
-// 	plants := make([]datastruct.Plant, 0,60)
-// 	animals := make([]datastruct.Animal,0,40)
-// 	data := new(datastruct.ShopData)
-//     var err error
-// 	err = engine.Find(&plants)
-// 	if err != nil{
-// 	   log.Debug("GetPlantsData error:%v",err.Error())
-// 	   return datastruct.GetDataFailed,nil
-// 	}
-// 	err = engine.Find(&animals)
-// 	if err != nil{
-// 	   log.Debug("GetAnimalData error:%v",err.Error())
-// 	   return datastruct.GetDataFailed,nil
-// 	}
-// 	data.Plants = plants
-// 	data.Animals = animals
-//     return datastruct.NULLError,data
-// }
-
 
 func(handle *DBHandler)GetPlantsSlice()[]datastruct.Plant{
 	engine:=handle.mysqlEngine
