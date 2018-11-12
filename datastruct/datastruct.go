@@ -201,29 +201,33 @@ type Soil5 struct{
 //宠物栏1,2,3,4 海，陆，空，神
 type Petbar1 struct{
 	 PId int `xorm:"not null pk INT(11)"` //玩家id
-	 AnimalId int `xorm:"not null INT(11)"`//0表示没有种植
+	 AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
 	 Price int  `xorm:"not null INT(11)"`//当前价格
+	 CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
 	 State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
 type Petbar2 struct{
 	 PId int `xorm:"not null pk INT(11)"` //玩家id
-	 AnimalId int `xorm:"not null INT(11)"`//0表示没有种植
+	 AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
 	 Price int  `xorm:"not null INT(11)"`//当前价格
+	 CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
 	 State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
 type Petbar3 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
-	AnimalId int `xorm:"not null INT(11)"`//0表示没有种植
+	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
 	Price int  `xorm:"not null INT(11)"`//当前价格
+	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
 	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
 type Petbar4 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
-	AnimalId int `xorm:"not null INT(11)"`//0表示没有种植
+	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
 	Price int  `xorm:"not null INT(11)"`//当前价格
+	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
 	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
@@ -247,20 +251,21 @@ type PlayerSoil struct{
 
 
 type PetbarData struct{
-	Id int //宠物栏id
+	Type AnimalType //宠物栏类型
 	Price int  //当前价格
 	Require int //开启条件
 }
 
 type PlayerPetbar struct{
-	Id int //宠物栏id
-	AnimalId int//为0,表示没有养动物
+	Type AnimalType //宠物栏类型
+	AnimalNumber int//为0,表示没有养动物
 	Price int  //当前价格
+	CurrentExp int64 //当前宠物栏经验
 	State GoodsState
 }
 
 type ResponsePetbar struct{
-	Id int //宠物栏id
+	Type AnimalType //宠物栏类型
 	Animal *ResponseAnimal//为null,表示没有养动物
 	Price int  //当前价格
 	State GoodsState
@@ -269,7 +274,8 @@ type ResponsePetbar struct{
 type ResponseAnimal struct{
 	Name  string //名称
 	Factor int //增益系数
-	Exp int //升级所需经验
+	CurrentExp int64 //当前经验
+	Exp int64 //升级所需经验
 }
 
 type ResponsePlant struct{
@@ -312,12 +318,20 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType][]Animal)[]*Res
 	 rs:=make([]*ResponsePetbar, 0,len(p_data.PetBar))
 	 for _,v:= range p_data.PetBar{
 		resp:=new(ResponsePetbar)
-		resp.Id = v.Id
+		resp.Type = v.Type
 		resp.Price = v.Price
 		resp.State = v.State
-		resp.Animal = nil
+		if v.AnimalNumber == 0{
+		  resp.Animal = nil
+		} else {
+		  resp.Animal = nil
+		  //anis:= ani_mp[v.Type]
+		  //anis[v.AnimalNumber]
+		}
 		rs = append(rs,resp)
 	 }
 	 return rs
 }
+
+
 

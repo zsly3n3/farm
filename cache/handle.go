@@ -69,9 +69,9 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 		}
 		conn.Send("hset", soiltableName,key,value)
 	}
-
-	for i,v := range p_data.PetBar{
-		petbartableName:=fmt.Sprintf("petbar%d",i+1)
+     
+	for _,v := range p_data.PetBar{
+		petbartableName:=fmt.Sprintf("petbar%d",int(v.Type))
 		value,isError:=tools.PlayerPetbarToString(&v)
 		if isError{
 		   log.Debug("CACHEHandler SetPlayerData PlayerPetbarToString err:%s player:%s",petbartableName,key)	
@@ -140,9 +140,9 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	}
 
 
-	len_petbar:=4
+	len_petbar:=int(datastruct.Deity)
     rs.PetBar=make([]datastruct.PlayerPetbar,0,len_petbar)
-	for i:=1;i<=len_petbar;i++{
+	for i:=int(datastruct.Sea);i<=len_petbar;i++{
 		petbartableName:=fmt.Sprintf("petbar%d",i)
 		value, err := redis.String(conn.Do("hget",petbartableName,key))
 		if err == nil{
