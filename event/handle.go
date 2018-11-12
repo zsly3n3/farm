@@ -102,7 +102,8 @@ func (handle *EventHandler)GetShopData(c *gin.Context,token string){
     if code != datastruct.NULLError{
 	   c.JSON(200, gin.H{
 			"code":int(code),
-	   })	
+	   })
+	   return
 	}
 
 	len:=len(handle.plants)
