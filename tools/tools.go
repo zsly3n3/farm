@@ -111,7 +111,7 @@ func GetAnimalInfo()[]datastruct.Animal{
 		animal.Name = name
 		animal.ClassId = StringToInt(cid)
 		animal.Factor = StringToInt(factor)
-		animal.Exp = StringToInt(exp)
+		animal.Exp = StringToInt64(exp)
 		animal.Number = StringToInt(number)
         animals = append(animals,animal)
         index++

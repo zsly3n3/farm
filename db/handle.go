@@ -101,9 +101,9 @@ func(handle *DBHandler)GetPlantsSlice()[]datastruct.Plant{
 	return plants
 }
 
-func(handle *DBHandler)GetAnimalsMap()map[datastruct.AnimalType][]datastruct.Animal{
+func(handle *DBHandler)GetAnimalsMap()map[datastruct.AnimalType]map[int]datastruct.Animal{
 	engine:=handle.mysqlEngine
-	mp:=make(map[datastruct.AnimalType][]datastruct.Animal)
+	mp:=make(map[datastruct.AnimalType]map[int]datastruct.Animal)
 	start:=int(datastruct.Sea)
 	end:=int(datastruct.Deity)
 	for i:=start;i<=end;i++{
@@ -113,7 +113,11 @@ func(handle *DBHandler)GetAnimalsMap()map[datastruct.AnimalType][]datastruct.Ani
 			log.Debug("GetAnimalsMap error:%v",err.Error())
 			return nil
 		}
-		mp[datastruct.AnimalType(i)]=arr
+		tmp_mp:=make(map[int]datastruct.Animal)
+		for _,v := range arr{
+          tmp_mp[v.Number] = v
+		}
+		mp[datastruct.AnimalType(i)]=tmp_mp
 	}
 	return mp
 }

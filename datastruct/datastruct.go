@@ -102,7 +102,7 @@ type Animal struct {
     Id int    `xorm:"not null pk autoincr INT(11)"`
     Name  string `xorm:"VARCHAR(64) not null "` //名称
 	Factor int `xorm:"not null INT(11) "`//增益系数
-	Exp int `xorm:"not null INT(11) "`//升级所需经验
+	Exp int64 `xorm:"not null bigint"`//升级所需经验
 	ClassId int `xorm:"not null INT(11) "` //关联AnimalClass中id
 	Number int `xorm:"not null INT(11) "` //动物编号
 }
@@ -300,7 +300,7 @@ const (
 
 
 
-func ResponseLoginData(p_data *PlayerData,ani_mp map[AnimalType][]Animal)map[string]interface{}{
+func ResponseLoginData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
 	if p_data == nil{
 	   return nil
 	}  	
@@ -314,7 +314,7 @@ func ResponseLoginData(p_data *PlayerData,ani_mp map[AnimalType][]Animal)map[str
 	return mp
 }
 
-func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType][]Animal)[]*ResponsePetbar{
+func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)[]*ResponsePetbar{
 	 rs:=make([]*ResponsePetbar, 0,len(p_data.PetBar))
 	 for _,v:= range p_data.PetBar{
 		resp:=new(ResponsePetbar)
@@ -324,9 +324,25 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType][]Animal)[]*Res
 		if v.AnimalNumber == 0{
 		  resp.Animal = nil
 		} else {
+		  var tf bool
+		  var anis map[int]Animal
+		  anis,tf= ani_mp[v.Type]
+		  if tf {
+			var ani Animal  
+			ani,tf=anis[v.AnimalNumber]
+			if tf{
+			   resp.Animal = new(ResponseAnimal)
+			   resp.Animal.CurrentExp = v.CurrentExp
+			   resp.Animal.Factor = ani.Factor
+			   resp.Animal.Exp = ani.Exp
+			   resp.Type = AnimalType(ani.ClassId)
+			} else {
+			   resp.Animal = nil 
+			}
+		  } else {
+			resp.Animal = nil 
+		  }
 		  resp.Animal = nil
-		  //anis:= ani_mp[v.Type]
-		  //anis[v.AnimalNumber]
 		}
 		rs = append(rs,resp)
 	 }

@@ -16,7 +16,7 @@ type EventHandler struct {
 	ticker *time.Ticker
 	isExistTicker bool
 	plants []datastruct.Plant
-	animals map[datastruct.AnimalType][]datastruct.Animal//按动物类型划分
+	animals map[datastruct.AnimalType]map[int]datastruct.Animal//按动物类型划分
 	petbars []datastruct.PetbarData
 	soils []datastruct.SoilData
 }
