@@ -1,5 +1,7 @@
 package datastruct
 
+import "farm/log"
+
 const NULLSTRING = ""
 const NULLID = -1
 
@@ -321,6 +323,7 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)
 		resp.Type = v.Type
 		resp.Price = v.Price
 		resp.State = v.State
+		log.Debug("vvvvvvv:%d",v.AnimalNumber)
 		if v.AnimalNumber == 0{
 		  resp.Animal = nil
 		} else {
