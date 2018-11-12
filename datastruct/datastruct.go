@@ -27,7 +27,9 @@ const (
 	GetDataFailed//获取数据失败
 	PutDataFailed//修改数据失败
 	VersionError//客户端与服务器版本不一致
-	TokenNull//没有Token或者值为空
+	TokenError//没有Token或者值为空,或者不存在此Token
+	JsonParseFailedFromPutBody//来自put请求中的Body解析json失败
+	PurchaseFailed//购买失败，金币不够或者其他原因
 )
 
 
@@ -115,13 +117,6 @@ type ShopData struct{
 	Plants []*ResponsePlant
 }
 
-type UserLogin struct{
-	 PlatformId Platform //平台
-	 Code string //身份标识
-	 IsAuth int //是否授权
-	 NickName string
-	 Avatar string
-}
 
 //save reids,save mysql 
 type PlayerData struct{
@@ -401,4 +396,15 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 }
 
 
+//body
+type UserLogin struct{
+	PlatformId Platform //平台
+	Code string //身份标识
+	IsAuth int //是否授权
+	NickName string
+	Avatar string
+}
 
+type BuyPlant struct{
+   PlantId int
+}

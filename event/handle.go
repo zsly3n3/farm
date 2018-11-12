@@ -96,6 +96,21 @@ func (handle *EventHandler)UpdatePermisson(key string,permissionId int) datastru
 	return code
 }
 
+func (handle *EventHandler)BuyPlant(key string,c *gin.Context) (datastruct.CodeType,int64){
+	var body datastruct.BuyPlant
+	err:=c.BindJSON(&body)
+	code:=datastruct.NULLError
+	var gold int64
+	if err == nil {
+	   index:=body.PlantId-1
+	   code,gold=handle.cacheHandler.UpdatePlantLevel(key,&handle.plants[index])
+	} else{
+	   code=datastruct.JsonParseFailedFromPutBody
+	}
+	return code,gold
+}
+
+
 
 func (handle *EventHandler)GetShopData(c *gin.Context,token string){
 	plantlevel,code:=handle.cacheHandler.GetPlantLevel(token)

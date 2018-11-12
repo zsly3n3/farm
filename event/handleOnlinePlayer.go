@@ -52,8 +52,6 @@ func (handle *EventHandler)createUser(code string,permissionId int,nickName stri
     return player
 }
 
-
-
 func createSoil(soils map[int]datastruct.SoilData)map[int]datastruct.PlayerSoil{
     rs:=make(map[int]datastruct.PlayerSoil)
     for k,v := range soils{

@@ -154,7 +154,7 @@ func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastru
 	conn:=handle.GetConn()
 	defer conn.Close()
 	if !isExistUser(conn,key){
-       return datastruct.PutDataFailed
+       return datastruct.TokenError
 	}
 	rep, err := conn.Do("hset", key,datastruct.PermissionIdField,permissionId)
 	log.Debug("rep:%v",rep)
@@ -164,6 +164,44 @@ func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastru
 	   log.Debug("CACHEHandler UpdatePermisson err:%s",err.Error())
 	}
 	return code
+}
+
+func (handle *CACHEHandler)UpdatePlantLevel(key string,plant *datastruct.Plant) (datastruct.CodeType,int64){
+	conn:=handle.GetConn()
+	defer conn.Close()
+	if !isExistUser(conn,key){
+       return datastruct.PurchaseFailed,-1
+	}
+    value, err := redis.Values(conn.Do("hmget",key,
+	datastruct.GoldField,datastruct.PlantLevelField))
+	if err!=nil{	
+		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
+		return datastruct.PurchaseFailed,-1
+	}
+	var gold int64
+	var plantLevel int
+    for i:=0;i<len(value);i++{
+		tmp:= value[i].([]byte)
+		str:= string(tmp[:])
+		switch i{
+		  case 0:
+			gold = tools.StringToInt64(str)
+		  case 1:
+			plantLevel = tools.StringToInt(str)
+	    } 
+    }
+    if gold>=int64(plant.Price){
+	   gold=gold-int64(plant.Price)
+	   plantLevel+=1
+	} else{	
+	   return datastruct.PurchaseFailed,-1
+	}
+	_, err = conn.Do("hmset", key,datastruct.GoldField,gold,datastruct.PlantLevelField,plantLevel)
+	if err != nil {
+	   log.Debug("CACHEHandler UpdatePlantLevel hmset err:%s",err.Error())
+	   return datastruct.PurchaseFailed,-1
+	}
+	return datastruct.NULLError,gold
 }
 
 func (handle *CACHEHandler)clearData(){
@@ -177,7 +215,10 @@ func (handle *CACHEHandler)GetPlantLevel(key string)(int,datastruct.CodeType){
 	defer conn.Close()
 	value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
 	code:=datastruct.NULLError
-	if err != nil && value == "" {
+	if value == ""{
+	   return -1,datastruct.TokenError
+	}
+	if err != nil {
 		code = datastruct.GetDataFailed
 		log.Debug("CACHEHandler GetPlantLevel err:%s",err.Error())
 		return -1,code
