@@ -116,7 +116,7 @@ func checkToken(c *gin.Context) (string,bool){
 			 }
 		} else{
 			c.JSON(200, gin.H{
-				"code": datastruct.TokenNull,
+				"code": datastruct.TokenError,
 			}) 
 		}
 		return token,tf
