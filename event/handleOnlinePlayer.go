@@ -61,7 +61,10 @@ func createSoil(soils map[int]datastruct.SoilData)map[int]datastruct.PlayerSoil{
         state:=datastruct.Locked
         tmp.PlantId = 0
         if k == 1{
-          state = datastruct.Unlocked
+          state = datastruct.Owned
+          tmp.PlantId = 1
+        } else {
+          tmp.PlantId = 0  
         }
         tmp.Factor = v.Factor
         tmp.Level = v.Level
