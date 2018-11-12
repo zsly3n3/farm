@@ -230,13 +230,30 @@ type SoilData struct{
 	Require int //开启条件
 }
 
-type PlayerSoil struct{
+type PlayerSoilBase struct{
 	Level int //土地等级
 	Price int  //当前价格
 	Factor int //生产系数
-	PlantId int //0表示没有种植
 	State GoodsState //土地状态
 }
+
+type PlayerSoil struct{
+	PlayerSoilBase
+	PlantId int //0表示没有种植
+}
+
+type ResponsePlayerSoilBase struct{
+	PlayerSoilBase
+	Id int //土地id
+}
+
+type ResponsePlayerSoil struct{
+	*ResponsePlayerSoilBase
+	PlantId int //0表示没有种植
+}
+
+
+
 
 
 type PetbarData struct{
@@ -287,8 +304,6 @@ const (
 	Deity//神
 )
 
-
-
 func ResponseLoginData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
 	if p_data == nil{
 	   return nil
@@ -298,12 +313,35 @@ func ResponseLoginData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani_
 	mp["Token"] = &(p_data.Token)
 	mp[GoldField] = &(p_data.GoldCount)
 	mp[HoneyField] = &(p_data.HoneyCount)
-	mp["Soil"] = p_data.Soil
-	mp["Petbar"] = ResponsePetbarData(p_data,petbars,ani_mp)
+	mp["Soil"] = responsePlayerSoil(p_data)
+	mp["Petbar"] = responsePetbarData(p_data,petbars,ani_mp)
 	return mp
 }
 
-func ResponsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)[]interface{}{
+func responsePlayerSoil(p_data *PlayerData)[]interface{}{
+	rs:=make([]interface{},0,len(p_data.Soil))
+	for k,v:=range p_data.Soil{
+		var interface_var interface{}
+		resp_base:=new(ResponsePlayerSoilBase)
+		resp_base.Id = k
+		resp_base.Level = v.Level
+		resp_base.Price = v.Price
+		resp_base.Factor = v.Factor
+		resp_base.State = v.State
+        if v.PlantId == 0{
+		  interface_var = resp_base
+		} else {
+			resp:=new(ResponsePlayerSoil)
+			resp.ResponsePlayerSoilBase = resp_base
+			resp.PlantId = v.PlantId
+			interface_var = resp
+		}
+		rs = append(rs,interface_var)
+	}
+	return rs
+}
+
+func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)[]interface{}{
 	 rs:=make([]interface{}, 0,len(p_data.PetBar))
 	 for k,v:= range p_data.PetBar{
 		var interface_var interface{}
