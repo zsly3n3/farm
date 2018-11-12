@@ -16,7 +16,7 @@ func cors() gin.HandlerFunc {
 		// c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
 		// c.Writer.Header().Add("Access-Control-Allow-Headers", "appversion,apptoken")
 		// c.Next()
-        method := c.Request.Method
+        // method := c.Request.Method
  
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Token, Appversion, Apptoken")
