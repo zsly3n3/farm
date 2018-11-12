@@ -337,7 +337,7 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)
 			   resp.Animal.CurrentExp = v.CurrentExp
 			   resp.Animal.Factor = ani.Factor
 			   resp.Animal.Exp = ani.Exp
-			   resp.Animal.Type = AnimalType(ani.ClassId)
+			   resp.Animal.Name = ani.Name
 			} else {
 			   log.Debug("------------------------11")
 			   resp.Animal = nil 
