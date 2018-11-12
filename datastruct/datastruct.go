@@ -323,7 +323,6 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)
 		resp.Type = v.Type
 		resp.Price = v.Price
 		resp.State = v.State
-		log.Debug("vvvvvvv:%d",v.AnimalNumber)
 		if v.AnimalNumber == 0{
 		  resp.Animal = nil
 		} else {
@@ -338,11 +337,13 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)
 			   resp.Animal.CurrentExp = v.CurrentExp
 			   resp.Animal.Factor = ani.Factor
 			   resp.Animal.Exp = ani.Exp
-			   resp.Type = AnimalType(ani.ClassId)
+			   resp.Animal.Type = AnimalType(ani.ClassId)
 			} else {
+			   log.Debug("------------------------11")
 			   resp.Animal = nil 
 			}
 		  } else {
+			log.Debug("------------------------22")	  
 			resp.Animal = nil 
 		  }
 		  resp.Animal = nil
