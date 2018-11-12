@@ -266,8 +266,12 @@ type PlayerPetbar struct{
 }
 
 type ResponsePetbar struct{
+	Animal *ResponseAnimal//动物
+	*ResponsePetbarBase
+}
+
+type ResponsePetbarBase struct{
 	Type AnimalType //宠物栏类型
-	Animal *ResponseAnimal//为null,表示没有养动物
 	Price int  //当前价格
 	State GoodsState
 }
@@ -315,16 +319,20 @@ func ResponseLoginData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)m
 	return mp
 }
 
-func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)[]*ResponsePetbar{
-	 rs:=make([]*ResponsePetbar, 0,len(p_data.PetBar))
+func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)[]interface{}{
+	 rs:=make([]interface{}, 0,len(p_data.PetBar))
 	 for _,v:= range p_data.PetBar{
-		resp:=new(ResponsePetbar)
-		resp.Type = v.Type
-		resp.Price = v.Price
-		resp.State = v.State
+		var interface_var interface{}
+		base:=new(ResponsePetbarBase)
+		base.Price = v.Price
+		base.State = v.State
+		base.Type = v.Type
+
 		if v.AnimalNumber == 0{
-		  resp.Animal = nil
+		  interface_var = base
 		} else {
+		  resp:=new(ResponsePetbar)
+		  resp.ResponsePetbarBase = base
 		  var tf bool
 		  var anis map[int]Animal
 		  anis,tf= ani_mp[v.Type]
@@ -343,8 +351,9 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)
 		  } else {	  
 			resp.Animal = nil 
 		  }
+		  interface_var = resp
 		}
-		rs = append(rs,resp)
+		rs = append(rs,interface_var)
 	 }
 	 return rs
 }
