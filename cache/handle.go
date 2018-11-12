@@ -45,7 +45,6 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	key:=p_data.Token
 	//add
 
-
 	conn.Send("MULTI")
 	conn.Send("hmset", key,
 	datastruct.IdField,p_data.Id,
@@ -60,8 +59,8 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	datastruct.SoilLevelField,p_data.SoilLevel)
 	
     
-	for i,v := range p_data.Soil{
-		soiltableName:=fmt.Sprintf("soil%d",i+1)
+	for _,v := range p_data.Soil{
+		soiltableName:=fmt.Sprintf("soil%d",v.Id)
 		value,isError:=tools.PlayerSoilToString(&v)
 		if isError{
 		   log.Debug("CACHEHandler SetPlayerData PlayerSoilToString err:%s player:%s",soiltableName,key)	
