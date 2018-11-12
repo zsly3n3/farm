@@ -58,8 +58,8 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	datastruct.PlantLevelField,p_data.PlantLevel)
 	
     
-	for _,v := range p_data.Soil{
-		soiltableName:=fmt.Sprintf("soil%d",v.Id)
+	for k,v := range p_data.Soil{
+		soiltableName:=fmt.Sprintf("soil%d",k)
 		value,isError:=tools.PlayerSoilToString(&v)
 		if isError{
 		   log.Debug("CACHEHandler SetPlayerData PlayerSoilToString err:%s player:%s",soiltableName,key)	
@@ -125,13 +125,13 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	}
 
 	len_soil:=5
-    rs.Soil=make([]datastruct.PlayerSoil,0,len_soil)
+    rs.Soil=make(map[int]datastruct.PlayerSoil)
 	for i:=1;i<=len_soil;i++{
 		soiltableName:=fmt.Sprintf("soil%d",i)
 		value, err := redis.String(conn.Do("hget",soiltableName,key))
 		if err == nil{
 			tmp,_:=tools.BytesToPlayerSoil([]byte(value))
-			rs.Soil=append(rs.Soil,*tmp)
+			rs.Soil[i]=*tmp
 		}
 	}
 

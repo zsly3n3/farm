@@ -54,21 +54,20 @@ func (handle *EventHandler)createUser(code string,permissionId int,nickName stri
 
 
 
-func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
-    rs:=make([]datastruct.PlayerSoil,0,len(soils))
-    for i,v := range soils{
+func createSoil(soils map[int]datastruct.SoilData)map[int]datastruct.PlayerSoil{
+    rs:=make(map[int]datastruct.PlayerSoil)
+    for k,v := range soils{
         var tmp datastruct.PlayerSoil
         state:=datastruct.Locked
-        if i == 0{
+        if k == 1{
           state = datastruct.Unlocked
         }
-        tmp.Id = v.Id
         tmp.Factor = v.Factor
         tmp.Level = v.Level
         tmp.PlantId = 0
         tmp.Price = v.Price
         tmp.State = state
-        rs = append(rs,tmp)
+        rs[k]=tmp
     }
     return rs
 }

@@ -120,14 +120,14 @@ func GetAnimalInfo()[]datastruct.Animal{
 }
 
 
-func GetSoildInfo()([]datastruct.SoilData,map[datastruct.AnimalType]datastruct.PetbarData){
+func GetSoildInfo()(map[int]datastruct.SoilData,map[datastruct.AnimalType]datastruct.PetbarData){
 	xlsx, err := excelize.OpenFile("conf/soil_data.xlsx")
     if err != nil {
         log.Fatal("Excel error is %v", err.Error())
     }
 	index:=2
 	soildtTableName:="Sheet1"
-	soils:=make([]datastruct.SoilData, 0,5)
+	soils:=make(map[int]datastruct.SoilData)
     for {
 		cell_index  := fmt.Sprintf("A%d",index)
 		cell_price := fmt.Sprintf("B%d",index)
@@ -141,12 +141,12 @@ func GetSoildInfo()([]datastruct.SoilData,map[datastruct.AnimalType]datastruct.P
             break
 		}
 		var soil datastruct.SoilData
-		soil.Id = StringToInt(location)
+		soil_id := StringToInt(location)
 		soil.Price = StringToInt(price)
 		soil.Factor = StringToInt(factor)
 		soil.Require = StringToInt(require)
 		soil.Level = 1
-        soils = append(soils,soil)
+		soils[soil_id]=soil
         index++
 	}
 

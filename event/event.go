@@ -18,7 +18,7 @@ type EventHandler struct {
 	plants []datastruct.Plant
 	animals map[datastruct.AnimalType]map[int]datastruct.Animal//按动物类型划分
 	petbars map[datastruct.AnimalType]datastruct.PetbarData
-	soils []datastruct.SoilData
+	soils map[int]datastruct.SoilData//key为土地id
 }
 
 func CreateEventHandler()*EventHandler{

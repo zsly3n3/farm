@@ -84,7 +84,16 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	      return userinfo.Id
 	    }
 	}
- 
+    
+	for k,v:=range p_data.Soil {
+		sql=fmt.Sprintf("REPLACE INTO soil%d (p_id,level,plant_id,price,factor,state)VALUES(%d,%d,%d,%d,%d,%d)",k,userinfo.Id,v.Level,v.PlantId,v.Price,v.Factor,int(v.State))
+		_, err=session.Exec(sql)
+	    if err != nil{
+	      str:=fmt.Sprintf("DBHandler->SetPlayerData REPLACE PetBar :%s",err.Error())
+	      rollback(str,session)
+	      return userinfo.Id
+	    }
+	}
 
 
 	err=session.Commit()

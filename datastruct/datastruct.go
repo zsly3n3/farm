@@ -135,7 +135,7 @@ type PlayerData struct{
 	NickName string
 	Avatar string
 	PlantLevel int //可购买商店植物的等级
-	Soil []PlayerSoil //玩家土地信息
+	Soil map[int]PlayerSoil //玩家土地信息
 	PetBar map[AnimalType]PlayerPetbar //宠物栏信息
 }
 
@@ -224,7 +224,6 @@ type Petbar4 struct{
 
 
 type SoilData struct{
-	Id int //土地id 
 	Level int //土地当前等级
 	Price int //当前价格
 	Factor int //生产系数
@@ -232,7 +231,6 @@ type SoilData struct{
 }
 
 type PlayerSoil struct{
-	Id int //土地id
 	Level int //土地等级
 	Price int  //当前价格
 	Factor int //生产系数
@@ -274,7 +272,6 @@ type ResponsePlant struct{
 	Plant
 	State GoodsState `json:"state"`
 }
-
 
 type PermissionType int //错误码
 const (
