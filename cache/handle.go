@@ -160,7 +160,8 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastruct.CodeType{
 	conn:=handle.GetConn()
 	defer conn.Close()
-	_, err := conn.Do("hset", key,datastruct.PermissionIdField,permissionId)
+	rep, err := conn.Do("hset", key,datastruct.PermissionIdField,permissionId)
+	log.Debug("rep:%v",rep)
 	code:=datastruct.NULLError
 	if err != nil {
 	   code = datastruct.PutDataFailed
