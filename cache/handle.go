@@ -55,8 +55,7 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	datastruct.UpdateTimeField,p_data.UpdateTime,
 	datastruct.NickNameField,p_data.NickName,
 	datastruct.AvatarField,p_data.Avatar,
-	datastruct.PlantLevelField,p_data.PlantLevel,
-	datastruct.SoilLevelField,p_data.SoilLevel)
+	datastruct.PlantLevelField,p_data.PlantLevel)
 	
     
 	for _,v := range p_data.Soil{
@@ -95,7 +94,7 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	datastruct.IdField,datastruct.GoldField, datastruct.HoneyField, 
 	datastruct.PermissionIdField,datastruct.CreatedAtField,datastruct.UpdateTimeField,
 	datastruct.NickNameField,datastruct.AvatarField,
-	datastruct.PlantLevelField,datastruct.SoilLevelField))
+	datastruct.PlantLevelField))
 	if err!=nil{	
 	   log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s",err.Error(),key)
 	   return rs
@@ -122,8 +121,6 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 				rs.Avatar = str
 			 case 8:
 				rs.PlantLevel = tools.StringToInt(str)
-			 case 9:
-				rs.SoilLevel = tools.StringToInt(str)
 		}
 	}
 

@@ -47,7 +47,6 @@ func (handle *EventHandler)createUser(code string,permissionId int,nickName stri
 	player.NickName = nickName
 	player.Avatar = avatar
     player.PlantLevel = 0
-    player.SoilLevel = 0
     player.Soil = createSoil(handle.soils)
     player.PetBar = createPetbar(handle.petbars)
     return player

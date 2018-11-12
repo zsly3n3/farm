@@ -48,7 +48,6 @@ const NickNameField = "NickName"
 const AvatarField = "Avatar"
 
 const PlantLevelField = "PlantLevel"
-const SoilLevelField = "SoilLevel"
 
 const PlayerPetbarField = "PlayerPetbar"
 
@@ -74,7 +73,6 @@ type PlayerInfo struct {
 	HoneyCount int64 `xorm:"bigint not null"`//蜂蜜数量
 	GoldCount  int64 `xorm:"bigint not null"`//金币数量
 	PlantLevel int `xorm:"not null INT(11) "`//玩家的种植等级
-	SoilLevel int `xorm:"not null INT(11) "`//玩家的土地等级
 }
 
 
@@ -138,7 +136,6 @@ type PlayerData struct{
 	NickName string
 	Avatar string
 	PlantLevel int //可购买商店植物的等级
-	SoilLevel int //可购买土地或宠物栏的等级
 	Soil []PlayerSoil //玩家土地信息
 	PetBar []PlayerPetbar //宠物栏信息
 }
