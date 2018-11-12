@@ -324,6 +324,7 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)
 		resp.Price = v.Price
 		resp.State = v.State
 		if v.AnimalNumber == 0{
+		  log.Debug("------------------------00000")	
 		  resp.Animal = nil
 		} else {
 		  var tf bool
