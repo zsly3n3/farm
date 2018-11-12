@@ -145,7 +145,7 @@ func GetSoildInfo()(map[int]datastruct.SoilData,map[datastruct.AnimalType]datast
 		soil.Price = StringToInt(price)
 		soil.Factor = StringToInt(factor)
 		soil.Require = StringToInt(require)
-		soil.Level = 1
+		soil.Level = 0
 		soils[soil_id]=soil
         index++
 	}
