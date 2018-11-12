@@ -79,10 +79,10 @@ func createPetbar(petbars []datastruct.PetbarData)[]datastruct.PlayerPetbar{
     for _,v := range petbars{
         var tmp datastruct.PlayerPetbar
         tmp.Type = v.Type
-        tmp.AnimalNumber = 0
+        tmp.AnimalNumber = 1
         tmp.Price = v.Price
         tmp.CurrentExp = 0
-        tmp.State = datastruct.Locked
+        tmp.State = datastruct.Owned
         rs = append(rs,tmp)
     }
     return rs
