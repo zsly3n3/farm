@@ -79,13 +79,8 @@ func createPetbar(petbars []datastruct.PetbarData)[]datastruct.PlayerPetbar{
     for _,v := range petbars{
         var tmp datastruct.PlayerPetbar
         tmp.Type = v.Type
-        if tmp.Type == datastruct.Land{
-            tmp.AnimalNumber = 1
-            tmp.State = datastruct.Owned
-        } else {
-            tmp.AnimalNumber = 0
-            tmp.State = datastruct.Locked
-        }
+        tmp.AnimalNumber = 0
+        tmp.State = datastruct.Locked
         tmp.Price = v.Price
         tmp.CurrentExp = 0
         
