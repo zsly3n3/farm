@@ -46,7 +46,7 @@ func (handle *EventHandler)Login(c *gin.Context){
 		   }
 		   c.JSON(200, gin.H{
 			"code":code,
-			"data":datastruct.ResponseLoginData(p_data,handle.petbars,handle.animals),
+			"data":datastruct.ResponseLoginData(p_data,handle.plants,handle.petbars,handle.animals),
 		   })
 		 } else {
 			c.JSON(200, gin.H{

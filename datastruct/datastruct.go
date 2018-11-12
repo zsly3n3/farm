@@ -90,7 +90,7 @@ type Plant struct {
 	Price int `xorm:"not null INT(11)" json:"price"`//价格
 	InCome int `xorm:"not null INT(11)" json:"income"`//初始收益
 	ExpForAnimal int `xorm:"not null INT(11)" json:"exp"`//增加动物经验
-	Classid int `xorm:"not null INT(11)" json:"type"`//关联PlantClass中id
+	ClassId int `xorm:"not null INT(11)" json:"type"`//关联PlantClass中id
 	Level int `xorm:"not null INT(11)" json:"level"`//要求玩家种植等级
 }
 
@@ -249,8 +249,16 @@ type ResponsePlayerSoilBase struct{
 
 type ResponsePlayerSoil struct{
 	*ResponsePlayerSoilBase
-	PlantId int //0表示没有种植
+	Plant *ResponseSoilPlant
 }
+
+type ResponseSoilPlant struct{
+	 Name string
+	 InCome int
+	 ExpForAnimal int
+	 Type int
+}
+
 
 
 
@@ -304,21 +312,21 @@ const (
 	Deity//神
 )
 
-func ResponseLoginData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
+func ResponseLoginData(p_data *PlayerData,plants []Plant,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
 	if p_data == nil{
 	   return nil
-	}  	
+	}
 	mp:=make(map[string]interface{})
 	mp[PermissionIdField] = &(p_data.PermissionId)
 	mp["Token"] = &(p_data.Token)
 	mp[GoldField] = &(p_data.GoldCount)
 	mp[HoneyField] = &(p_data.HoneyCount)
-	mp["Soil"] = responsePlayerSoil(p_data)
+	mp["Soil"] = responsePlayerSoil(p_data,plants)
 	mp["Petbar"] = responsePetbarData(p_data,petbars,ani_mp)
 	return mp
 }
 
-func responsePlayerSoil(p_data *PlayerData)[]interface{}{
+func responsePlayerSoil(p_data *PlayerData,plants []Plant)[]interface{}{
 	rs:=make([]interface{},0,len(p_data.Soil))
 	for k,v:=range p_data.Soil{
 		var interface_var interface{}
@@ -328,15 +336,29 @@ func responsePlayerSoil(p_data *PlayerData)[]interface{}{
 		resp_base.Price = v.Price
 		resp_base.Factor = v.Factor
 		resp_base.State = v.State
-        if v.PlantId == 0{
+        if v.PlantId <= 0{
 		  interface_var = resp_base
 		} else {
 			resp:=new(ResponsePlayerSoil)
 			resp.ResponsePlayerSoilBase = resp_base
-			resp.PlantId = v.PlantId
+			resp.Plant = createResponseSoilPlant(v.PlantId,plants)
 			interface_var = resp
 		}
 		rs = append(rs,interface_var)
+	}
+	return rs
+}
+
+func createResponseSoilPlant(plant_id int,plants []Plant)*ResponseSoilPlant{
+	rs:=new(ResponseSoilPlant)
+	for _,v := range plants{
+		if v.Id == plant_id{
+			rs.Name =v.Name
+			rs.InCome = v.InCome
+			rs.ExpForAnimal = v.ExpForAnimal
+			rs.Type = v.ClassId
+			break
+		}
 	}
 	return rs
 }
@@ -350,7 +372,7 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 		base.Price = petbars[k].Price
 		base.State = v.State
 
-		if v.AnimalNumber == 0{
+		if v.AnimalNumber <= 0{
 		  interface_var = base
 		} else {
 		  resp:=new(ResponsePetbar)

@@ -74,7 +74,7 @@ func GetPlantsInfo()[]datastruct.Plant{
         }
         var plant datastruct.Plant
 		plant.Name = name
-		plant.Classid = StringToInt(cid)
+		plant.ClassId = StringToInt(cid)
 		plant.Price = StringToInt(price)
 		plant.InCome = StringToInt(income)
 		plant.ExpForAnimal = StringToInt(exp)
