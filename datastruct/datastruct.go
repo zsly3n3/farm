@@ -59,8 +59,8 @@ type UserInfo struct {
 	PermissionId int `xorm:"not null INT(11)"` //权限id
 	CreatedAt int64 `xorm:"bigint not null"` //创建用户的时间
 	UpdateTime int64 `xorm:"bigint not null"` //最近一次离开或者登陆的时间
-	NickName string `xorm:"VARCHAR(256) not null"` //昵称
-	Avatar string `xorm:"VARCHAR(256) not null"`//头像
+	NickName string `xorm:"VARCHAR(255) not null"` //昵称
+	Avatar string `xorm:"VARCHAR(255) not null"`//头像
 }
 
 type Permission struct {
