@@ -152,7 +152,7 @@ type Soil1 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
 	Level int `xorm:"not null INT(11)"`//土地等级
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
+	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
@@ -161,7 +161,7 @@ type Soil2 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
 	Level int `xorm:"not null INT(11)"`//土地等级
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
+	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
@@ -170,7 +170,7 @@ type Soil3 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
 	Level int `xorm:"not null INT(11)"`//土地等级
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
+	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
@@ -179,7 +179,7 @@ type Soil4 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
 	Level int `xorm:"not null INT(11)"`//土地等级
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
+	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
@@ -188,7 +188,7 @@ type Soil5 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
 	Level int `xorm:"not null INT(11)"`//土地等级
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
+	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
@@ -224,15 +224,16 @@ type Petbar4 struct{
 
 
 type SoilData struct{
-	Level int //土地当前等级
-	Price int //当前价格
+	Level int //土地默认等级
+	Price int //购买价格 
 	Factor int //生产系数
 	Require int //开启条件
 }
 
 type PlayerSoilBase struct{
 	Level int //土地等级
-	Price int  //当前价格
+	Price int  //购买价格
+	UpgradeLevelPrice int//升下一级的价格
 	Factor int //生产系数
 	State GoodsState //土地状态
 }
@@ -258,10 +259,6 @@ type ResponseSoilPlant struct{
 	 ExpForAnimal int
 	 Type int
 }
-
-
-
-
 
 
 type PetbarData struct{
@@ -334,6 +331,7 @@ func responsePlayerSoil(p_data *PlayerData,plants []Plant)[]interface{}{
 		resp_base.Id = k
 		resp_base.Level = v.Level
 		resp_base.Price = v.Price
+		resp_base.UpgradeLevelPrice = v.UpgradeLevelPrice
 		resp_base.Factor = v.Factor
 		resp_base.State = v.State
         if v.PlantId <= 0{

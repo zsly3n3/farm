@@ -239,3 +239,8 @@ func BytesToSliceInt(bytes []byte)([]int,bool){
     }
 	return tmp,false
 }
+
+
+func GetUpgradeLevelPriceForSoil(currentLevel int)int{
+	 return 100
+}
