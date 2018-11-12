@@ -1,6 +1,5 @@
 package datastruct
 
-import "farm/log"
 
 const NULLSTRING = ""
 const NULLID = -1
