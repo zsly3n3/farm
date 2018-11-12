@@ -294,7 +294,7 @@ const (
 
 
 
-func ResponseLoginData(p_data *PlayerData)map[string]interface{}{
+func ResponseLoginData(p_data *PlayerData,ani_mp map[AnimalType][]Animal)map[string]interface{}{
 	if p_data == nil{
 	   return nil
 	}  	
@@ -304,11 +304,11 @@ func ResponseLoginData(p_data *PlayerData)map[string]interface{}{
 	mp[GoldField] = &(p_data.GoldCount)
 	mp[HoneyField] = &(p_data.HoneyCount)
 	mp["Soil"] = p_data.Soil
-	mp["Petbar"] = ResponsePetbarData(p_data)
+	mp["Petbar"] = ResponsePetbarData(p_data,ani_mp)
 	return mp
 }
 
-func ResponsePetbarData(p_data *PlayerData)[]*ResponsePetbar{
+func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType][]Animal)[]*ResponsePetbar{
 	 rs:=make([]*ResponsePetbar, 0,len(p_data.PetBar))
 	 for _,v:= range p_data.PetBar{
 		resp:=new(ResponsePetbar)

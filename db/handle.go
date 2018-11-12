@@ -74,7 +74,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	  rollback(str,session)
 	  return userinfo.Id
 	}
-
+	
+	
 
 
 	err=session.Commit()
@@ -107,7 +108,7 @@ func(handle *DBHandler)GetAnimalsMap()map[datastruct.AnimalType][]datastruct.Ani
 	end:=int(datastruct.Deity)
 	for i:=start;i<=end;i++{
 		arr:= make([]datastruct.Animal, 0)
-		err:= engine.Where("class_id = ?",i).Find(&arr)
+		err:= engine.Asc("number").Where("class_id = ?",i).Find(&arr)
 		if err != nil{
 			log.Debug("GetAnimalsMap error:%v",err.Error())
 			return nil
