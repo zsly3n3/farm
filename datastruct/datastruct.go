@@ -148,7 +148,7 @@ const (
 )
 
 //土地表1,2,3,4,5
-type Soil struct{
+type Soil1 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
 	Level int `xorm:"not null INT(11)"`//土地等级
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
@@ -156,48 +156,70 @@ type Soil struct{
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
-type Soil1 struct{
-	Soil
-}
 
 type Soil2 struct{
-	Soil
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 type Soil3 struct{
-	Soil
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 type Soil4 struct{
-	Soil
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 type Soil5 struct{
-	Soil
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
 }
 
 //宠物栏1,2,3,4 海，陆，空，神
-type Petbar struct{
+type Petbar1 struct{
 	PId int `xorm:"not null pk INT(11)"` //玩家id
 	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
 	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
 	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
-type Petbar1 struct{
-	Petbar
-}
-
 type Petbar2 struct{
-	Petbar
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
+	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
+	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
 type Petbar3 struct{
-	Petbar
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
+	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
+	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
 type Petbar4 struct{
-	Petbar
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
+	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
+	State GoodsState `xorm:"not null INT(11)"` //状态
 }
 
 
