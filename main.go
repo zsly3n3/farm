@@ -24,10 +24,10 @@ func cors() gin.HandlerFunc {
 		c.Header("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type")
 		c.Header("Access-Control-Allow-Credentials", "true")
  
-		//放行所有OPTIONS方法
-		if method == "OPTIONS" {
-			c.AbortWithStatus(http.StatusNoContent)
-		}
+		// //放行所有OPTIONS方法
+		// if method == "OPTIONS" {
+		// 	c.AbortWithStatus(http.StatusNoContent)
+		// }
 		// 处理请求
 		c.Next()
 	}
