@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"farm/event"
 	"farm/routes"
-	//"net/http"
+	"net/http"
 )
 
 
@@ -16,7 +16,7 @@ func cors() gin.HandlerFunc {
 		// c.Writer.Header().Add("Access-Control-Allow-Origin", "*")
 		// c.Writer.Header().Add("Access-Control-Allow-Headers", "appversion,apptoken")
 		// c.Next()
-        // method := c.Request.Method
+        method := c.Request.Method
  
 		c.Header("Access-Control-Allow-Origin", "*")
 		c.Header("Access-Control-Allow-Headers", "Content-Type,AccessToken,X-CSRF-Token, Authorization, Appversion, Apptoken")
@@ -25,10 +25,10 @@ func cors() gin.HandlerFunc {
 		c.Header("Access-Control-Allow-Credentials", "true")
  
 		//放行所有OPTIONS方法
-		// if method == "OPTIONS" {
-		// 	c.AbortWithStatus(http.StatusNoContent)
-		// }
-		// 处理请求
+		if method == "OPTIONS" {
+		   c.AbortWithStatus(http.StatusNoContent)
+		}
+		//处理请求
 		c.Next()
 	}
 }
