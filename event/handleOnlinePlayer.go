@@ -73,17 +73,14 @@ func createSoil(soils []datastruct.SoilData)[]datastruct.PlayerSoil{
     return rs
 }
 
-func createPetbar(petbars []datastruct.PetbarData)[]datastruct.PlayerPetbar{
-    rs:=make([]datastruct.PlayerPetbar,0,len(petbars))
-    for _,v := range petbars{
+func createPetbar(petbars map[datastruct.AnimalType]datastruct.PetbarData)map[datastruct.AnimalType]datastruct.PlayerPetbar{
+    rs:=make(map[datastruct.AnimalType]datastruct.PlayerPetbar)
+    for k,_ := range petbars{
         var tmp datastruct.PlayerPetbar
-        tmp.Type = v.Type
         tmp.AnimalNumber = 0
         tmp.State = datastruct.Locked
-        tmp.Price = v.Price
         tmp.CurrentExp = 0
-        
-        rs = append(rs,tmp)
+        rs[k]=tmp
     }
     return rs
 }

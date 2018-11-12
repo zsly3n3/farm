@@ -120,7 +120,7 @@ func GetAnimalInfo()[]datastruct.Animal{
 }
 
 
-func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
+func GetSoildInfo()([]datastruct.SoilData,map[datastruct.AnimalType]datastruct.PetbarData){
 	xlsx, err := excelize.OpenFile("conf/soil_data.xlsx")
     if err != nil {
         log.Fatal("Excel error is %v", err.Error())
@@ -152,22 +152,22 @@ func GetSoildInfo()([]datastruct.SoilData,[]datastruct.PetbarData){
 
 	index=2
 	petbarTableName:="Sheet2"
-	petbars:=make([]datastruct.PetbarData, 0,4)
+	petbars:=make(map[datastruct.AnimalType]datastruct.PetbarData)
     for {
-		cell_index  := fmt.Sprintf("A%d",index)
+		cell_class  := fmt.Sprintf("A%d",index)
 		cell_price := fmt.Sprintf("B%d",index)
 		cell_require := fmt.Sprintf("C%d",index)
-		class := xlsx.GetCellValue(petbarTableName, cell_index)
+		class := xlsx.GetCellValue(petbarTableName, cell_class)
 		price := xlsx.GetCellValue(petbarTableName, cell_price)
 		require := xlsx.GetCellValue(petbarTableName, cell_require)
         if class == "" {
             break
 		}
 		var petbar datastruct.PetbarData
-		petbar.Type = datastruct.AnimalType(StringToInt(class))
+		petbar_type:= datastruct.AnimalType(StringToInt(class))
 		petbar.Price = StringToInt(price)
 		petbar.Require = StringToInt(require)
-        petbars = append(petbars,petbar)
+		petbars[petbar_type]=petbar
         index++
     }
 	return soils,petbars

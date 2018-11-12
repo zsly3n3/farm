@@ -17,7 +17,7 @@ type EventHandler struct {
 	isExistTicker bool
 	plants []datastruct.Plant
 	animals map[datastruct.AnimalType]map[int]datastruct.Animal//按动物类型划分
-	petbars []datastruct.PetbarData
+	petbars map[datastruct.AnimalType]datastruct.PetbarData
 	soils []datastruct.SoilData
 }
 

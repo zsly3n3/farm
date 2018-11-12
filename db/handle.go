@@ -56,26 +56,35 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		var has bool
 		has, err = session.Where("id=?",p_data.Id).Get(&tmp)
 	    if has {
-		  userinfo.Id = p_data.Id
 		  _, err = session.Where("id=?",p_data.Id).Update(&userinfo)
+		  userinfo.Id = p_data.Id
 		} else {
 		  _, err = session.Insert(&userinfo)
 		}
 	}
 	if err != nil{
-		str:=fmt.Sprintf("DBHandler->SetPlayerData Update UserInfo :%s",err.Error())
+		str:=fmt.Sprintf("DBHandler->SetPlayerData InsertOrUpdate UserInfo :%s",err.Error())
 		rollback(str,session)
 	    return userinfo.Id
 	}
 	sql:=fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,plant_level)VALUES(%d,%d,%d,%d)",userinfo.Id,p_data.HoneyCount,p_data.GoldCount,p_data.PlantLevel)
 	_, err=session.Exec(sql)
 	if err != nil{
-	  str:=fmt.Sprintf("DBHandler->SetPlayerData Update PlayerInfo :%s",err.Error())
+	  str:=fmt.Sprintf("DBHandler->SetPlayerData REPLACE PlayerInfo :%s",err.Error())
 	  rollback(str,session)
 	  return userinfo.Id
 	}
-	
-	
+
+	for k,v:=range p_data.PetBar {
+		sql=fmt.Sprintf("REPLACE INTO petbar%d (p_id,animal_number,current_exp,state)VALUES(%d,%d,%d,%d)",int(k),userinfo.Id,v.AnimalNumber,v.CurrentExp,int(v.State))
+		_, err=session.Exec(sql)
+	    if err != nil{
+	      str:=fmt.Sprintf("DBHandler->SetPlayerData REPLACE PetBar :%s",err.Error())
+	      rollback(str,session)
+	      return userinfo.Id
+	    }
+	}
+ 
 
 
 	err=session.Commit()

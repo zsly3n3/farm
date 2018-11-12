@@ -51,7 +51,6 @@ const PlantLevelField = "PlantLevel"
 
 const PlayerPetbarField = "PlayerPetbar"
 
-//plantlevel , soil 保存到redis和mysql
 
 type UserInfo struct {
 	Id    int       `xorm:"not null pk autoincr INT(11)"`
@@ -137,10 +136,8 @@ type PlayerData struct{
 	Avatar string
 	PlantLevel int //可购买商店植物的等级
 	Soil []PlayerSoil //玩家土地信息
-	PetBar []PlayerPetbar //宠物栏信息
+	PetBar map[AnimalType]PlayerPetbar //宠物栏信息
 }
-
-
 
 
 type GoodsState int 
@@ -151,82 +148,56 @@ const (
 )
 
 //土地表1,2,3,4,5
+type Soil struct{
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	Level int `xorm:"not null INT(11)"`//土地等级
+	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
+	Price int  `xorm:"not null INT(11)"`//当前价格
+	Factor int `xorm:"not null INT(11)"`//生产系数
+	State GoodsState `xorm:"not null INT(11)"` //土地状态
+}
 type Soil1 struct{
-	 PId int `xorm:"not null pk INT(11)"` //玩家id
-	 Level int `xorm:"not null INT(11)"`//土地等级
-	 PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	 Price int  `xorm:"not null INT(11)"`//当前价格
-	 Factor int `xorm:"not null INT(11)"`//生产系数
-	 State GoodsState `xorm:"not null INT(11)"` //土地状态
+	Soil
 }
 
 type Soil2 struct{
-	PId int `xorm:"not null pk INT(11)"` //玩家id
-	Level int `xorm:"not null INT(11)"`//土地等级
-	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
-	Factor int `xorm:"not null INT(11)"`//生产系数
-	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	Soil
 }
 
 type Soil3 struct{
-	PId int `xorm:"not null pk INT(11)"` //玩家id
-	Level int `xorm:"not null INT(11)"`//土地等级
-	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
-	Factor int `xorm:"not null INT(11)"`//生产系数
-	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	Soil
 }
 
 type Soil4 struct{
-	PId int `xorm:"not null pk INT(11)"` //玩家id
-	Level int `xorm:"not null INT(11)"`//土地等级
-	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
-	Factor int `xorm:"not null INT(11)"`//生产系数
-	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	Soil
 }
 
 type Soil5 struct{
-	PId int `xorm:"not null pk INT(11)"` //玩家id
-	Level int `xorm:"not null INT(11)"`//土地等级
-	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
-	Factor int `xorm:"not null INT(11)"`//生产系数
-	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	Soil
 }
 
 //宠物栏1,2,3,4 海，陆，空，神
+type Petbar struct{
+	PId int `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
+	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
+	State GoodsState `xorm:"not null INT(11)"` //状态
+}
+
 type Petbar1 struct{
-	 PId int `xorm:"not null pk INT(11)"` //玩家id
-	 AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
-	 Price int  `xorm:"not null INT(11)"`//当前价格
-	 CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
-	 State GoodsState `xorm:"not null INT(11)"` //状态
+	Petbar
 }
 
 type Petbar2 struct{
-	 PId int `xorm:"not null pk INT(11)"` //玩家id
-	 AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
-	 Price int  `xorm:"not null INT(11)"`//当前价格
-	 CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
-	 State GoodsState `xorm:"not null INT(11)"` //状态
+	Petbar
 }
 
 type Petbar3 struct{
-	PId int `xorm:"not null pk INT(11)"` //玩家id
-	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
-	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
-	State GoodsState `xorm:"not null INT(11)"` //状态
+	Petbar
 }
 
 type Petbar4 struct{
-	PId int `xorm:"not null pk INT(11)"` //玩家id
-	AnimalNumber int `xorm:"not null INT(11)"`//0表示没有种植
-	Price int  `xorm:"not null INT(11)"`//当前价格
-	CurrentExp int64 `xorm:"not null bigint"` //当前宠物栏经验
-	State GoodsState `xorm:"not null INT(11)"` //状态
+	Petbar
 }
 
 
@@ -249,15 +220,12 @@ type PlayerSoil struct{
 
 
 type PetbarData struct{
-	Type AnimalType //宠物栏类型
-	Price int  //当前价格
+	Price int //单价
 	Require int //开启条件
 }
 
 type PlayerPetbar struct{
-	Type AnimalType //宠物栏类型
 	AnimalNumber int//为0,表示没有养动物
-	Price int  //当前价格
 	CurrentExp int64 //当前宠物栏经验
 	State GoodsState
 }
@@ -269,7 +237,7 @@ type ResponsePetbar struct{
 
 type ResponsePetbarBase struct{
 	Type AnimalType //宠物栏类型
-	Price int  //当前价格
+	Price int //单价
 	State GoodsState
 }
 
@@ -302,7 +270,7 @@ const (
 
 
 
-func ResponseLoginData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
+func ResponseLoginData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
 	if p_data == nil{
 	   return nil
 	}  	
@@ -312,18 +280,18 @@ func ResponseLoginData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)m
 	mp[GoldField] = &(p_data.GoldCount)
 	mp[HoneyField] = &(p_data.HoneyCount)
 	mp["Soil"] = p_data.Soil
-	mp["Petbar"] = ResponsePetbarData(p_data,ani_mp)
+	mp["Petbar"] = ResponsePetbarData(p_data,petbars,ani_mp)
 	return mp
 }
 
-func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)[]interface{}{
+func ResponsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)[]interface{}{
 	 rs:=make([]interface{}, 0,len(p_data.PetBar))
-	 for _,v:= range p_data.PetBar{
+	 for k,v:= range p_data.PetBar{
 		var interface_var interface{}
 		base:=new(ResponsePetbarBase)
-		base.Price = v.Price
+		base.Type = k
+		base.Price = petbars[k].Price
 		base.State = v.State
-		base.Type = v.Type
 
 		if v.AnimalNumber == 0{
 		  interface_var = base
@@ -332,9 +300,9 @@ func ResponsePetbarData(p_data *PlayerData,ani_mp map[AnimalType]map[int]Animal)
 		  resp.ResponsePetbarBase = base
 		  var tf bool
 		  var anis map[int]Animal
-		  anis,tf= ani_mp[v.Type]
+		  anis,tf= ani_mp[k]
 		  if tf {
-			var ani Animal  
+			var ani Animal
 			ani,tf=anis[v.AnimalNumber]
 			if tf{
 			   resp.Animal = new(ResponseAnimal)
