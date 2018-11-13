@@ -309,11 +309,12 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 	return datastruct.NULLError,gold,"",-1
 }
 
-func (handle *CACHEHandler)BuyPetbar(key string,soid_id int,petbars map[datastruct.AnimalType]datastruct.PetbarData)(datastruct.CodeType,int64,*datastruct.ResponseAnimal){
+func (handle *CACHEHandler)BuyPetbar(key string,soid_id int,petbars map[datastruct.AnimalType]datastruct.PetbarData)(datastruct.CodeType,int64,*datastruct.ResponseAnimal,int){
 	var animal *datastruct.ResponseAnimal
 	animal = nil
 	var tmp *datastruct.PetbarData
 	tmp=nil
+	var soil_id int
 	for _,v := range petbars{
        if v.Id == soid_id{
 		  tmp = &v 
@@ -321,18 +322,18 @@ func (handle *CACHEHandler)BuyPetbar(key string,soid_id int,petbars map[datastru
 	   }
 	}
 	if tmp == nil{
-	   return datastruct.PutDataFailed,-1,animal
+	   return datastruct.PutDataFailed,-1,animal,soil_id
 	} 
 
 	conn:=handle.GetConn()
 	defer conn.Close()
 	
 	if !isExistUser(conn,key){
-	  return datastruct.PutDataFailed,-1,animal
+	  return datastruct.PutDataFailed,-1,animal,soil_id
 	}
 	code,gold:=handle.ComputeCurrentGold(conn,key)
 	if code != datastruct.NULLError{
-	   return datastruct.PutDataFailed,-1,animal
+	   return datastruct.PutDataFailed,-1,animal,soil_id
 	}
 	
 	// Price int //单价
@@ -343,26 +344,26 @@ func (handle *CACHEHandler)BuyPetbar(key string,soid_id int,petbars map[datastru
 	value, err:= redis.String(conn.Do("hget",key,datastruct.SoilLevelField))
 	if err!=nil{	
 		log.Debug("CACHEHandler BuyPetbar hget err:%s ,player:%s",err.Error(),key)
-		return datastruct.GetDataFailed,-1,animal
+		return datastruct.GetDataFailed,-1,animal,soil_id
 	}
 
 	soilLevel := tools.StringToInt(value)
 	
 	if soilLevel + 1 == tmp.Require{
-		
+	   
 	} else{
-		return datastruct.SoilRequireUnlock,gold,"",soil.LastId   
+		return datastruct.SoilRequireUnlock,gold,animal,soil_id
 	}
 
 	if gold < int64(tmp.Price){
-	   return datastruct.GoldIsNotEnoughForPlant,gold,animal  	
+	   return datastruct.GoldIsNotEnoughForPlant,gold,animal,soil_id  	
 	}
 
 	gold=gold-int64(tmp.Price)
 	soilLevel = tmp.Require 
 	//save 
 	
-	return datastruct.NULLError,gold,animal
+	return datastruct.NULLError,gold,animal,soil_id
 }
 
 
