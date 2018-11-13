@@ -42,7 +42,7 @@ func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
 	eventHandler.GetShopData(c,token)
   })
 }
-
+/*
 func buyPlant(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/buyplant", func(c *gin.Context) {
 		if !checkVersion(c,eventHandler){
@@ -67,6 +67,33 @@ func buyPlant(r *gin.Engine,eventHandler *event.EventHandler){
 		}
 	})
 }
+
+func plant(r *gin.Engine,eventHandler *event.EventHandler){
+	r.PUT("/user/plant", func(c *gin.Context) {
+		if !checkVersion(c,eventHandler){
+			return
+		}
+		token,tf:= checkToken(c)
+		if !tf{
+			return
+		}
+		code,gold:=eventHandler.PlantInSoil(token,c)
+		if code == datastruct.NULLError{
+		   mp:=make(map[string]int64)
+		   mp["GoldCount"]=gold
+		   c.JSON(200, gin.H{
+				"code": int(code),
+				"data": mp,
+		   })
+		} else {
+			c.JSON(200, gin.H{
+				"code": int(code),
+			})
+		}
+	})
+}
+*/
+
 
 
 func updatePermisson(r *gin.Engine,eventHandler *event.EventHandler){
@@ -141,7 +168,8 @@ func Register(r *gin.Engine,eventHandler *event.EventHandler){
 	 getShopData(r,eventHandler)
 	 login(r,eventHandler)
 	 updatePermisson(r,eventHandler)
-	 buyPlant(r,eventHandler)
+	//  buyPlant(r,eventHandler)
+	//  plant(r,eventHandler)
 	 test1(r,eventHandler)
 	 test2(r,eventHandler)
 }

@@ -170,39 +170,60 @@ func (handle *CACHEHandler)UpdatePlantLevel(key string,plant *datastruct.Plant) 
 	conn:=handle.GetConn()
 	defer conn.Close()
 	if !isExistUser(conn,key){
-       return datastruct.PurchaseFailed,-1
+       return datastruct.PutDataFailed,-1
 	}
-    value, err := redis.Values(conn.Do("hmget",key,
-	datastruct.GoldField,datastruct.PlantLevelField))
+	code,gold:=handle.ComputeCurrentGold(conn,key)
+	if code != datastruct.NULLError{
+	   return datastruct.PutDataFailed,-1
+	}
+
+    value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
 	if err!=nil{	
 		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
-		return datastruct.PurchaseFailed,-1
+		return datastruct.PutDataFailed,-1
 	}
-	var gold int64
-	var plantLevel int
-    for i:=0;i<len(value);i++{
-		tmp:= value[i].([]byte)
-		str:= string(tmp[:])
-		switch i{
-		  case 0:
-			gold = tools.StringToInt64(str)
-		  case 1:
-			plantLevel = tools.StringToInt(str)
-	    } 
-	}
+	plantLevel := tools.StringToInt(value)
     if plantLevel < plant.Level && gold>=int64(plant.Price){
 	   gold=gold-int64(plant.Price)
 	   plantLevel+=1
 	} else{	
-	   return datastruct.PurchaseFailed,-1
+	   return datastruct.PutDataFailed,-1
 	}
 	_, err = conn.Do("hmset", key,datastruct.GoldField,gold,datastruct.PlantLevelField,plantLevel)
 	if err != nil {
 	   log.Debug("CACHEHandler UpdatePlantLevel hmset err:%s",err.Error())
-	   return datastruct.PurchaseFailed,-1
+	   return datastruct.PutDataFailed,-1
 	}
 	return datastruct.NULLError,gold
 }
+
+// func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantInSoil,soils map[int]datastruct.SoilData,petbars map[datastruct.AnimalType]datastruct.PetbarData)(datastruct.CodeType,int64){
+// 	conn:=handle.GetConn()
+// 	defer conn.Close()
+// 	if !isExistUser(conn,key){
+// 		return datastruct.PutDataFailed,-1
+// 	}
+// }
+
+// func (handle *CACHEHandler)checkSoilState(conn redis.Conn,key string)bool{
+// 	tf:=false
+// 	code,gold:=handle.ComputeCurrentGold(conn,key)
+// 	if code != datastruct.NULLError{
+// 	   return datastruct.PutDataFailed,-1
+// 	}
+//     return tf
+// }
+
+func(handle *CACHEHandler)ComputeCurrentGold(conn redis.Conn,key string)(datastruct.CodeType,int64){
+	value, err := redis.String(conn.Do("hget",key,datastruct.GoldField))
+	code:=datastruct.NULLError
+	if err!=nil{
+		log.Debug("CACHEHandler ComputeCurrentGold err:%s",err.Error())
+		return datastruct.PutDataFailed,-1
+	}
+	return code,tools.StringToInt64(value)
+}
+
 
 func (handle *CACHEHandler)clearData(){
 	conn:=handle.GetConn()

@@ -29,7 +29,6 @@ const (
 	VersionError//客户端与服务器版本不一致
 	TokenError//没有Token或者值为空,或者不存在此Token
 	JsonParseFailedFromPutBody//来自put请求中的Body解析json失败
-	PurchaseFailed//购买失败，金币不够或者其他原因
 )
 
 
@@ -101,7 +100,7 @@ type Plant struct {
 type Animal struct {
     Id int    `xorm:"not null pk autoincr INT(11)"`
     Name  string `xorm:"VARCHAR(64) not null "` //名称
-	Factor int `xorm:"not null INT(11) "`//增益系数
+	InCome int `xorm:"not null INT(11) "`//初始收益
 	Exp int64 `xorm:"not null bigint"`//升级所需经验
 	ClassId int `xorm:"not null INT(11) "` //关联AnimalClass中id
 	Number int `xorm:"not null INT(11) "` //动物编号
@@ -255,6 +254,12 @@ type ResponseSoilPlant struct{
 	 Type int
 }
 
+type ResponseSoil struct{
+	Level int //土地默认等级
+	Factor int //生产系数
+}
+
+
 
 type PetbarData struct{
 	Price int //单价
@@ -280,7 +285,7 @@ type ResponsePetbarBase struct{
 
 type ResponseAnimal struct{
 	Name  string //名称
-	Factor int //增益系数
+	InCome int //基本收益
 	CurrentExp int64 //当前经验
 	Exp int64 //升级所需经验
 }
@@ -379,7 +384,7 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 			if tf{
 			   resp.Animal = new(ResponseAnimal)
 			   resp.Animal.CurrentExp = v.CurrentExp
-			   resp.Animal.Factor = ani.Factor
+			   resp.Animal.InCome = ani.InCome
 			   resp.Animal.Exp = ani.Exp
 			   resp.Animal.Name = ani.Name
 			} else {
@@ -405,6 +410,11 @@ type UserLogin struct{
 	Avatar string
 }
 
-type BuyPlant struct{
-   PlantId int
+// type BuyPlant struct{
+//    PlantId int
+// }
+
+type PlantInSoil struct{
+	PlantId int
+	SoilId int
 }
