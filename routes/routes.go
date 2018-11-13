@@ -57,8 +57,9 @@ func plant(r *gin.Engine,eventHandler *event.EventHandler){
 		mp["goldcount"]=gold
 		switch code {
 		case datastruct.NULLError:
+			 fallthrough
 		case datastruct.GoldIsNotEnoughForSoil:
-			c.JSON(200, gin.H{
+			 c.JSON(200, gin.H{
 				"code": int(code),
 				"data": mp,
 			})

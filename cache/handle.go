@@ -55,7 +55,8 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
 	datastruct.UpdateTimeField,p_data.UpdateTime,
 	datastruct.NickNameField,p_data.NickName,
 	datastruct.AvatarField,p_data.Avatar,
-	datastruct.PlantLevelField,p_data.PlantLevel)
+	datastruct.PlantLevelField,p_data.PlantLevel,
+	datastruct.SoilLevelField,p_data.SoilLevel)
 	
     
 	for k,v := range p_data.Soil{
@@ -203,35 +204,48 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 	if !isExistUser(conn,key){
 		return datastruct.PutDataFailed,-1,"",-1
 	}
-	code,gold:=handle.ComputeCurrentGold(conn,key)
-	if code != datastruct.NULLError{
-	   return datastruct.PutDataFailed,-1,"",-1
-	}
 	value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
 	if err!=nil{	
 		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
 		return datastruct.PutDataFailed,-1,"",-1
 	}
 	plant:=plants[plantInSoil.PlantId-1]
-	
-	if gold<int64(plant.Price){
-	   return datastruct.NULLError,-1,plant.CName,-1
-	}
-	
-	// GoldIsNotEnough//金币不足
-	// PlantRequireUnlock//植物未到达解锁条件
-	// SoilRequireUnlock//土地未到达解锁条件
-	
 	plantLevel := tools.StringToInt(value)
-	if plantLevel < plant.Level {
-	   gold=gold-int64(plant.Price)
-	   plantLevel+=1
-	} else{
-	   last_plant:=plants[1]
-	   return datastruct.NULLError,-1,last_plant.CName,-1
+	if plantLevel >= plant.Level{
+	   return datastruct.PutDataFailed,-1,"",-1
+	}
+    
+	code,gold:=handle.ComputeCurrentGold(conn,key)
+	if code != datastruct.NULLError{
+	   return datastruct.PutDataFailed,-1,"",-1
+	}
+
+	if gold<int64(plant.Price){
+	   return datastruct.GoldIsNotEnoughForPlant,-1,plant.CName,-1
 	}
 	
+	if plantLevel + 1 == plant.Level {
+	   gold=gold-int64(plant.Price)
+	   plantLevel = plant.Level
+	} else {
+	   last_plant:=plants[plant.Level-2]
+	   return datastruct.PlantRequireUnlock,-1,last_plant.CName,-1
+	}
+
+	soil:=soils[plantInSoil.SoilId]
+	if gold<int64(soil.Price){
+	  return datastruct.GoldIsNotEnoughForSoil,-1,"",-1
+	}
 	
+    asd
+	
+    //value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
+		
+	
+	//SoilRequireUnlock//土地未到达解锁条件
+	
+	//save gold,plantlevel
+
 	return datastruct.NULLError,gold,"",-1
 }
 
