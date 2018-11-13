@@ -110,24 +110,26 @@ func (handle *EventHandler)UpdatePermisson(key string,permissionId int) datastru
 // 	return code,gold
 // }
 
-// func (handle *EventHandler)PlantInSoil(key string,c *gin.Context) (datastruct.CodeType,int64){
-// 	var body datastruct.PlantInSoil
-// 	err:=c.BindJSON(&body)
-// 	code:=datastruct.NULLError
-
-// 	var gold int64
-// 	if err == nil {
-// 	   soil_data,tf:=handle.soils[body.SoilId]
-// 	   if tf{
-// 		 code,gold=handle.cacheHandler.PlantInSoil(key,&body,handle.soils,handle.petbars)   
-// 	   } else {
-// 		 code=datastruct.PutDataFailed
-// 	   }
-// 	} else{
-// 	   code=datastruct.JsonParseFailedFromPutBody
-// 	}
-// 	return code,gold
-// }
+func (handle *EventHandler)PlantInSoil(key string,c *gin.Context) (datastruct.CodeType,int64,string,int){
+	var body datastruct.PlantInSoil
+	err:=c.BindJSON(&body)
+	code:=datastruct.NULLError
+	var gold int64
+	var plantName string
+	var soil_id int
+	if err == nil {
+	   _,tf:=handle.soils[body.SoilId]
+	   index:=body.PlantId-1
+	   if tf && index >=0 && index < len(handle.plants){
+		 code,gold,plantName,soil_id=handle.cacheHandler.PlantInSoil(key,&body,handle.plants,handle.soils,handle.petbars)   
+	   } else {
+		 code=datastruct.PutDataFailed
+	   }
+	} else{
+	   code=datastruct.JsonParseFailedFromPutBody
+	}
+	return code,gold,plantName,soil_id
+}
 
 
 

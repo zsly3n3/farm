@@ -63,12 +63,14 @@ func GetPlantsInfo()[]datastruct.Plant{
 		cell_Income:= fmt.Sprintf("D%d",index)
 		cell_AddExp:= fmt.Sprintf("E%d",index)
 		cell_Level:= fmt.Sprintf("F%d",index)
+		cell_ChName:= fmt.Sprintf("G%d",index)
 		name := xlsx.GetCellValue(tableName, cell_Name)
 		cid := xlsx.GetCellValue(tableName, cell_ClassId)
 		price := xlsx.GetCellValue(tableName, cell_Price)
 		income := xlsx.GetCellValue(tableName, cell_Income)
 		exp := xlsx.GetCellValue(tableName, cell_AddExp)
 		level := xlsx.GetCellValue(tableName, cell_Level)
+		chName := xlsx.GetCellValue(tableName, cell_ChName)
         if name == "" {
             break
         }
@@ -79,6 +81,7 @@ func GetPlantsInfo()[]datastruct.Plant{
 		plant.InCome = StringToInt(income)
 		plant.ExpForAnimal = StringToInt(exp)
 		plant.Level = StringToInt(level)
+		plant.CName = chName
         plants = append(plants,plant)
         index++
     }

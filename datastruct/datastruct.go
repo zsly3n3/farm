@@ -29,6 +29,10 @@ const (
 	VersionError//客户端与服务器版本不一致
 	TokenError//没有Token或者值为空,或者不存在此Token
 	JsonParseFailedFromPutBody//来自put请求中的Body解析json失败
+    GoldIsNotEnoughForPlant//购买植物金币不足
+	PlantRequireUnlock//植物未到达解锁条件
+	GoldIsNotEnoughForSoil//购买土地金币不足
+	SoilRequireUnlock//土地未到达解锁条件
 )
 
 
@@ -93,6 +97,7 @@ type Plant struct {
 	ExpForAnimal int `xorm:"not null INT(11)" json:"exp"`//增加动物经验
 	ClassId int `xorm:"not null INT(11)" json:"type"`//关联PlantClass中id
 	Level int `xorm:"not null INT(11)" json:"level"`//要求玩家种植等级
+	CName string `xorm:"VARCHAR(64) not null" json:"c_name"`//植物中文名称
 }
 
 
@@ -294,6 +299,9 @@ type ResponsePlant struct{
 	Plant
 	State GoodsState `json:"state"`
 }
+
+
+
 
 type PermissionType int //错误码
 const (

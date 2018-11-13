@@ -166,44 +166,74 @@ func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastru
 	return code
 }
 
-func (handle *CACHEHandler)UpdatePlantLevel(key string,plant *datastruct.Plant) (datastruct.CodeType,int64){
-	conn:=handle.GetConn()
-	defer conn.Close()
-	if !isExistUser(conn,key){
-       return datastruct.PutDataFailed,-1
-	}
-	code,gold:=handle.ComputeCurrentGold(conn,key)
-	if code != datastruct.NULLError{
-	   return datastruct.PutDataFailed,-1
-	}
-
-    value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
-	if err!=nil{	
-		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
-		return datastruct.PutDataFailed,-1
-	}
-	plantLevel := tools.StringToInt(value)
-    if plantLevel < plant.Level && gold>=int64(plant.Price){
-	   gold=gold-int64(plant.Price)
-	   plantLevel+=1
-	} else{	
-	   return datastruct.PutDataFailed,-1
-	}
-	_, err = conn.Do("hmset", key,datastruct.GoldField,gold,datastruct.PlantLevelField,plantLevel)
-	if err != nil {
-	   log.Debug("CACHEHandler UpdatePlantLevel hmset err:%s",err.Error())
-	   return datastruct.PutDataFailed,-1
-	}
-	return datastruct.NULLError,gold
-}
-
-// func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantInSoil,soils map[int]datastruct.SoilData,petbars map[datastruct.AnimalType]datastruct.PetbarData)(datastruct.CodeType,int64){
+// func (handle *CACHEHandler)UpdatePlantLevel(key string,plant *datastruct.Plant) (datastruct.CodeType,int64){
 // 	conn:=handle.GetConn()
 // 	defer conn.Close()
 // 	if !isExistUser(conn,key){
+//        return datastruct.PutDataFailed,-1
+// 	}
+// 	code,gold:=handle.ComputeCurrentGold(conn,key)
+// 	if code != datastruct.NULLError{
+// 	   return datastruct.PutDataFailed,-1
+// 	}
+
+//     value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
+// 	if err!=nil{	
+// 		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
 // 		return datastruct.PutDataFailed,-1
 // 	}
+// 	plantLevel := tools.StringToInt(value)
+//     if plantLevel < plant.Level && gold>=int64(plant.Price){
+// 	   gold=gold-int64(plant.Price)
+// 	   plantLevel+=1
+// 	} else{	
+// 	   return datastruct.PutDataFailed,-1
+// 	}
+// 	_, err = conn.Do("hmset", key,datastruct.GoldField,gold,datastruct.PlantLevelField,plantLevel)
+// 	if err != nil {
+// 	   log.Debug("CACHEHandler UpdatePlantLevel hmset err:%s",err.Error())
+// 	   return datastruct.PutDataFailed,-1
+// 	}
+// 	return datastruct.NULLError,gold
 // }
+
+func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantInSoil,plants []datastruct.Plant,soils map[int]datastruct.SoilData,petbars map[datastruct.AnimalType]datastruct.PetbarData)(datastruct.CodeType,int64,string,int){
+	conn:=handle.GetConn()
+	defer conn.Close()
+	if !isExistUser(conn,key){
+		return datastruct.PutDataFailed,-1,"",-1
+	}
+	code,gold:=handle.ComputeCurrentGold(conn,key)
+	if code != datastruct.NULLError{
+	   return datastruct.PutDataFailed,-1,"",-1
+	}
+	value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
+	if err!=nil{	
+		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
+		return datastruct.PutDataFailed,-1,"",-1
+	}
+	plant:=plants[plantInSoil.PlantId-1]
+	
+	if gold<int64(plant.Price){
+	   return datastruct.NULLError,-1,plant.CName,-1
+	}
+	
+	// GoldIsNotEnough//金币不足
+	// PlantRequireUnlock//植物未到达解锁条件
+	// SoilRequireUnlock//土地未到达解锁条件
+	
+	plantLevel := tools.StringToInt(value)
+	if plantLevel < plant.Level {
+	   gold=gold-int64(plant.Price)
+	   plantLevel+=1
+	} else{
+	   last_plant:=plants[1]
+	   return datastruct.NULLError,-1,last_plant.CName,-1
+	}
+	
+	
+	return datastruct.NULLError,gold,"",-1
+}
 
 // func (handle *CACHEHandler)checkSoilState(conn redis.Conn,key string)bool{
 // 	tf:=false

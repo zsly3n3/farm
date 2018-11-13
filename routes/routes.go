@@ -42,31 +42,6 @@ func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
 	eventHandler.GetShopData(c,token)
   })
 }
-/*
-func buyPlant(r *gin.Engine,eventHandler *event.EventHandler){
-	r.PUT("/user/buyplant", func(c *gin.Context) {
-		if !checkVersion(c,eventHandler){
-			return
-		}
-		token,tf:= checkToken(c)
-		if !tf{
-			return
-		}
-		code,gold:=eventHandler.BuyPlant(token,c)
-		if code == datastruct.NULLError{
-		   mp:=make(map[string]int64)
-		   mp["GoldCount"]=gold
-		   c.JSON(200, gin.H{
-				"code": int(code),
-				"data": mp,
-		   })
-		} else {
-			c.JSON(200, gin.H{
-				"code": int(code),
-			})
-		}
-	})
-}
 
 func plant(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/plant", func(c *gin.Context) {
@@ -77,22 +52,39 @@ func plant(r *gin.Engine,eventHandler *event.EventHandler){
 		if !tf{
 			return
 		}
-		code,gold:=eventHandler.PlantInSoil(token,c)
-		if code == datastruct.NULLError{
-		   mp:=make(map[string]int64)
-		   mp["GoldCount"]=gold
-		   c.JSON(200, gin.H{
-				"code": int(code),
-				"data": mp,
-		   })
-		} else {
+		code,gold,plantName,soil_id:=eventHandler.PlantInSoil(token,c)
+		mp:=make(map[string]interface{})
+		mp["goldcount"]=gold
+		switch code {
+		case datastruct.NULLError:
+		case datastruct.GoldIsNotEnoughForSoil:
 			c.JSON(200, gin.H{
 				"code": int(code),
+				"data": mp,
 			})
+		case datastruct.GoldIsNotEnoughForPlant:
+			 fallthrough
+		case datastruct.PlantRequireUnlock:
+			 mp["plantname"]=plantName
+			 c.JSON(200, gin.H{
+				"code": int(code),
+				"data": mp,
+			 })
+		case datastruct.SoilRequireUnlock:
+			 mp["soilid"]=soil_id
+			 c.JSON(200, gin.H{
+				"code": int(code),
+				"data": mp,
+			}) 	
+		default:
+			c.JSON(200, gin.H{
+				"code": int(code),
+			}) 	
 		}
 	})
 }
-*/
+
+
 
 
 
@@ -168,8 +160,7 @@ func Register(r *gin.Engine,eventHandler *event.EventHandler){
 	 getShopData(r,eventHandler)
 	 login(r,eventHandler)
 	 updatePermisson(r,eventHandler)
-	//  buyPlant(r,eventHandler)
-	//  plant(r,eventHandler)
+	 plant(r,eventHandler)
 	 test1(r,eventHandler)
 	 test2(r,eventHandler)
 }
