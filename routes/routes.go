@@ -94,22 +94,27 @@ func buyPetbar(r *gin.Engine,eventHandler *event.EventHandler){
 		if !tf{
 			return
 		}
-		code,gold,ani:=eventHandler.BuyPetbar(token,c)
+		code,gold,ani,soil_id:=eventHandler.BuyPetbar(token,c)
 		mp:=make(map[string]interface{})
 		mp["goldcount"]=gold
 		if code == datastruct.NULLError{
 			mp["animal"]=ani
 			c.JSON(200, gin.H{
 				"code": int(code),
-				"data": resp_tmp,
+				"data": mp,
 			})
-		} else if code == datastruct.NULLError{
+		} else if code == datastruct.GoldIsNotEnoughForSoil{
 			c.JSON(200, gin.H{
 				"code": int(code),
 				"data": mp,
 			})
-		} 
-		else {
+		} else if code == datastruct.SoilRequireUnlock{
+			mp["soilid"]=soil_id
+			c.JSON(200, gin.H{
+				"code": int(code),
+				"data": mp,
+			})
+		} else {
 			c.JSON(200, gin.H{
 				"code": int(code),
 			})

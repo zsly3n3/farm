@@ -356,7 +356,7 @@ func (handle *CACHEHandler)BuyPetbar(key string,soid_id int,petbars map[datastru
 	}
 
 	if gold < int64(tmp.Price){
-	   return datastruct.GoldIsNotEnoughForPlant,gold,animal,soil_id  	
+	   return datastruct.GoldIsNotEnoughForSoil,gold,animal,soil_id  	
 	}
 
 	gold=gold-int64(tmp.Price)

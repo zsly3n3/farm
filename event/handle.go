@@ -149,19 +149,20 @@ func (handle *EventHandler)PlantInSoil(key string,c *gin.Context) (datastruct.Co
 	return code,gold,plantName,soil_id
 }
 
-func (handle *EventHandler)BuyPetbar(key string,c *gin.Context)(datastruct.CodeType,int64,*datastruct.ResponseAnimal){
+func (handle *EventHandler)BuyPetbar(key string,c *gin.Context)(datastruct.CodeType,int64,*datastruct.ResponseAnimal,int){
 	var body datastruct.BuyPetbar
 	err:=c.BindJSON(&body)
 	code:=datastruct.NULLError
 	var gold int64
 	var animal *datastruct.ResponseAnimal
+	var soil_id int
 	animal = nil
 	if err == nil {
-		code,gold,animal=handle.cacheHandler.BuyPetbar(key,body.SoilId,handle.petbars)
+		code,gold,animal,soil_id=handle.cacheHandler.BuyPetbar(key,body.SoilId,handle.petbars)
 	} else{
 		code=datastruct.JsonParseFailedFromPutBody
 	}
-	return code,gold,animal
+	return code,gold,animal,soil_id
 }
 
 
