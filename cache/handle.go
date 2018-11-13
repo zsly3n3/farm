@@ -191,7 +191,7 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 	}
 
 	if gold<int64(plant.Price){
-	   return datastruct.GoldIsNotEnoughForPlant,-1,plant.CName,-1
+	   return datastruct.GoldIsNotEnoughForPlant,gold,plant.CName,-1
 	}
 	
 	if plantLevel + 1 == plant.Level {
@@ -199,12 +199,12 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 	   plantLevel = plant.Level
 	} else {
 	   last_plant:=plants[plant.Level-2]
-	   return datastruct.PlantRequireUnlock,-1,last_plant.CName,-1
+	   return datastruct.PlantRequireUnlock,gold,last_plant.CName,-1
 	}
 
 	soil:=soils[plantInSoil.SoilId]
 	if gold<int64(soil.Price){
-	  return datastruct.GoldIsNotEnoughForSoil,-1,"",-1
+	  return datastruct.GoldIsNotEnoughForSoil,gold,"",-1
 	}
 	
     value, err = redis.String(conn.Do("hget",key,datastruct.SoilLevelField))
@@ -219,7 +219,7 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 		gold=gold-int64(soil.Price)
 		soilLevel = soil.Require 
 	} else{
-		return datastruct.SoilRequireUnlock,-1,"",soil.LastId   
+		return datastruct.SoilRequireUnlock,gold,"",soil.LastId   
 	}
 	
 	soiltableName:=fmt.Sprintf("soil%d",plantInSoil.SoilId)
