@@ -57,7 +57,7 @@ func createSoil(soils map[int]datastruct.SoilData)map[int]datastruct.PlayerSoil{
     for k,v := range soils{
         var tmp datastruct.PlayerSoil
         state:=datastruct.Locked
-        tmp.PlantId = 0
+        tmp.PlantId = 1
         if k == 1{
           state = datastruct.Unlocked
         } 

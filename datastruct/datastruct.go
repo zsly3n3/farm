@@ -225,11 +225,11 @@ type SoilData struct{
 }
 
 type PlayerSoilBase struct{
-	Level int //土地等级
-	Price int  //购买价格
-	UpgradeLevelPrice int//升下一级的价格
-	Factor int //生产系数
-	State GoodsState //土地状态
+	Level int `json:"level"`//土地等级
+	Price int  `json:"price"`//购买价格
+	UpgradeLevelPrice int `json:"upgradelevelprice"`//升下一级的价格
+	Factor int `json:"factor"`//生产系数
+	State GoodsState `json:"state"`//土地状态
 }
 
 type PlayerSoil struct{
@@ -239,19 +239,19 @@ type PlayerSoil struct{
 
 type ResponsePlayerSoilBase struct{
 	PlayerSoilBase
-	Id int //土地id
+	Id int `json:"id"`//土地id 
 }
 
 type ResponsePlayerSoil struct{
 	*ResponsePlayerSoilBase
-	Plant *ResponseSoilPlant
+	Plant *ResponseSoilPlant `json:"plant"` 
 }
 
 type ResponseSoilPlant struct{
-	 Name string
-	 InCome int
-	 ExpForAnimal int
-	 Type int
+	 Name string `json:"name"`
+	 InCome int `json:"income"`
+	 ExpForAnimal int `json:"expforanimal"`
+	 Type int `json:"type"`
 }
 
 type ResponseSoil struct{
@@ -273,21 +273,21 @@ type PlayerPetbar struct{
 }
 
 type ResponsePetbar struct{
-	Animal *ResponseAnimal//动物
+	Animal *ResponseAnimal `json:"animal"` //动物 
 	*ResponsePetbarBase
 }
 
 type ResponsePetbarBase struct{
-	Type AnimalType //宠物栏类型
-	Price int //单价
-	State GoodsState
+	Type AnimalType `json:"type"`//宠物栏类型
+	Price int `json:"price"`//单价
+	State GoodsState `json:"state"`
 }
 
 type ResponseAnimal struct{
-	Name  string //名称
-	InCome int //基本收益
-	CurrentExp int64 //当前经验
-	Exp int64 //升级所需经验
+	Name  string `json:"name"`//名称
+	InCome int `json:"income"`//基本收益
+	CurrentExp int64 `json:"currentexp"`//当前经验
+	Exp int64 `json:"exp"`//升级所需经验
 }
 
 type ResponsePlant struct{
@@ -314,12 +314,12 @@ func ResponseLoginData(p_data *PlayerData,plants []Plant,petbars map[AnimalType]
 	   return nil
 	}
 	mp:=make(map[string]interface{})
-	mp[PermissionIdField] = &(p_data.PermissionId)
-	mp["Token"] = &(p_data.Token)
-	mp[GoldField] = &(p_data.GoldCount)
-	mp[HoneyField] = &(p_data.HoneyCount)
-	mp["Soil"] = responsePlayerSoil(p_data,plants)
-	mp["Petbar"] = responsePetbarData(p_data,petbars,ani_mp)
+	mp["permissionid"] = &(p_data.PermissionId)
+	mp["token"] = &(p_data.Token)
+	mp["goldCount"] = &(p_data.GoldCount)
+	mp["honeyCount"] = &(p_data.HoneyCount)
+	mp["soil"] = responsePlayerSoil(p_data,plants)
+	mp["petbar"] = responsePetbarData(p_data,petbars,ani_mp)
 	return mp
 }
 
@@ -403,11 +403,11 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 
 //body
 type UserLogin struct{
-	PlatformId Platform //平台
-	Code string //身份标识
-	IsAuth int //是否授权
-	NickName string
-	Avatar string
+	PlatformId Platform `json:"platformid"`//平台 
+	Code string `json:"code"`//身份标识
+	IsAuth int `json:"isauth"`//是否授权
+	NickName string `json:"nickname"`
+	Avatar string `json:"avatar"`
 }
 
 // type BuyPlant struct{
