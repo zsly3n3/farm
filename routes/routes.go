@@ -85,6 +85,38 @@ func plant(r *gin.Engine,eventHandler *event.EventHandler){
 	})
 }
 
+func buyPetbar(r *gin.Engine,eventHandler *event.EventHandler){
+	r.PUT("/user/buyPetbar", func(c *gin.Context) {
+		if !checkVersion(c,eventHandler){
+			return
+		}
+		token,tf:= checkToken(c)
+		if !tf{
+			return
+		}
+		code,gold,ani:=eventHandler.BuyPetbar(token,c)
+		mp:=make(map[string]interface{})
+		mp["goldcount"]=gold
+		if code == datastruct.NULLError{
+			mp["animal"]=ani
+			c.JSON(200, gin.H{
+				"code": int(code),
+				"data": resp_tmp,
+			})
+		} else if code == datastruct.NULLError{
+			c.JSON(200, gin.H{
+				"code": int(code),
+				"data": mp,
+			})
+		} 
+		else {
+			c.JSON(200, gin.H{
+				"code": int(code),
+			})
+		}
+	})
+} 
+
 func upgradeSoil(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/upgradeSoil", func(c *gin.Context) {
 		if !checkVersion(c,eventHandler){
@@ -111,16 +143,16 @@ func upgradeSoil(r *gin.Engine,eventHandler *event.EventHandler){
 func updatePermisson(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/updatePermisson", func(c *gin.Context) {
 		if !checkVersion(c,eventHandler){
-			return
+		  return
 		}
 		token,tf:= checkToken(c)
 		if !tf{
-			return
+		  return
 		}
 		permissonId:=2
 		code:=eventHandler.UpdatePermisson(token,permissonId)
 		c.JSON(200, gin.H{
-		"code": int(code),
+		 "code": int(code),
 		})
 	})
 }
@@ -128,16 +160,16 @@ func updatePermisson(r *gin.Engine,eventHandler *event.EventHandler){
 func test1(r *gin.Engine,eventHandler *event.EventHandler) {
  r.POST("/Test1", func(c *gin.Context) {
 	if !checkVersion(c,eventHandler){
-		return
+	 return
 	}
     eventHandler.Test1(c)
  })
 }
 
 func test2(r *gin.Engine,eventHandler *event.EventHandler) {
-	r.POST("/Test2", func(c *gin.Context) {
+	r.POST("/addMoney", func(c *gin.Context) {
 		if !checkVersion(c,eventHandler){
-			return
+		 return
 		}
 	  eventHandler.Test2(c)
 	})

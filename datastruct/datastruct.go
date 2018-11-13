@@ -414,6 +414,7 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 	 return rs
 }
 
+
 //response 
 type ResponseUpgradeSoil struct{
 	GoldCount int64 `json:"goldcount"`
@@ -439,5 +440,9 @@ type PlantInSoil struct{
 
 type UpgradeSoil struct{
 	Level int `json:"level"`
+	SoilId int `json:"soilid"`
+}
+
+type BuyPetbar struct{
 	SoilId int `json:"soilid"`
 }
