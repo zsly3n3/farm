@@ -424,11 +424,7 @@ type UserLogin struct{
 	Avatar string `json:"avatar"`
 }
 
-// type BuyPlant struct{
-//    PlantId int
-// }
-
 type PlantInSoil struct{
-	PlantId int
-	SoilId int
+	PlantId int `json:"plantid"`
+	SoilId int `json:"soilid"`
 }
