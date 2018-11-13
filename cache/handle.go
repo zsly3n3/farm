@@ -167,36 +167,6 @@ func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastru
 	return code
 }
 
-// func (handle *CACHEHandler)UpdatePlantLevel(key string,plant *datastruct.Plant) (datastruct.CodeType,int64){
-// 	conn:=handle.GetConn()
-// 	defer conn.Close()
-// 	if !isExistUser(conn,key){
-//        return datastruct.PutDataFailed,-1
-// 	}
-// 	code,gold:=handle.ComputeCurrentGold(conn,key)
-// 	if code != datastruct.NULLError{
-// 	   return datastruct.PutDataFailed,-1
-// 	}
-
-//     value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
-// 	if err!=nil{	
-// 		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
-// 		return datastruct.PutDataFailed,-1
-// 	}
-// 	plantLevel := tools.StringToInt(value)
-//     if plantLevel < plant.Level && gold>=int64(plant.Price){
-// 	   gold=gold-int64(plant.Price)
-// 	   plantLevel+=1
-// 	} else{	
-// 	   return datastruct.PutDataFailed,-1
-// 	}
-// 	_, err = conn.Do("hmset", key,datastruct.GoldField,gold,datastruct.PlantLevelField,plantLevel)
-// 	if err != nil {
-// 	   log.Debug("CACHEHandler UpdatePlantLevel hmset err:%s",err.Error())
-// 	   return datastruct.PutDataFailed,-1
-// 	}
-// 	return datastruct.NULLError,gold
-// }
 
 func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantInSoil,plants []datastruct.Plant,soils map[int]datastruct.SoilData,petbars map[datastruct.AnimalType]datastruct.PetbarData)(datastruct.CodeType,int64,string,int){
 	conn:=handle.GetConn()
@@ -207,7 +177,7 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 	value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
 	if err!=nil{	
 		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s",err.Error(),key)
-		return datastruct.PutDataFailed,-1,"",-1
+		return datastruct.GetDataFailed,-1,"",-1
 	}
 	plant:=plants[plantInSoil.PlantId-1]
 	plantLevel := tools.StringToInt(value)
@@ -237,14 +207,54 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 	  return datastruct.GoldIsNotEnoughForSoil,-1,"",-1
 	}
 	
-    asd
+    value, err = redis.String(conn.Do("hget",key,datastruct.SoilLevelField))
+	if err!=nil{	
+		log.Debug("CACHEHandler PlantInSoil hget err:%s ,player:%s",err.Error(),key)
+		return datastruct.GetDataFailed,-1,"",-1
+	}
+
+	soilLevel := tools.StringToInt(value)
+     
+	if soilLevel + 1 == soil.Require{
+		gold=gold-int64(soil.Price)
+		soilLevel = soil.Require 
+	} else{
+		return datastruct.SoilRequireUnlock,-1,"",soil.LastId   
+	}
 	
-    //value, err := redis.String(conn.Do("hget",key,datastruct.PlantLevelField))
-		
+	soiltableName:=fmt.Sprintf("soil%d",plantInSoil.SoilId)
+	value, err= redis.String(conn.Do("hget",soiltableName,key))
+	var player_soil *datastruct.PlayerSoil 
+	if err == nil{
+		player_soil,_=tools.BytesToPlayerSoil([]byte(value))
+	} else {
+		return datastruct.GetDataFailed,-1,"",-1
+	}
+
+	player_soil.PlantId =  plantInSoil.PlantId
+	player_soil.State = datastruct.Owned
+    
+
+	conn.Send("MULTI")
+
+	conn.Send("hmset", key,
+	datastruct.GoldField,gold,
+	datastruct.PlantLevelField,plantLevel,
+	datastruct.SoilLevelField,soilLevel)
+
+	value,isError:=tools.PlayerSoilToString(player_soil)
+	if isError{
+		log.Debug("CACHEHandler PlantInSoil PlayerSoilToString err:%s player:%s",soiltableName,key)	
+		return datastruct.PutDataFailed,-1,"",-1
+	}
+	conn.Send("hset", soiltableName,key,value)
+
+	_, err = conn.Do("EXEC")
 	
-	//SoilRequireUnlock//土地未到达解锁条件
-	
-	//save gold,plantlevel
+	if err != nil {
+	  log.Debug("CACHEHandler PlantInSoil MULTI set data err:%s",err.Error())
+	  return datastruct.PutDataFailed,-1,"",-1
+	}
 
 	return datastruct.NULLError,gold,"",-1
 }
