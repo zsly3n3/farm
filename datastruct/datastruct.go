@@ -269,6 +269,7 @@ type ResponseSoil struct{
 type PetbarData struct{
 	Price int //单价
 	Require int //开启条件
+	Id int //土地id
 }
 
 type PlayerPetbar struct{

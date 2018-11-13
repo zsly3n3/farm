@@ -160,9 +160,11 @@ func GetSoildInfo()(map[int]datastruct.SoilData,map[datastruct.AnimalType]datast
 		cell_class  := fmt.Sprintf("A%d",index)
 		cell_price := fmt.Sprintf("B%d",index)
 		cell_require := fmt.Sprintf("C%d",index)
+		cell_id := fmt.Sprintf("D%d",index)
 		class := xlsx.GetCellValue(petbarTableName, cell_class)
 		price := xlsx.GetCellValue(petbarTableName, cell_price)
 		require := xlsx.GetCellValue(petbarTableName, cell_require)
+		id := xlsx.GetCellValue(petbarTableName, cell_id)
         if class == "" {
             break
 		}
@@ -170,6 +172,7 @@ func GetSoildInfo()(map[int]datastruct.SoilData,map[datastruct.AnimalType]datast
 		petbar_type:= datastruct.AnimalType(StringToInt(class))
 		petbar.Price = StringToInt(price)
 		petbar.Require = StringToInt(require)
+		petbar.Id = StringToInt(id)
 		petbars[petbar_type]=petbar
         index++
     }
