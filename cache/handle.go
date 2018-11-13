@@ -353,16 +353,10 @@ func isExistUser(conn redis.Conn,key string)bool{
 	return isExist
 }
 
-
-
-
-
-
-
 func (handle *CACHEHandler)TestMoney(key string){
 	conn:=handle.GetConn()
 	defer conn.Close()
-	_, err := conn.Do("hmset", key,datastruct.GoldField,100, datastruct.HoneyField,200)
+	_, err := conn.Do("hmset", key,datastruct.GoldField,10000, datastruct.HoneyField,2000)
 	if err != nil {
 		log.Debug("CACHEHandler TestMoney err:%s",err.Error())
 	}

@@ -43,18 +43,14 @@ func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
   })
 }
 
-
-
-
-
 func plant(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/plant", func(c *gin.Context) {
 		if !checkVersion(c,eventHandler){
-			return
+		  return
 		}
 		token,tf:= checkToken(c)
 		if !tf{
-			return
+		  return
 		}
 		code,gold,plantName,soil_id:=eventHandler.PlantInSoil(token,c)
 		mp:=make(map[string]interface{})
@@ -66,7 +62,7 @@ func plant(r *gin.Engine,eventHandler *event.EventHandler){
 			 c.JSON(200, gin.H{
 				"code": int(code),
 				"data": mp,
-			})
+			 })
 		case datastruct.GoldIsNotEnoughForPlant:
 			 fallthrough
 		case datastruct.PlantRequireUnlock:
@@ -76,11 +72,11 @@ func plant(r *gin.Engine,eventHandler *event.EventHandler){
 				"data": mp,
 			 })
 		case datastruct.SoilRequireUnlock:
-			 mp["soilid"]=soil_id
-			 c.JSON(200, gin.H{
-				"code": int(code),
-				"data": mp,
-			}) 	
+			mp["soilid"]=soil_id
+			c.JSON(200, gin.H{
+			 "code": int(code),
+			 "data": mp,
+			})
 		default:
 			c.JSON(200, gin.H{
 				"code": int(code),
@@ -88,7 +84,6 @@ func plant(r *gin.Engine,eventHandler *event.EventHandler){
 		}
 	})
 }
-
 
 func upgradeSoil(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/upgradeSoil", func(c *gin.Context) {
@@ -113,7 +108,6 @@ func upgradeSoil(r *gin.Engine,eventHandler *event.EventHandler){
 	})
 }
 
-
 func updatePermisson(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/updatePermisson", func(c *gin.Context) {
 		if !checkVersion(c,eventHandler){
@@ -131,13 +125,12 @@ func updatePermisson(r *gin.Engine,eventHandler *event.EventHandler){
 	})
 }
 
-
 func test1(r *gin.Engine,eventHandler *event.EventHandler) {
  r.POST("/Test1", func(c *gin.Context) {
 	if !checkVersion(c,eventHandler){
 		return
 	}
-   eventHandler.Test1(c)
+    eventHandler.Test1(c)
  })
 }
 
