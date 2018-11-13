@@ -113,7 +113,7 @@ type AnimalClass struct {
 }
 
 type ShopData struct{
-	Plants []*ResponsePlant
+	Plants []*ResponsePlant `json:"plants"`
 }
 
 
@@ -316,8 +316,8 @@ func ResponseLoginData(p_data *PlayerData,plants []Plant,petbars map[AnimalType]
 	mp:=make(map[string]interface{})
 	mp["permissionid"] = &(p_data.PermissionId)
 	mp["token"] = &(p_data.Token)
-	mp["goldCount"] = &(p_data.GoldCount)
-	mp["honeyCount"] = &(p_data.HoneyCount)
+	mp["goldcount"] = &(p_data.GoldCount)
+	mp["honeycount"] = &(p_data.HoneyCount)
 	mp["soil"] = responsePlayerSoil(p_data,plants)
 	mp["petbar"] = responsePetbarData(p_data,petbars,ani_mp)
 	return mp
