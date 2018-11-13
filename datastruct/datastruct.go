@@ -137,8 +137,8 @@ type PlayerData struct{
 	Avatar string
 	PlantLevel int //可购买商店植物的等级
 	SoilLevel int //可购买土地的等级
-	Soil map[int]PlayerSoil //玩家土地信息
-	PetBar map[AnimalType]PlayerPetbar //宠物栏信息
+	Soil map[int]*PlayerSoil //玩家土地信息
+	PetBar map[AnimalType]*PlayerPetbar //宠物栏信息
 }
 
 
@@ -414,6 +414,14 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 	 return rs
 }
 
+//response 
+type ResponseUpgradeSoil struct{
+	GoldCount int64 `json:"goldcount"`
+	Level int `json:"level"`
+	Factor int `json:"factor"`
+	UpgradePrice int `json:"upgradeprice"`
+}
+
 
 //body
 type UserLogin struct{
@@ -426,5 +434,10 @@ type UserLogin struct{
 
 type PlantInSoil struct{
 	PlantId int `json:"plantid"`
+	SoilId int `json:"soilid"`
+}
+
+type UpgradeSoil struct{
+	Level int `json:"level"`
 	SoilId int `json:"soilid"`
 }

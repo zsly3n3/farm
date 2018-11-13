@@ -53,10 +53,10 @@ func (handle *EventHandler)createUser(code string,permissionId int,nickName stri
     return player
 }
 
-func createSoil(soils map[int]datastruct.SoilData)map[int]datastruct.PlayerSoil{
-    rs:=make(map[int]datastruct.PlayerSoil)
+func createSoil(soils map[int]datastruct.SoilData)map[int]*datastruct.PlayerSoil{
+    rs:=make(map[int]*datastruct.PlayerSoil)
     for k,v := range soils{
-        var tmp datastruct.PlayerSoil
+        tmp:=new(datastruct.PlayerSoil)
         state:=datastruct.Locked
         tmp.PlantId = 0
         if k == 1{
@@ -72,10 +72,10 @@ func createSoil(soils map[int]datastruct.SoilData)map[int]datastruct.PlayerSoil{
     return rs
 }
 
-func createPetbar(petbars map[datastruct.AnimalType]datastruct.PetbarData)map[datastruct.AnimalType]datastruct.PlayerPetbar{
-    rs:=make(map[datastruct.AnimalType]datastruct.PlayerPetbar)
+func createPetbar(petbars map[datastruct.AnimalType]datastruct.PetbarData)map[datastruct.AnimalType]*datastruct.PlayerPetbar{
+    rs:=make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
     for k,_ := range petbars{
-        var tmp datastruct.PlayerPetbar
+        tmp:=new(datastruct.PlayerPetbar)
         tmp.AnimalNumber = 0
         tmp.State = datastruct.Locked
         tmp.CurrentExp = 0

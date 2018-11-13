@@ -94,7 +94,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	      return userinfo.Id
 	    }
 	}
-
+    
 
 	err=session.Commit()
 	if err != nil{

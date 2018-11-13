@@ -43,6 +43,10 @@ func getShopData(r *gin.Engine,eventHandler *event.EventHandler) {
   })
 }
 
+
+
+
+
 func plant(r *gin.Engine,eventHandler *event.EventHandler){
 	r.PUT("/user/plant", func(c *gin.Context) {
 		if !checkVersion(c,eventHandler){
@@ -86,7 +90,28 @@ func plant(r *gin.Engine,eventHandler *event.EventHandler){
 }
 
 
-
+func upgradeSoil(r *gin.Engine,eventHandler *event.EventHandler){
+	r.PUT("/user/upgradeSoil", func(c *gin.Context) {
+		if !checkVersion(c,eventHandler){
+			return
+		}
+		token,tf:= checkToken(c)
+		if !tf{
+			return
+		}
+		code,resp_tmp:=eventHandler.UpgradeSoil(token,c)
+		if code == datastruct.NULLError{
+			c.JSON(200, gin.H{
+				"code": int(code),
+				"data": resp_tmp,
+			})
+		} else {
+			c.JSON(200, gin.H{
+				"code": int(code),
+			})
+		}
+	})
+}
 
 
 func updatePermisson(r *gin.Engine,eventHandler *event.EventHandler){
@@ -162,6 +187,7 @@ func Register(r *gin.Engine,eventHandler *event.EventHandler){
 	 login(r,eventHandler)
 	 updatePermisson(r,eventHandler)
 	 plant(r,eventHandler)
+	 upgradeSoil(r,eventHandler)
 	 test1(r,eventHandler)
 	 test2(r,eventHandler)
 }

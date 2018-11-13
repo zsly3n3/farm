@@ -253,6 +253,31 @@ func BytesToSliceInt(bytes []byte)([]int,bool){
 }
 
 
+//level为升到当前多少级,price为土地初始价格
+func ComputeSoilLevelPrice(gold int64,level int,current *datastruct.PlayerSoil)(int64,*datastruct.ResponseUpgradeSoil){
+	resp_upsoil:=new(datastruct.ResponseUpgradeSoil)
+	rs_UpgradePrice:=current.UpgradeLevelPrice
+	rs_factor:=current.Factor
+	rs_level:=current.Level
+	for i:=current.Level;i<=level;i++{
+		if gold < int64(rs_UpgradePrice){
+		   break
+		}
+		gold -= int64(rs_UpgradePrice)
+		rs_level += 1
+		rs_factor += + 20
+	    rs_UpgradePrice+=20
+	}
+	resp_upsoil.GoldCount = gold
+	resp_upsoil.Level = rs_level
+	resp_upsoil.UpgradePrice = rs_UpgradePrice
+	resp_upsoil.Factor = rs_factor
+	current.Level = rs_level
+	current.UpgradeLevelPrice = rs_UpgradePrice
+	current.Factor = rs_factor
+	return gold,resp_upsoil
+}
+
 func GetUpgradeLevelPriceForSoil(currentLevel int)int{
 	 return 100
 }

@@ -37,11 +37,11 @@ func (handle *EventHandler)Login(c *gin.Context){
 			 if !isExistMysql{
 				p_data=handle.createUser(openid,getPermissionId(body.IsAuth),"test","avatar")
 			 } else {
-				refreshPlayerData(p_data,body.IsAuth)
+				handle.refreshPlayerData(p_data,body.IsAuth)
 			 }
 			 handle.cacheHandler.SetPlayerAllData(conn,p_data)
 		   } else {
-			 refreshPlayerData(p_data,body.IsAuth)
+			 handle.refreshPlayerData(p_data,body.IsAuth)
 			 handle.cacheHandler.SetPlayerSomeData(conn,p_data)
 		   }
 		   c.JSON(200, gin.H{
@@ -65,12 +65,23 @@ func getOpenId(code string) string{
 	 return code
 }
 
-
-func refreshPlayerData(p_data *datastruct.PlayerData,isauth int){
+func (handle *EventHandler)refreshPlayerData(p_data *datastruct.PlayerData,isauth int){
 	if isauth == 1 && p_data.PermissionId == int(datastruct.Guest){
 	  p_data.PermissionId = int(datastruct.Player)
 	}
 	p_data.UpdateTime = time.Now().Unix()
+
+	gold:=p_data.GoldCount
+	for k,v := range handle.soils{
+        if gold >= int64(v.Price){
+			p_data.Soil[k].State = datastruct.Unlocked
+		}
+	}
+	for k,v := range handle.petbars{
+        if gold >= int64(v.Price){
+		  p_data.PetBar[k].State = datastruct.Unlocked
+		}
+	}
 }
 
 func (handle *EventHandler)fromRedisToMysql(token string){
@@ -96,6 +107,26 @@ func (handle *EventHandler)UpdatePermisson(key string,permissionId int) datastru
 	return code
 }
 
+func (handle *EventHandler)UpgradeSoil(key string,c *gin.Context)(datastruct.CodeType,*datastruct.ResponseUpgradeSoil){
+	var body datastruct.UpgradeSoil
+	err:=c.BindJSON(&body)
+	code:=datastruct.NULLError
+	var resp_tmp *datastruct.ResponseUpgradeSoil
+	resp_tmp = nil
+	if err == nil {
+		_,tf:=handle.soils[body.SoilId]
+		if tf {
+		  code,resp_tmp=handle.cacheHandler.UpgradeSoil(key,&body,handle.soils)   
+		} else {
+		  code=datastruct.PutDataFailed
+		}
+	} else{
+		code=datastruct.JsonParseFailedFromPutBody
+	}
+	return code,resp_tmp
+}
+
+
 
 func (handle *EventHandler)PlantInSoil(key string,c *gin.Context) (datastruct.CodeType,int64,string,int){
 	var body datastruct.PlantInSoil
@@ -108,7 +139,7 @@ func (handle *EventHandler)PlantInSoil(key string,c *gin.Context) (datastruct.Co
 	   _,tf:=handle.soils[body.SoilId]
 	   index:=body.PlantId-1
 	   if tf && index >=0 && index < len(handle.plants){
-		 code,gold,plantName,soil_id=handle.cacheHandler.PlantInSoil(key,&body,handle.plants,handle.soils,handle.petbars)   
+		 code,gold,plantName,soil_id=handle.cacheHandler.PlantInSoil(key,&body,handle.plants,handle.soils)   
 	   } else {
 		 code=datastruct.PutDataFailed
 	   }

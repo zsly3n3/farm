@@ -61,7 +61,7 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
     
 	for k,v := range p_data.Soil{
 		soiltableName:=fmt.Sprintf("soil%d",k)
-		value,isError:=tools.PlayerSoilToString(&v)
+		value,isError:=tools.PlayerSoilToString(v)
 		if isError{
 		   log.Debug("CACHEHandler SetPlayerData PlayerSoilToString err:%s player:%s",soiltableName,key)	
 		   return
@@ -71,7 +71,7 @@ func (handle *CACHEHandler)SetPlayerAllData(conn redis.Conn,p_data *datastruct.P
      
 	for k,v := range p_data.PetBar{
 		petbartableName:=fmt.Sprintf("petbar%d",int(k))
-		value,isError:=tools.PlayerPetbarToString(&v)
+		value,isError:=tools.PlayerPetbarToString(v)
 		if isError{
 		   log.Debug("CACHEHandler SetPlayerData PlayerPetbarToString err:%s player:%s",petbartableName,key)	
 		   return
@@ -126,25 +126,25 @@ func (handle *CACHEHandler)ReadPlayerData(conn redis.Conn,key string) *datastruc
 	}
 
 	len_soil:=5
-    rs.Soil=make(map[int]datastruct.PlayerSoil)
+    rs.Soil=make(map[int]*datastruct.PlayerSoil)
 	for i:=1;i<=len_soil;i++{
 		soiltableName:=fmt.Sprintf("soil%d",i)
 		value, err := redis.String(conn.Do("hget",soiltableName,key))
 		if err == nil{
 			tmp,_:=tools.BytesToPlayerSoil([]byte(value))
-			rs.Soil[i]=*tmp
+			rs.Soil[i]=tmp
 		}
 	}
 
 
 	len_petbar:=int(datastruct.Deity)
-    rs.PetBar=make(map[datastruct.AnimalType]datastruct.PlayerPetbar)
+    rs.PetBar=make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
 	for i:=int(datastruct.Sea);i<=len_petbar;i++{
 		petbartableName:=fmt.Sprintf("petbar%d",i)
 		value, err := redis.String(conn.Do("hget",petbartableName,key))
 		if err == nil{
 			tmp,_:=tools.BytesToPlayerPetbar([]byte(value))
-			rs.PetBar[datastruct.AnimalType(i)]=*tmp
+			rs.PetBar[datastruct.AnimalType(i)]=tmp
 		}
 	}
 	rs.Token = key
@@ -168,7 +168,50 @@ func (handle *CACHEHandler)UpdatePermisson(key string,permissionId int) datastru
 }
 
 
-func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantInSoil,plants []datastruct.Plant,soils map[int]datastruct.SoilData,petbars map[datastruct.AnimalType]datastruct.PetbarData)(datastruct.CodeType,int64,string,int){
+func (handle *CACHEHandler)UpgradeSoil(key string,upgradeSoil *datastruct.UpgradeSoil,soils map[int]datastruct.SoilData)(datastruct.CodeType,*datastruct.ResponseUpgradeSoil){
+	conn:=handle.GetConn()
+	defer conn.Close()
+	var resp_tmp *datastruct.ResponseUpgradeSoil
+	resp_tmp = nil
+	if !isExistUser(conn,key){
+	  return datastruct.PutDataFailed,resp_tmp
+	}
+
+	code,gold:=handle.ComputeCurrentGold(conn,key)
+	if code != datastruct.NULLError{
+	   return datastruct.PutDataFailed,resp_tmp
+	}
+
+	soiltableName:=fmt.Sprintf("soil%d",upgradeSoil.SoilId)
+	value, err := redis.String(conn.Do("hget",soiltableName,key))
+	if err!=nil{
+		return datastruct.GetDataFailed,resp_tmp
+	}
+	tmp,_:=tools.BytesToPlayerSoil([]byte(value))
+	if tmp.State != datastruct.Owned || gold < int64(tmp.UpgradeLevelPrice) {
+		resp_tmp:=new(datastruct.ResponseUpgradeSoil)
+		resp_tmp.Level = tmp.Level
+		resp_tmp.UpgradePrice = tmp.UpgradeLevelPrice
+		resp_tmp.Factor = tmp.Factor
+		resp_tmp.GoldCount = gold
+		return datastruct.NULLError,resp_tmp
+	}
+	gold,resp_tmp=tools.ComputeSoilLevelPrice(gold,upgradeSoil.Level,tmp)
+	value,_=tools.PlayerSoilToString(tmp);
+	conn.Send("MULTI")
+	conn.Send("hset", key,datastruct.GoldField,gold)
+	conn.Send("hset", soiltableName,key,value)
+	_, err = conn.Do("EXEC")
+	
+	if err != nil {
+	  log.Debug("CACHEHandler UpgradeSoil err:%s",err.Error())
+	  return datastruct.PutDataFailed,nil
+	}
+	
+	return datastruct.NULLError,resp_tmp
+}
+
+func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantInSoil,plants []datastruct.Plant,soils map[int]datastruct.SoilData)(datastruct.CodeType,int64,string,int){
 	conn:=handle.GetConn()
 	defer conn.Close()
 	if !isExistUser(conn,key){
@@ -255,7 +298,7 @@ func (handle *CACHEHandler)PlantInSoil(key string,plantInSoil *datastruct.PlantI
 	  log.Debug("CACHEHandler PlantInSoil MULTI set data err:%s",err.Error())
 	  return datastruct.PutDataFailed,-1,"",-1
 	}
-
+    
 	return datastruct.NULLError,gold,"",-1
 }
 
