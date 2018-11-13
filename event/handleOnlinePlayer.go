@@ -42,7 +42,7 @@ func (handle *EventHandler)createUser(code string,permissionId int,nickName stri
 	player.CreatedAt = timestamp
 	player.UpdateTime = timestamp
 	player.Token = code
-	player.GoldCount = 0
+	player.GoldCount = 10000
 	player.HoneyCount = 0
 	player.NickName = nickName
 	player.Avatar = avatar
