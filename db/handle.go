@@ -67,7 +67,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		rollback(str,session)
 	    return userinfo.Id
 	}
-	sql:=fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,plant_level,soil_level)VALUES(%d,%d,%d,%d,%d)",userinfo.Id,p_data.HoneyCount,p_data.GoldCount,p_data.PlantLevel,p_data.SoilLevel)
+	sql:=fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,soil_level)VALUES(%d,%d,%d,%d)",userinfo.Id,p_data.HoneyCount,p_data.GoldCount,p_data.SoilLevel)
 	_, err=session.Exec(sql)
 	if err != nil{
 	  str:=fmt.Sprintf("DBHandler->SetPlayerData REPLACE PlayerInfo :%s",err.Error())
@@ -86,7 +86,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	}
     
 	for k,v:=range p_data.Soil {
-		sql=fmt.Sprintf("REPLACE INTO soil%d (p_id,level,plant_id,upgrade_level_price,factor,state)VALUES(%d,%d,%d,%d,%d,%d)",k,userinfo.Id,v.Level,v.PlantId,v.UpgradeLevelPrice,v.Factor,int(v.State))
+		sql=fmt.Sprintf("REPLACE INTO soil%d (p_id,level,plant_id,upgrade_level_price,factor,state,plant_level)VALUES(%d,%d,%d,%d,%d,%d,%d)",k,userinfo.Id,v.Level,v.PlantId,v.UpgradeLevelPrice,v.Factor,int(v.State),v.PlantLevel)
 		_, err=session.Exec(sql)
 	    if err != nil{
 	      str:=fmt.Sprintf("DBHandler->SetPlayerData REPLACE PetBar :%s",err.Error())

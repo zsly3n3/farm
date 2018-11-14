@@ -46,7 +46,6 @@ func (handle *EventHandler)createUser(code string,permissionId int,nickName stri
 	player.HoneyCount = 0
 	player.NickName = nickName
 	player.Avatar = avatar
-    player.PlantLevel = 0
     player.SoilLevel = 0
     player.Soil = createSoil(handle.soils)
     player.PetBar = createPetbar(handle.petbars)
@@ -67,6 +66,7 @@ func createSoil(soils map[int]datastruct.SoilData)map[int]*datastruct.PlayerSoil
         tmp.Price = v.Price
         tmp.UpgradeLevelPrice = tools.GetUpgradeLevelPriceForSoil(tmp.Level)
         tmp.State = state
+        tmp.PlantLevel = 0
         rs[k]=tmp
     }
     return rs

@@ -55,7 +55,6 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 		datastruct.UpdateTimeField, p_data.UpdateTime,
 		datastruct.NickNameField, p_data.NickName,
 		datastruct.AvatarField, p_data.Avatar,
-		datastruct.PlantLevelField, p_data.PlantLevel,
 		datastruct.SoilLevelField, p_data.SoilLevel)
 
 	for k, v := range p_data.Soil {
@@ -91,8 +90,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 	value, err := redis.Values(conn.Do("hmget", key,
 		datastruct.IdField, datastruct.GoldField, datastruct.HoneyField,
 		datastruct.PermissionIdField, datastruct.CreatedAtField, datastruct.UpdateTimeField,
-		datastruct.NickNameField, datastruct.AvatarField,
-		datastruct.PlantLevelField))
+		datastruct.NickNameField, datastruct.AvatarField))
 	if err != nil {
 		log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s", err.Error(), key)
 		return rs
@@ -117,8 +115,6 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 			rs.NickName = str
 		case 7:
 			rs.Avatar = str
-		case 8:
-			rs.PlantLevel = tools.StringToInt(str)
 		}
 	}
 
@@ -212,13 +208,18 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	if !isExistUser(conn, key) {
 		return datastruct.PutDataFailed, -1, "", -1
 	}
-	value, err := redis.String(conn.Do("hget", key, datastruct.PlantLevelField))
-	if err != nil {
-		log.Debug("CACHEHandler UpdatePlantLevel hmget err:%s ,player:%s", err.Error(), key)
+
+	soiltableName := fmt.Sprintf("soil%d", plantInSoil.SoilId)
+	value, err := redis.String(conn.Do("hget", soiltableName, key))
+	var player_soil *datastruct.PlayerSoil
+	if err == nil {
+		player_soil, _ = tools.BytesToPlayerSoil([]byte(value))
+	} else {
 		return datastruct.GetDataFailed, -1, "", -1
 	}
+
 	plant := plants[plantInSoil.PlantId-1]
-	plantLevel := tools.StringToInt(value)
+	plantLevel := player_soil.PlantLevel
 	if plantLevel >= plant.Level {
 		return datastruct.PutDataFailed, -1, "", -1
 	}
@@ -235,18 +236,10 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	if plantLevel+1 == plant.Level {
 		gold = gold - int64(plant.Price)
 		plantLevel = plant.Level
+		player_soil.PlantLevel = plantLevel
 	} else {
 		last_plant := plants[plant.Level-2]
 		return datastruct.PlantRequireUnlock, gold, last_plant.CName, -1
-	}
-
-	soiltableName := fmt.Sprintf("soil%d", plantInSoil.SoilId)
-	value, err = redis.String(conn.Do("hget", soiltableName, key))
-	var player_soil *datastruct.PlayerSoil
-	if err == nil {
-		player_soil, _ = tools.BytesToPlayerSoil([]byte(value))
-	} else {
-		return datastruct.GetDataFailed, -1, "", -1
 	}
 
 	player_soil.PlantId = plantInSoil.PlantId
@@ -271,13 +264,10 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 		conn.Send("MULTI")
 		conn.Send("hmset", key,
 			datastruct.GoldField, gold,
-			datastruct.PlantLevelField, plantLevel,
 			datastruct.SoilLevelField, soilLevel)
 	} else {
 		conn.Send("MULTI")
-		conn.Send("hmset", key,
-			datastruct.GoldField, gold,
-			datastruct.PlantLevelField, plantLevel)
+		conn.Send("hset", key,datastruct.GoldField, gold)
 	}
 
 	value, isError := tools.PlayerSoilToString(player_soil)
@@ -394,20 +384,19 @@ func (handle *CACHEHandler) clearData() {
 	conn.Do("flushdb")
 }
 
-func (handle *CACHEHandler) GetPlantLevel(key string) (int, datastruct.CodeType) {
+func (handle *CACHEHandler) GetPlantLevel(key string,soil_id int) (datastruct.CodeType,int) {
 	conn := handle.GetConn()
 	defer conn.Close()
-	value, err := redis.String(conn.Do("hget", key, datastruct.PlantLevelField))
-	code := datastruct.NULLError
-	if value == "" {
-		return -1, datastruct.TokenError
+
+	soiltableName := fmt.Sprintf("soil%d", soil_id)
+	value, err := redis.String(conn.Do("hget", soiltableName, key))
+	var player_soil *datastruct.PlayerSoil
+	if err == nil {
+		player_soil, _ = tools.BytesToPlayerSoil([]byte(value))
+	} else {
+		return datastruct.GetDataFailed,-1
 	}
-	if err != nil {
-		code = datastruct.GetDataFailed
-		log.Debug("CACHEHandler GetPlantLevel err:%s", err.Error())
-		return -1, code
-	}
-	return tools.StringToInt(value), code
+	return datastruct.NULLError,player_soil.PlantLevel
 }
 
 func isExistUser(conn redis.Conn, key string) bool {

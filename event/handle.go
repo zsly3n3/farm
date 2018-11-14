@@ -164,15 +164,21 @@ func (handle *EventHandler) BuyPetbar(key string, c *gin.Context) (datastruct.Co
 	return code, gold, animal, soil_id
 }
 
-func (handle *EventHandler) GetShopData(c *gin.Context, token string) {
-	plantlevel, code := handle.cacheHandler.GetPlantLevel(token)
-	if code != datastruct.NULLError {
+func (handle *EventHandler) GetShopData(c *gin.Context, token string,soil_id int) {
+	_, tf := handle.soils[soil_id]
+    if !tf{
 		c.JSON(200, gin.H{
-			"code": int(code),
+			"code": datastruct.GetDataFailed,
 		})
 		return
 	}
-
+	code,plantlevel:= handle.cacheHandler.GetPlantLevel(token,soil_id)
+	if code != datastruct.NULLError {
+		c.JSON(200, gin.H{
+			"code": code,
+		})
+		return
+	}
 	len := len(handle.plants)
 	index := 0
 	num := 40
@@ -202,7 +208,7 @@ func (handle *EventHandler) GetShopData(c *gin.Context, token string) {
 	shopData.Plants = plants
 
 	c.JSON(200, gin.H{
-		"code": int(code),
+		"code": code,
 		"data": shopData,
 	})
 }

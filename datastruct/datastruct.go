@@ -52,7 +52,6 @@ const IdentityIdField = "IdentityId"
 const NickNameField = "NickName"
 const AvatarField = "Avatar"
 
-const PlantLevelField = "PlantLevel"
 const SoilLevelField = "SoilLevel"
 
 const PlayerPetbarField = "PlayerPetbar"
@@ -135,7 +134,6 @@ type PlayerData struct{
 	HoneyCount int64 //蜂蜜数量
 	NickName string
 	Avatar string
-	PlantLevel int //可购买商店植物的等级
 	SoilLevel int //可购买土地的等级
 	Soil map[int]*PlayerSoil //玩家土地信息
 	PetBar map[AnimalType]*PlayerPetbar //宠物栏信息
@@ -156,7 +154,8 @@ type Soil1 struct{
 	PlantId int `xorm:"not null INT(11)"`//0表示没有种植
 	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
-	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	State GoodsState `xorm:"not null INT(11)"`//土地状态
+	PlantLevel int `xorm:"not null INT(11)"`//可购买商店植物的等级
 }
 
 type Soil2 struct{
@@ -166,6 +165,7 @@ type Soil2 struct{
 	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	PlantLevel int `xorm:"not null INT(11)"`//可购买商店植物的等级
 }
 
 type Soil3 struct{
@@ -175,6 +175,7 @@ type Soil3 struct{
 	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	PlantLevel int `xorm:"not null INT(11)"`//可购买商店植物的等级
 }
 
 type Soil4 struct{
@@ -184,6 +185,7 @@ type Soil4 struct{
 	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	PlantLevel int `xorm:"not null INT(11)"`//可购买商店植物的等级
 }
 
 type Soil5 struct{
@@ -193,6 +195,7 @@ type Soil5 struct{
 	UpgradeLevelPrice int  `xorm:"not null INT(11)"`//升下一级的价格
 	Factor int `xorm:"not null INT(11)"`//生产系数
 	State GoodsState `xorm:"not null INT(11)"` //土地状态
+	PlantLevel int `xorm:"not null INT(11)"`//可购买商店植物的等级
 }
 
 //宠物栏1,2,3,4 海，陆，空，神
@@ -243,6 +246,7 @@ type PlayerSoilBase struct{
 
 type PlayerSoil struct{
 	PlayerSoilBase
+	PlantLevel int
 	PlantId int //0表示没有种植
 }
 

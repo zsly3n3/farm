@@ -3,7 +3,7 @@ package routes
 import (
 	"farm/datastruct"
 	"farm/event"
-
+    "farm/tools"
 	"github.com/gin-gonic/gin"
 	//"farm/log"
 )
@@ -32,7 +32,7 @@ func login(r *gin.Engine, eventHandler *event.EventHandler) {
 }
 
 func getShopData(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.GET("/shop", func(c *gin.Context) {
+	r.GET("/shop/:soilid", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
@@ -40,7 +40,8 @@ func getShopData(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		eventHandler.GetShopData(c, token)
+		soil_id := c.Param("soilid")
+		eventHandler.GetShopData(c, token,tools.StringToInt(soil_id))
 	})
 }
 
@@ -61,7 +62,7 @@ func plant(r *gin.Engine, eventHandler *event.EventHandler) {
 			fallthrough
 		case datastruct.GoldIsNotEnoughForSoil:
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 				"data": mp,
 			})
 		case datastruct.GoldIsNotEnoughForPlant:
@@ -69,18 +70,18 @@ func plant(r *gin.Engine, eventHandler *event.EventHandler) {
 		case datastruct.PlantRequireUnlock:
 			mp["plantname"] = plantName
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 				"data": mp,
 			})
 		case datastruct.SoilRequireUnlock:
 			mp["soilid"] = soil_id
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 				"data": mp,
 			})
 		default:
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 			})
 		}
 	})
@@ -101,23 +102,23 @@ func buyPetbar(r *gin.Engine, eventHandler *event.EventHandler) {
 		if code == datastruct.NULLError {
 			mp["animal"] = ani
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 				"data": mp,
 			})
 		} else if code == datastruct.GoldIsNotEnoughForSoil {
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 				"data": mp,
 			})
 		} else if code == datastruct.SoilRequireUnlock {
 			mp["soilid"] = soil_id
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 				"data": mp,
 			})
 		} else {
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 			})
 		}
 	})
@@ -135,12 +136,12 @@ func upgradeSoil(r *gin.Engine, eventHandler *event.EventHandler) {
 		code, resp_tmp := eventHandler.UpgradeSoil(token, c)
 		if code == datastruct.NULLError {
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 				"data": resp_tmp,
 			})
 		} else {
 			c.JSON(200, gin.H{
-				"code": int(code),
+				"code": code,
 			})
 		}
 	})
@@ -158,7 +159,7 @@ func updatePermisson(r *gin.Engine, eventHandler *event.EventHandler) {
 		permissonId := 2
 		code := eventHandler.UpdatePermisson(token, permissonId)
 		c.JSON(200, gin.H{
-			"code": int(code),
+			"code": code,
 		})
 	})
 }
