@@ -76,7 +76,7 @@ func createPetbar(petbars map[datastruct.AnimalType]datastruct.PetbarData)map[da
     rs:=make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
     for k,_ := range petbars{
         tmp:=new(datastruct.PlayerPetbar)
-        tmp.AnimalNumber = 1
+        tmp.AnimalNumber = 0
         tmp.State = datastruct.Locked
         tmp.CurrentExp = 0
         rs[k]=tmp
