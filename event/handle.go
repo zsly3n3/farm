@@ -230,10 +230,15 @@ func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruc
 }
 
 func (handle *EventHandler)AnimalUpgrade(key string,c *gin.Context)(datastruct.CodeType,*datastruct.ResponseAnimalUpgrade){
+	var resp_data *datastruct.ResponseAnimalUpgrade
+	resp_data = nil 
+	var body datastruct.BuyPetbar
+	err := c.BindJSON(&body)
 	var code datastruct.CodeType
-	var resp_data *datastruct.ResponseAnimalUpgrade   
-	
-
+	if err != nil{
+	 return datastruct.JsonParseFailedFromPostBody,resp_data
+	}
+    code,resp_data = handle.cacheHandler.AnimalUpgrade(key,body.PetbarId,handle.petbars)
 	return code,resp_data
 }
 

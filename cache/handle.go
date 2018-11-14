@@ -368,6 +368,31 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 	return datastruct.NULLError, gold, animal, soil_id
 }
 
+func (handle *CACHEHandler)AnimalUpgrade(key string, perbarId int, petbars map[datastruct.AnimalType]datastruct.PetbarData) (datastruct.CodeType, *datastruct.ResponseAnimalUpgrade) {
+	var resp_data *datastruct.ResponseAnimalUpgrade
+	resp_data = nil
+
+	// var tmp *datastruct.PetbarData
+	// tmp = nil
+	// var soil_id int
+	// var petbar_type datastruct.AnimalType
+	// for k, v := range petbars {
+	// 	if v.Id == soid_id {
+	// 		tmp = &v
+	// 		petbar_type = k
+	// 		break
+	// 	}
+	// }
+	// if tmp == nil {
+	// 	return datastruct.UpdateDataFailed, -1, animal, soil_id
+	// }
+
+	conn := handle.GetConn()
+	defer conn.Close()
+    return datastruct.NULLError,resp_data
+}
+
+
 func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (datastruct.CodeType, int64) {
 	value, err := redis.String(conn.Do("hget", key, datastruct.GoldField))
 	code := datastruct.NULLError
