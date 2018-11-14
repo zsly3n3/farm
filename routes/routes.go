@@ -46,7 +46,7 @@ func getShopData(r *gin.Engine, eventHandler *event.EventHandler) {
 }
 
 func plant(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.PUT("/user/plant", func(c *gin.Context) {
+	r.POST("/user/plant", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
@@ -88,7 +88,7 @@ func plant(r *gin.Engine, eventHandler *event.EventHandler) {
 }
 
 func buyPetbar(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.PUT("/user/buyPetbar", func(c *gin.Context) {
+	r.POST("/user/buyPetbar", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
@@ -125,7 +125,7 @@ func buyPetbar(r *gin.Engine, eventHandler *event.EventHandler) {
 }
 
 func upgradeSoil(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.PUT("/user/upgradeSoil", func(c *gin.Context) {
+	r.POST("/user/upgradeSoil", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
@@ -148,7 +148,7 @@ func upgradeSoil(r *gin.Engine, eventHandler *event.EventHandler) {
 }
 
 func updatePermisson(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.PUT("/user/updatePermisson", func(c *gin.Context) {
+	r.POST("/user/updatePermisson", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
@@ -165,7 +165,7 @@ func updatePermisson(r *gin.Engine, eventHandler *event.EventHandler) {
 }
 
 func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.PUT("/animal/addExp", func(c *gin.Context) {
+	r.POST("/animal/addExp", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
@@ -174,6 +174,31 @@ func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
 			return
 		}
 		code,currentExp:= eventHandler.AddExpForAnimal(token, c)
+		if code == datastruct.NULLError{
+			mp := make(map[string]interface{})
+			mp["currentexp"]=currentExp
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		}else{
+			c.JSON(200, gin.H{
+				"code": code,
+			})
+		}
+	})
+}
+
+func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.POST("/animal/upgrade", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c)
+		if !tf {
+			return
+		}
+		code,:= eventHandler.AnimalUpgrade(token, c)
 		if code == datastruct.NULLError{
 			mp := make(map[string]interface{})
 			mp["currentexp"]=currentExp
@@ -249,6 +274,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	upgradeSoil(r, eventHandler)
 	buyPetbar(r,eventHandler)
 	addExpForAnimal(r,eventHandler)
+	animalUpgrade(r,eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }

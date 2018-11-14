@@ -33,6 +33,9 @@ const (
 	PlantRequireUnlock//植物未到达解锁条件
 	GoldIsNotEnoughForSoil//购买土地金币不足
 	SoilRequireUnlock//土地未到达解锁条件
+	ExpIsNotFullForUpgradeAnimal//升级动物失败,经验值不满足 value=13
+	HoneyCountIsNotEnoughForUpgradeAnimal//升级动物失败,蜂蜜不足 value=14
+	
 )
 
 
