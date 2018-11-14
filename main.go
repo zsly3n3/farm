@@ -38,5 +38,6 @@ func main() {
 	r := gin.Default()
 	r.Use(cors())
 	routes.Register(r, eventHandler)
-	r.Run("127.0.0.1:9090") //listen and serve on 0.0.0.0:8080
+	r.Run("192.168.0.161:8080")
+	//r.Run("127.0.0.1:9090") //listen and serve on 0.0.0.0:8080
 }
