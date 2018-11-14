@@ -189,30 +189,31 @@ func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
 	})
 }
 
-// func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
-// 	r.POST("/animal/upgrade", func(c *gin.Context) {
-// 		if !checkVersion(c, eventHandler) {
-// 			return
-// 		}
-// 		token, tf := checkToken(c)
-// 		if !tf {
-// 			return
-// 		}
-// 		code,:= eventHandler.AnimalUpgrade(token, c)
-// 		if code == datastruct.NULLError{
-// 			mp := make(map[string]interface{})
-// 			mp["currentexp"]=currentExp
-// 			c.JSON(200, gin.H{
-// 				"code": code,
-// 				"data": mp,
-// 			})
-// 		}else{
-// 			c.JSON(200, gin.H{
-// 				"code": code,
-// 			})
-// 		}
-// 	})
-// }
+/*
+func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.POST("/animal/upgrade", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c)
+		if !tf {
+			return
+		}
+		code,resp_data:= eventHandler.AnimalUpgrade(token, c)
+		if code == datastruct.NULLError{
+			mp := make(map[string]interface{})
+			mp["currentexp"]=currentExp
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		}else{
+			c.JSON(200, gin.H{
+				"code": code,
+			})
+		}
+	})
+}*/
 
 
 

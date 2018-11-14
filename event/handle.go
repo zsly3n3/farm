@@ -229,6 +229,12 @@ func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruc
 	return code,currentExp
 }
 
+// func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruct.CodeType,datastruct
+// 	){
+
+// }
+
+
 func (handle *EventHandler) Test1(c *gin.Context) {
 	var body datastruct.UserLogin
 	c.BindJSON(&body)

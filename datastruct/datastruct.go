@@ -35,7 +35,6 @@ const (
 	SoilRequireUnlock//土地未到达解锁条件
 	ExpIsNotFullForUpgradeAnimal//升级动物失败,经验值不满足 value=13
 	HoneyCountIsNotEnoughForUpgradeAnimal//升级动物失败,蜂蜜不足 value=14
-	
 )
 
 
@@ -299,6 +298,7 @@ type ResponsePetbarBase struct{
 	Type AnimalType `json:"type"`//宠物栏类型
 	Price int `json:"price"`//单价
 	State GoodsState `json:"state"`
+	Id int`json:"id"`//宠物栏id
 }
 
 type ResponseAnimal struct{
@@ -390,7 +390,7 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 		base.Type = k
 		base.Price = petbars[k].Price
 		base.State = v.State
-
+		base.Id = petbars[k].Id
 		if v.AnimalNumber <= 0{
 		  interface_var = base
 		} else {
@@ -429,6 +429,13 @@ type ResponseUpgradeSoil struct{
 	Factor int `json:"factor"`
 	UpgradePrice int `json:"upgradeprice"`
 }
+
+type ResponseAnimalUpgrade struct{
+	HoneyCount int64 
+	Animal *ResponseAnimal
+	RightExp int64
+}
+
 
 
 //body
