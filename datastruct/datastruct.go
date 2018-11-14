@@ -76,7 +76,6 @@ type PlayerInfo struct {
 	Id    int       `xorm:"not null pk INT(11)"` //关联UserInfo中id
 	HoneyCount int64 `xorm:"bigint not null"`//蜂蜜数量
 	GoldCount  int64 `xorm:"bigint not null"`//金币数量
-	PlantLevel int `xorm:"not null INT(11) "`//玩家的种植等级
 	SoilLevel int `xorm:"not null INT(11) "`//玩家的土地购买等级
 }
 
