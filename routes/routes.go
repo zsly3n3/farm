@@ -219,6 +219,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	updatePermisson(r, eventHandler)
 	plant(r, eventHandler)
 	upgradeSoil(r, eventHandler)
+	buyPetbar(r,eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }
