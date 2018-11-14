@@ -25,7 +25,7 @@ const (
 	LoginFailed//登录失败,如无此账号或者密码错误等
 	JsonParseFailedFromPostBody//来自post请求中的Body解析json失败
 	GetDataFailed//获取数据失败
-	PutDataFailed//修改数据失败
+	UpdateDataFailed//修改数据失败 
 	VersionError//客户端与服务器版本不一致
 	TokenError//没有Token或者值为空,或者不存在此Token
 	JsonParseFailedFromPutBody//来自put请求中的Body解析json失败

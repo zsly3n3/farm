@@ -119,10 +119,10 @@ func (handle *EventHandler) UpgradeSoil(key string, c *gin.Context) (datastruct.
 		if tf {
 			code, resp_tmp = handle.cacheHandler.UpgradeSoil(key, &body, handle.soils)
 		} else {
-			code = datastruct.PutDataFailed
+			code = datastruct.UpdateDataFailed
 		}
 	} else {
-		code = datastruct.JsonParseFailedFromPutBody
+		code = datastruct.JsonParseFailedFromPostBody
 	}
 	return code, resp_tmp
 }
@@ -140,10 +140,10 @@ func (handle *EventHandler) PlantInSoil(key string, c *gin.Context) (datastruct.
 		if tf && index >= 0 && index < len(handle.plants) {
 			code, gold, plantName, soil_id = handle.cacheHandler.PlantInSoil(key, &body, handle.plants, handle.soils)
 		} else {
-			code = datastruct.PutDataFailed
+			code = datastruct.UpdateDataFailed
 		}
 	} else {
-		code = datastruct.JsonParseFailedFromPutBody
+		code = datastruct.JsonParseFailedFromPostBody
 	}
 	return code, gold, plantName, soil_id
 }
@@ -159,7 +159,7 @@ func (handle *EventHandler) BuyPetbar(key string, c *gin.Context) (datastruct.Co
 	if err == nil {
 		code, gold, animal, soil_id = handle.cacheHandler.BuyPetbar(key, body.SoilId, handle.petbars, handle.animals)
 	} else {
-		code = datastruct.JsonParseFailedFromPutBody
+		code = datastruct.JsonParseFailedFromPostBody
 	}
 	return code, gold, animal, soil_id
 }
@@ -219,11 +219,11 @@ func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruc
 	var code datastruct.CodeType
 	var currentExp int64
 	if err != nil{
-	   return datastruct.JsonParseFailedFromPutBody,-1
+	   return datastruct.JsonParseFailedFromPostBody,-1
 	}
 	_, tf := handle.soils[body.SoilId]
 	if !tf {
-	   return datastruct.PutDataFailed,-1
+	   return datastruct.UpdateDataFailed,-1
 	}
     code,currentExp = handle.cacheHandler.AddExpForAnimal(key,&body,handle.petbars,handle.plants)
 	return code,currentExp
