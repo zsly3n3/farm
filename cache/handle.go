@@ -153,7 +153,7 @@ func (handle *CACHEHandler) UpdatePermisson(key string, permissionId int) datast
 	log.Debug("rep:%v", rep)
 	code := datastruct.NULLError
 	if err != nil {
-		code = datastruct.PutDataFailed
+		code = datastruct.UpdateDataFailed
 		log.Debug("CACHEHandler UpdatePermisson err:%s", err.Error())
 	}
 	return code
@@ -165,12 +165,12 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 	var resp_tmp *datastruct.ResponseUpgradeSoil
 	resp_tmp = nil
 	if !isExistUser(conn, key) {
-		return datastruct.PutDataFailed, resp_tmp
+		return datastruct.UpdateDataFailed, resp_tmp
 	}
 
 	code, gold := handle.ComputeCurrentGold(conn, key)
 	if code != datastruct.NULLError {
-		return datastruct.PutDataFailed, resp_tmp
+		return datastruct.UpdateDataFailed, resp_tmp
 	}
 
 	soiltableName := fmt.Sprintf("soil%d", upgradeSoil.SoilId)
@@ -196,7 +196,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 
 	if err != nil {
 		log.Debug("CACHEHandler UpgradeSoil err:%s", err.Error())
-		return datastruct.PutDataFailed, nil
+		return datastruct.UpdateDataFailed, nil
 	}
 
 	return datastruct.NULLError, resp_tmp
@@ -206,7 +206,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	conn := handle.GetConn()
 	defer conn.Close()
 	if !isExistUser(conn, key) {
-		return datastruct.PutDataFailed, -1, "", -1
+		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 
 	soiltableName := fmt.Sprintf("soil%d", plantInSoil.SoilId)
@@ -221,12 +221,12 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	plant := plants[plantInSoil.PlantId-1]
 	plantLevel := player_soil.PlantLevel
 	if plantLevel >= plant.Level {
-		return datastruct.PutDataFailed, -1, "", -1
+		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 
 	code, gold := handle.ComputeCurrentGold(conn, key)
 	if code != datastruct.NULLError {
-		return datastruct.PutDataFailed, -1, "", -1
+		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 
 	if gold < int64(plant.Price) {
@@ -273,7 +273,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	value, isError := tools.PlayerSoilToString(player_soil)
 	if isError {
 		log.Debug("CACHEHandler PlantInSoil PlayerSoilToString err:%s player:%s", soiltableName, key)
-		return datastruct.PutDataFailed, -1, "", -1
+		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 	conn.Send("hset", soiltableName, key, value)
 
@@ -281,7 +281,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 
 	if err != nil {
 		log.Debug("CACHEHandler PlantInSoil MULTI set data err:%s", err.Error())
-		return datastruct.PutDataFailed, -1, "", -1
+		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 
 	return datastruct.NULLError, gold, "", -1
@@ -302,28 +302,28 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 		}
 	}
 	if tmp == nil {
-		return datastruct.PutDataFailed, -1, animal, soil_id
+		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
 	conn := handle.GetConn()
 	defer conn.Close()
 	if !isExistUser(conn, key) {
-		return datastruct.PutDataFailed, -1, animal, soil_id
+		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
 	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
 	value, err := redis.String(conn.Do("hget", petbartableName, key))
 	if err != nil {
-		return datastruct.PutDataFailed, -1, animal, soil_id
+		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 	rs_tmp, _ := tools.BytesToPlayerPetbar([]byte(value))
 	if rs_tmp.State == datastruct.Owned {
-		return datastruct.PutDataFailed, -1, animal, soil_id
+		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
 	code, gold := handle.ComputeCurrentGold(conn, key)
 	if code != datastruct.NULLError {
-		return datastruct.PutDataFailed, -1, animal, soil_id
+		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
 	if gold < int64(tmp.Price) {
@@ -356,7 +356,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 
 	if err != nil {
 		log.Debug("CACHEHandler UpgradeSoil err:%s", err.Error())
-		return datastruct.PutDataFailed, -1, animal, soil_id
+		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
 	rs_ani := animals[petbar_type][animalNumber]
@@ -373,7 +373,7 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (dat
 	code := datastruct.NULLError
 	if err != nil {
 		log.Debug("CACHEHandler ComputeCurrentGold err:%s", err.Error())
-		return datastruct.PutDataFailed, -1
+		return datastruct.UpdateDataFailed, -1
 	}
 	return code, tools.StringToInt64(value)
 }
@@ -420,7 +420,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 		}
 	}
 	if tmp == nil {
-       return datastruct.PutDataFailed, -1
+       return datastruct.UpdateDataFailed, -1
 	}
 	conn := handle.GetConn()
 	defer conn.Close()
@@ -432,7 +432,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 	playerPetbar, _ := tools.BytesToPlayerPetbar([]byte(value))
 	//没有购买宠物栏
 	if playerPetbar.State != datastruct.Owned{
-	   return datastruct.PutDataFailed, -1
+	   return datastruct.UpdateDataFailed, -1
 	}
 	
 	
@@ -445,7 +445,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 	
 	//没有植物可提供经验
 	if player_soil.PlantId == 0 || player_soil.State != datastruct.Owned{
-		return datastruct.PutDataFailed, -1
+		return datastruct.UpdateDataFailed, -1
 	}
 	
 	plant:=plants[player_soil.PlantId-1]
@@ -461,7 +461,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 	_, err = conn.Do("EXEC")
 	if err != nil {
 		log.Debug("CACHEHandler AddExpForAnimal err:%s", err.Error())
-		return datastruct.PutDataFailed, -1
+		return datastruct.UpdateDataFailed, -1
 	}
     currentExp=playerPetbar.CurrentExp
 	return datastruct.NULLError,currentExp
