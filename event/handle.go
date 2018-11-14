@@ -213,6 +213,22 @@ func (handle *EventHandler) GetShopData(c *gin.Context, token string,soil_id int
 	})
 }
 
+func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruct.CodeType,int64){
+	var body datastruct.AddExpForAnimal
+	err := c.BindJSON(&body)
+	var code datastruct.CodeType
+	var currentExp int64
+	if err != nil{
+	   return datastruct.JsonParseFailedFromPutBody,-1
+	}
+	_, tf := handle.soils[body.SoilId]
+	if !tf {
+	   return datastruct.PutDataFailed,-1
+	}
+    code,currentExp = handle.cacheHandler.AddExpForAnimal(key,&body,petbars)
+	return code,currentExp
+}
+
 func (handle *EventHandler) Test1(c *gin.Context) {
 	var body datastruct.UserLogin
 	c.BindJSON(&body)

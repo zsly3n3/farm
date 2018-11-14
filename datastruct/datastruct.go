@@ -94,7 +94,7 @@ type Plant struct {
     Name  string `xorm:"VARCHAR(64) not null" json:"name"`//植物名称
 	Price int `xorm:"not null INT(11)" json:"price"`//价格
 	InCome int `xorm:"not null INT(11)" json:"income"`//初始收益
-	ExpForAnimal int `xorm:"not null INT(11)" json:"exp"`//增加动物经验
+	ExpForAnimal int64 `xorm:"not null bigint" json:"exp"`//增加动物经验
 	ClassId int `xorm:"not null INT(11)" json:"type"`//关联PlantClass中id
 	Level int `xorm:"not null INT(11)" json:"level"`//要求玩家种植等级
 	CName string `xorm:"VARCHAR(64) not null" json:"c_name"`//植物中文名称
@@ -448,5 +448,10 @@ type UpgradeSoil struct{
 }
 
 type BuyPetbar struct{
+	SoilId int `json:"soilid"`
+}
+
+type AddExpForAnimal struct{
+	PetbarId int `json:"petbarid"`
 	SoilId int `json:"soilid"`
 }

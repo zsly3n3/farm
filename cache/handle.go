@@ -407,6 +407,67 @@ func isExistUser(conn redis.Conn, key string) bool {
 	return isExist
 }
 
+func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpForAnimal,petbars  map[datastruct.AnimalType]datastruct.PetbarData,plants []datastruct.Plant)(datastruct.CodeType,int64){
+	var currentExp int64
+	var tmp *datastruct.PetbarData
+	tmp = nil
+	var petbar_type datastruct.AnimalType
+	for k, v := range petbars {
+		if v.Id == body.PetbarId{
+			tmp = &v
+			petbar_type = k
+			break
+		}
+	}
+	if tmp == nil {
+       return datastruct.PutDataFailed, -1
+	}
+	conn := handle.GetConn()
+	defer conn.Close()
+	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
+	value, err := redis.String(conn.Do("hget", petbartableName, key))
+	if err != nil {
+	   return datastruct.GetDataFailed, -1
+	}
+	playerPetbar, _ := tools.BytesToPlayerPetbar([]byte(value))
+	//没有购买宠物栏
+	if playerPetbar.State != datastruct.Owned{
+	   return datastruct.PutDataFailed, -1
+	}
+	
+	
+	soiltableName := fmt.Sprintf("soil%d", body.SoilId)
+	value, err = redis.String(conn.Do("hget", soiltableName, key))
+	if err != nil {
+		return datastruct.GetDataFailed,-1
+	}
+	player_soil, _ := tools.BytesToPlayerSoil([]byte(value))
+	
+	//没有植物可提供经验
+	if player_soil.PlantId == 0 || player_soil.State != datastruct.Owned{
+		return datastruct.PutDataFailed, -1
+	}
+	
+	plant:=plants[player_soil.PlantId-1]
+	player_soil.PlantLevel = 0
+	player_soil.PlantId = 0
+	playerPetbar.CurrentExp+=plant.ExpForAnimal
+	
+	soil_value, _ = tools.PlayerSoilToString(player_soil)
+	petbar_value, _ = tools.PlayerPetbarToString(playerPetbar)
+	conn.Send("MULTI")
+	conn.Send("hset", soiltableName, key, soil_value)
+	conn.Send("hset", petbartableName, key, petbar_value)
+	_, err = conn.Do("EXEC")
+	if err != nil {
+		log.Debug("CACHEHandler AddExpForAnimal err:%s", err.Error())
+		return datastruct.PutDataFailed, -1
+	}
+    currentExp=playerPetbar.CurrentExp
+	return datastruct.NULLError,currentExp
+}
+
+
 func (handle *CACHEHandler) TestMoney(key string) {
 	conn := handle.GetConn()
 	defer conn.Close()

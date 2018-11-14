@@ -164,6 +164,33 @@ func updatePermisson(r *gin.Engine, eventHandler *event.EventHandler) {
 	})
 }
 
+func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.PUT("/animal/addExp", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c)
+		if !tf {
+			return
+		}
+		code,currentExp:= eventHandler.AddExpForAnimal(token, c)
+		if code == datastruct.NULLError{
+			mp := make(map[string]interface{})
+			mp["currentexp"]=currentExp
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp
+			})
+		}else{
+			c.JSON(200, gin.H{
+				"code": code,
+			})
+		}
+	})
+}
+
+
+
 func test1(r *gin.Engine, eventHandler *event.EventHandler) {
 	r.POST("/Test1", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
@@ -221,6 +248,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	plant(r, eventHandler)
 	upgradeSoil(r, eventHandler)
 	buyPetbar(r,eventHandler)
+	addExpForAnimal(r,eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }
