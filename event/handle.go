@@ -238,7 +238,7 @@ func (handle *EventHandler)AnimalUpgrade(key string,c *gin.Context)(datastruct.C
 	if err != nil{
 	 return datastruct.JsonParseFailedFromPostBody,resp_data
 	}
-    code,resp_data = handle.cacheHandler.AnimalUpgrade(key,body.PetbarId,handle.petbars)
+    code,resp_data = handle.cacheHandler.AnimalUpgrade(key,body.PetbarId,handle.petbars,handle.animals)
 	return code,resp_data
 }
 
