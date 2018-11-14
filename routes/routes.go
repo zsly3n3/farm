@@ -274,7 +274,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	upgradeSoil(r, eventHandler)
 	buyPetbar(r,eventHandler)
 	addExpForAnimal(r,eventHandler)
-	animalUpgrade(r,eventHandler)
+	//animalUpgrade(r,eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }
