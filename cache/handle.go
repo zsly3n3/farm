@@ -5,7 +5,6 @@ import (
 	"farm/log"
 	"farm/tools"
 	"fmt"
-
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -91,11 +90,12 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 		datastruct.IdField, datastruct.GoldField, datastruct.HoneyField,
 		datastruct.PermissionIdField, datastruct.CreatedAtField, datastruct.UpdateTimeField,
 		datastruct.NickNameField, datastruct.AvatarField))
+	length:=len(value)
 	if err != nil {
 		log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s", err.Error(), key)
 		return rs
 	}
-	for i := 0; i < len(value); i++ {
+	for i := 0; i < length; i++ {
 		tmp := value[i].([]byte)
 		str := string(tmp[:])
 		switch i {
@@ -208,7 +208,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	if !isExistUser(conn, key) {
 		return datastruct.UpdateDataFailed, -1, "", -1
 	}
-
+    
 	soiltableName := fmt.Sprintf("soil%d", plantInSoil.SoilId)
 	value, err := redis.String(conn.Do("hget", soiltableName, key))
 	var player_soil *datastruct.PlayerSoil
@@ -365,30 +365,94 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 	animal.Exp = rs_ani.Exp
 	animal.InCome = rs_ani.InCome
 	animal.Name = rs_ani.Name
+	animal.HoneyCount = rs_ani.HoneyCount
+	animal.IsLast = 0
 	return datastruct.NULLError, gold, animal, soil_id
 }
 
-func (handle *CACHEHandler)AnimalUpgrade(key string, perbarId int, petbars map[datastruct.AnimalType]datastruct.PetbarData) (datastruct.CodeType, *datastruct.ResponseAnimalUpgrade) {
+func (handle *CACHEHandler)AnimalUpgrade(key string, perbarId int, petbars map[datastruct.AnimalType]datastruct.PetbarData,animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, *datastruct.ResponseAnimalUpgrade) {
 	var resp_data *datastruct.ResponseAnimalUpgrade
 	resp_data = nil
 
-	// var tmp *datastruct.PetbarData
-	// tmp = nil
-	// var soil_id int
-	// var petbar_type datastruct.AnimalType
-	// for k, v := range petbars {
-	// 	if v.Id == soid_id {
-	// 		tmp = &v
-	// 		petbar_type = k
-	// 		break
-	// 	}
-	// }
-	// if tmp == nil {
-	// 	return datastruct.UpdateDataFailed, -1, animal, soil_id
-	// }
+	var tmp *datastruct.PetbarData
+	tmp = nil
+	var petbar_type datastruct.AnimalType
+	for k, v := range petbars {
+		if v.Id == perbarId {
+			tmp = &v
+			petbar_type = k
+			break
+		}
+	}
+	if tmp == nil {
+		return datastruct.UpdateDataFailed, resp_data
+	}
 
 	conn := handle.GetConn()
 	defer conn.Close()
+	if !isExistUser(conn, key) {
+		return datastruct.GetDataFailed, resp_data
+	}
+
+	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
+	value, err := redis.String(conn.Do("hget", petbartableName, key))
+	if err != nil {
+		return datastruct.GetDataFailed, resp_data
+	}
+	rs_tmp, _ := tools.BytesToPlayerPetbar([]byte(value))
+	if rs_tmp.AnimalNumber == 0 || rs_tmp.State != datastruct.Owned{
+	   return datastruct.UpdateDataFailed, resp_data	
+	}
+	value, err = redis.String(conn.Do("hget", key, datastruct.HoneyField))
+	if err != nil {
+		return datastruct.GetDataFailed, resp_data
+	}
+	honeyCount:=tools.StringToInt64(value)
+	animal:=animals[petbar_type][rs_tmp.AnimalNumber]
+	num_animal:=len(animals)
+	//最后一个的动物无法升级
+	if animal.Number == num_animal{
+	   return datastruct.UpdateDataFailed, resp_data	
+	}
+	resp_data=new(datastruct.ResponseAnimalUpgrade)
+	if  rs_tmp.CurrentExp < animal.Exp{
+		resp_data.RightExp = rs_tmp.CurrentExp
+		return datastruct.ExpIsNotFullForUpgradeAnimal,resp_data
+	}
+	if honeyCount < animal.HoneyCount{
+		resp_data.HoneyCount = honeyCount
+		return datastruct.HoneyCountIsNotEnoughForUpgradeAnimal, resp_data
+	}
+    new_number:=rs_tmp.AnimalNumber+1
+	rs_tmp.AnimalNumber = new_number
+	rs_tmp.CurrentExp = 0
+	last_honey:= honeyCount - animal.HoneyCount
+	new_animal:=animals[petbar_type][new_number]
+	isLast:=0
+    if new_animal.Number == num_animal{
+		isLast = 1
+	}
+	
+	value, _ = tools.PlayerPetbarToString(rs_tmp)
+	conn.Send("MULTI")
+	conn.Send("hset", key, datastruct.HoneyField, last_honey)
+	conn.Send("hset", petbartableName, key, value)
+	_, err = conn.Do("EXEC")
+
+	if err != nil {
+		log.Debug("CACHEHandler AnimalUpgrade err:%s", err.Error())
+		return datastruct.UpdateDataFailed, nil
+	}
+
+    resp_data.HoneyCount = last_honey
+	resp_animal := new(datastruct.ResponseAnimal)
+	resp_animal.CurrentExp = 0
+	resp_animal.Exp = new_animal.Exp
+	resp_animal.InCome = new_animal.InCome
+	resp_animal.Name = new_animal.Name
+	resp_animal.HoneyCount = new_animal.HoneyCount
+	resp_animal.IsLast = isLast
+	resp_data.Animal = resp_animal
     return datastruct.NULLError,resp_data
 }
 
@@ -403,6 +467,7 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (dat
 	return code, tools.StringToInt64(value)
 }
 
+
 func (handle *CACHEHandler) clearData() {
 	conn := handle.GetConn()
 	defer conn.Close()
@@ -412,6 +477,9 @@ func (handle *CACHEHandler) clearData() {
 func (handle *CACHEHandler) GetPlantLevel(key string,soil_id int) (datastruct.CodeType,int) {
 	conn := handle.GetConn()
 	defer conn.Close()
+	if !isExistUser(conn, key) {
+		return datastruct.GetDataFailed,-1
+	}
 	soiltableName := fmt.Sprintf("soil%d", soil_id)
 	value, err := redis.String(conn.Do("hget", soiltableName, key))
 	var player_soil *datastruct.PlayerSoil
@@ -449,6 +517,10 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 	}
 	conn := handle.GetConn()
 	defer conn.Close()
+	if !isExistUser(conn, key) {
+		return datastruct.GetDataFailed,-1
+	}
+
 	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
 	value, err := redis.String(conn.Do("hget", petbartableName, key))
 	if err != nil {

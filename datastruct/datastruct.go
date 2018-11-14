@@ -306,6 +306,8 @@ type ResponseAnimal struct{
 	InCome int `json:"income"`//基本收益
 	CurrentExp int64 `json:"currentexp"`//当前经验
 	Exp int64 `json:"exp"`//升级所需经验
+	HoneyCount int64 `json:"honeycount"`//升级所需蜂蜜
+	IsLast int `json:"islast"` //是否为最后一个动物 ,1是，0不是             
 }
 
 type ResponsePlant struct{
@@ -407,12 +409,19 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 		  if tf {
 			var ani Animal
 			ani,tf=anis[v.AnimalNumber]
+			num:=len(anis)
 			if tf{
 			   resp.Animal = new(ResponseAnimal)
 			   resp.Animal.CurrentExp = v.CurrentExp
 			   resp.Animal.InCome = ani.InCome
 			   resp.Animal.Exp = ani.Exp
 			   resp.Animal.Name = ani.Name
+			   resp.Animal.HoneyCount = ani.HoneyCount
+			   isLast:=0
+			   if num == ani.Number  {
+				   isLast = 1
+			   }
+			   resp.Animal.IsLast = isLast
 			} else {
 			   resp.Animal = nil 
 			}
