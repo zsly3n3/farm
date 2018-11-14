@@ -387,7 +387,6 @@ func (handle *CACHEHandler) clearData() {
 func (handle *CACHEHandler) GetPlantLevel(key string,soil_id int) (datastruct.CodeType,int) {
 	conn := handle.GetConn()
 	defer conn.Close()
-
 	soiltableName := fmt.Sprintf("soil%d", soil_id)
 	value, err := redis.String(conn.Do("hget", soiltableName, key))
 	var player_soil *datastruct.PlayerSoil

@@ -107,6 +107,7 @@ type Animal struct {
     Name  string `xorm:"VARCHAR(64) not null "` //名称
 	InCome int `xorm:"not null INT(11) "`//初始收益
 	Exp int64 `xorm:"not null bigint"`//升级所需经验
+	HoneyCount int64 `xorm:"not null bigint"`//升级所需的蜂蜜
 	ClassId int `xorm:"not null INT(11) "` //关联AnimalClass中id
 	Number int `xorm:"not null INT(11) "` //动物编号
 }

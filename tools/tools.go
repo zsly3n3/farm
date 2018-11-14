@@ -102,11 +102,13 @@ func GetAnimalInfo()[]datastruct.Animal{
 		cell_InCome:= fmt.Sprintf("C%d",index)
 		cell_Exp:= fmt.Sprintf("D%d",index)
 		cell_Number:= fmt.Sprintf("E%d",index)
+		cell_Honey:= fmt.Sprintf("F%d",index)
 		name := xlsx.GetCellValue(tableName, cell_Name)
 		cid := xlsx.GetCellValue(tableName, cell_ClassId)
 		income := xlsx.GetCellValue(tableName, cell_InCome)
 		exp := xlsx.GetCellValue(tableName, cell_Exp)
 		number := xlsx.GetCellValue(tableName, cell_Number)
+		honey := xlsx.GetCellValue(tableName, cell_Honey)
         if name == "" {
             break
         }
@@ -116,6 +118,7 @@ func GetAnimalInfo()[]datastruct.Animal{
 		animal.InCome = StringToInt(income)
 		animal.Exp = StringToInt64(exp)
 		animal.Number = StringToInt(number)
+		animal.HoneyCount = StringToInt64(honey)
         animals = append(animals,animal)
         index++
     }
