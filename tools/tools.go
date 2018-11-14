@@ -79,7 +79,7 @@ func GetPlantsInfo()[]datastruct.Plant{
 		plant.ClassId = StringToInt(cid)
 		plant.Price = StringToInt(price)
 		plant.InCome = StringToInt(income)
-		plant.ExpForAnimal = StringToInt(exp)
+		plant.ExpForAnimal = StringToInt64(exp)
 		plant.Level = StringToInt(level)
 		plant.CName = chName
         plants = append(plants,plant)

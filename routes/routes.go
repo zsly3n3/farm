@@ -179,7 +179,7 @@ func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
 			mp["currentexp"]=currentExp
 			c.JSON(200, gin.H{
 				"code": code,
-				"data": mp
+				"data": mp,
 			})
 		}else{
 			c.JSON(200, gin.H{

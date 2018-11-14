@@ -453,8 +453,8 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 	player_soil.PlantId = 0
 	playerPetbar.CurrentExp+=plant.ExpForAnimal
 	
-	soil_value, _ = tools.PlayerSoilToString(player_soil)
-	petbar_value, _ = tools.PlayerPetbarToString(playerPetbar)
+	soil_value, _ := tools.PlayerSoilToString(player_soil)
+	petbar_value, _ := tools.PlayerPetbarToString(playerPetbar)
 	conn.Send("MULTI")
 	conn.Send("hset", soiltableName, key, soil_value)
 	conn.Send("hset", petbartableName, key, petbar_value)

@@ -225,7 +225,7 @@ func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruc
 	if !tf {
 	   return datastruct.PutDataFailed,-1
 	}
-    code,currentExp = handle.cacheHandler.AddExpForAnimal(key,&body,petbars)
+    code,currentExp = handle.cacheHandler.AddExpForAnimal(key,&body,handle.petbars,handle.plants)
 	return code,currentExp
 }
 

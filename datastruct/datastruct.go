@@ -263,7 +263,7 @@ type ResponsePlayerSoil struct{
 type ResponseSoilPlant struct{
 	 Name string `json:"name"`
 	 InCome int `json:"income"`
-	 ExpForAnimal int `json:"expforanimal"`
+	 ExpForAnimal int64 `json:"expforanimal"`
 	 Type int `json:"type"`
 }
 
