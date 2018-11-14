@@ -345,7 +345,9 @@ func ResponseLoginData(p_data *PlayerData,plants []Plant,petbars map[AnimalType]
 }
 
 func responsePlayerSoil(p_data *PlayerData,plants []Plant)[]interface{}{
-	rs:=make([]interface{},0,len(p_data.Soil))
+	length:=len(p_data.Soil)
+	start_index:=1
+	rs:=make([]interface{},length,length)
 	for k,v:=range p_data.Soil{
 		var interface_var interface{}
 		resp_base:=new(ResponsePlayerSoilBase)
@@ -363,7 +365,7 @@ func responsePlayerSoil(p_data *PlayerData,plants []Plant)[]interface{}{
 			resp.Plant = createResponseSoilPlant(v.PlantId,plants)
 			interface_var = resp
 		}
-		rs = append(rs,interface_var)
+		rs[resp_base.Id-start_index]=interface_var
 	}
 
 	return rs
