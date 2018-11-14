@@ -458,10 +458,11 @@ type UpgradeSoil struct{
 }
 
 type BuyPetbar struct{
-	SoilId int `json:"soilid"`
+	PetbarId int `json:"petbarid"`
 }
 
 type AddExpForAnimal struct{
 	PetbarId int `json:"petbarid"`
 	SoilId int `json:"soilid"`
 }
+

@@ -189,7 +189,6 @@ func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
 	})
 }
 
-/*
 func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
 	r.POST("/animal/upgrade", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
@@ -200,9 +199,22 @@ func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
 			return
 		}
 		code,resp_data:= eventHandler.AnimalUpgrade(token, c)
+		mp := make(map[string]interface{})
 		if code == datastruct.NULLError{
-			mp := make(map[string]interface{})
-			mp["currentexp"]=currentExp
+			mp["honeycount"]=resp_data.HoneyCount
+			mp["animal"]=resp_data.Animal
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		} else if code == datastruct.ExpIsNotFullForUpgradeAnimal{
+			mp["currentexp"]=resp_data.RightExp
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		} else if code == datastruct.HoneyCountIsNotEnoughForUpgradeAnimal{
+			mp["honeycount"]=resp_data.HoneyCount
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
@@ -213,7 +225,7 @@ func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
 			})
 		}
 	})
-}*/
+}
 
 
 
@@ -275,7 +287,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	upgradeSoil(r, eventHandler)
 	buyPetbar(r,eventHandler)
 	addExpForAnimal(r,eventHandler)
-	//animalUpgrade(r,eventHandler)
+	animalUpgrade(r,eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }

@@ -157,7 +157,7 @@ func (handle *EventHandler) BuyPetbar(key string, c *gin.Context) (datastruct.Co
 	var soil_id int
 	animal = nil
 	if err == nil {
-		code, gold, animal, soil_id = handle.cacheHandler.BuyPetbar(key, body.SoilId, handle.petbars, handle.animals)
+		code, gold, animal, soil_id = handle.cacheHandler.BuyPetbar(key, body.PetbarId, handle.petbars, handle.animals)
 	} else {
 		code = datastruct.JsonParseFailedFromPostBody
 	}
@@ -229,10 +229,13 @@ func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruc
 	return code,currentExp
 }
 
-// func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruct.CodeType,datastruct
-// 	){
+func (handle *EventHandler)AnimalUpgrade(key string,c *gin.Context)(datastruct.CodeType,*datastruct.ResponseAnimalUpgrade){
+	var code datastruct.CodeType
+	var resp_data *datastruct.ResponseAnimalUpgrade   
+	
 
-// }
+	return code,resp_data
+}
 
 
 func (handle *EventHandler) Test1(c *gin.Context) {
