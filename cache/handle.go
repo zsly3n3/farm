@@ -44,8 +44,18 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 	key := p_data.Token
 	//add
 
-	conn.Send("MULTI")
-	conn.Send("hmset", key,
+	speedup_str:=""
+    if p_data.SpeedUp != nil{
+	   var isError bool
+	   speedup_str,isError=tools.SpeedUpToString(p_data.SpeedUp)
+	   if isError {
+		log.Debug("CACHEHandler SetPlayerData SpeedUpToString err player:%s", key)
+		return
+	   }
+	}
+
+	conn.Send("MULTI")	
+    conn.Send("hmset", key,
 		datastruct.IdField, p_data.Id,
 		datastruct.GoldField, p_data.GoldCount,
 		datastruct.HoneyField, p_data.HoneyCount,
@@ -54,8 +64,9 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 		datastruct.UpdateTimeField, p_data.UpdateTime,
 		datastruct.NickNameField, p_data.NickName,
 		datastruct.AvatarField, p_data.Avatar,
-		datastruct.SoilLevelField, p_data.SoilLevel)
-
+		datastruct.SoilLevelField, p_data.SoilLevel,
+		datastruct.SpeedUpField,speedup_str)
+	
 	for k, v := range p_data.Soil {
 		soiltableName := fmt.Sprintf("soil%d", k)
 		value, isError := tools.PlayerSoilToString(v)
@@ -89,7 +100,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 	value, err := redis.Values(conn.Do("hmget", key,
 		datastruct.IdField, datastruct.GoldField, datastruct.HoneyField,
 		datastruct.PermissionIdField, datastruct.CreatedAtField, datastruct.UpdateTimeField,
-		datastruct.NickNameField, datastruct.AvatarField))
+		datastruct.NickNameField, datastruct.AvatarField,datastruct.SpeedUpField))
 	length:=len(value)
 	if err != nil {
 		log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s", err.Error(), key)
@@ -115,6 +126,11 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 			rs.NickName = str
 		case 7:
 			rs.Avatar = str
+		case 8:
+			rs.SpeedUp = nil
+			if str != ""{
+			  rs.SpeedUp,_=tools.BytesToSpeedUp(tmp)
+			}
 		}
 	}
 
@@ -566,12 +582,17 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 
 
 func (handle *CACHEHandler)AddHoneyCount(key string)(datastruct.CodeType,*datastruct.ResponseAddHoney){
-	var resp_data *datastruct.ResponseAddHoney
-	resp_data = nil
+	conn := handle.GetConn()
+	defer conn.Close()
+	if !isExistUser(conn, key) {
+		return datastruct.GetDataFailed,nil
+	}
+   
 	
 	
 
-
+    var resp_data *datastruct.ResponseAddHoney
+	resp_data = nil 
 	return datastruct.NULLError,resp_data
 }
 

@@ -238,6 +238,27 @@ func BytesToPlayerPetbar(bytes []byte)(*datastruct.PlayerPetbar,bool){
 	return tmp,false
 }
 
+func SpeedUpToString(tmp *datastruct.SpeedUpData)(string,bool){
+	jsons, err := json.Marshal(tmp) //转换成JSON返回的是byte[]
+	if err != nil {
+	   log.Debug("PlayerSoilToString error:%s",err.Error())
+	   return "",true
+	}
+	return string(jsons),false
+}
+
+func BytesToSpeedUp(bytes []byte)(*datastruct.SpeedUpData,bool){
+	tmp:=new(datastruct.SpeedUpData)
+    err := json.Unmarshal(bytes,tmp)
+    if err != nil {
+        log.Debug("StringToPlayerSoil error:%s",err.Error())
+		return nil,true
+    }
+	return tmp,false
+}
+
+
+
 
 func SliceIntToString(tmp []int)(string,bool){
 	jsons, err := json.Marshal(tmp) //转换成JSON返回的是byte[]

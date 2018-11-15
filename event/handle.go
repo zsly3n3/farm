@@ -3,10 +3,9 @@ package event
 import (
 	"farm/datastruct"
 	"time"
-
 	"github.com/gin-gonic/gin"
 	//"farm/tools"
-	//"farm/log"
+	"farm/log"
 )
 
 func (handle *EventHandler) Login(c *gin.Context) {
@@ -32,22 +31,23 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			defer conn.Close()
 
 			openid := getOpenId(body.Code)
+			var tmpLoginData *datastruct.TmpLoginData
 			p_data, isExistRedis = handle.cacheHandler.GetPlayerData(conn, openid) //find in redis
 			if !isExistRedis {
 				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
 				if !isExistMysql {
 					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), "test", "avatar")
 				} else {
-					handle.refreshPlayerData(p_data, body.IsAuth)
+					tmpLoginData=handle.refreshPlayerData(p_data, body.IsAuth)
 				}
 				handle.cacheHandler.SetPlayerAllData(conn, p_data)
 			} else {
-				handle.refreshPlayerData(p_data, body.IsAuth)
+				tmpLoginData=handle.refreshPlayerData(p_data, body.IsAuth)
 				handle.cacheHandler.SetPlayerSomeData(conn, p_data)
 			}
 			c.JSON(200, gin.H{
 				"code": code,
-				"data": datastruct.ResponseLoginData(p_data, handle.plants, handle.petbars, handle.animals),
+				"data": datastruct.ResponseLoginData(tmpLoginData,p_data, handle.plants, handle.petbars, handle.animals),
 			})
 		} else {
 			c.JSON(200, gin.H{
@@ -66,11 +66,13 @@ func getOpenId(code string) string {
 	return code
 }
 
-func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isauth int) {
+func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isauth int)*datastruct.TmpLoginData{
 	if isauth == 1 && p_data.PermissionId == int(datastruct.Guest) {
 		p_data.PermissionId = int(datastruct.Player)
 	}
-	p_data.UpdateTime = time.Now().Unix()
+	last_UpdateTime := p_data.UpdateTime
+	current_UpdateTime:=time.Now().Unix()
+	
 
 	gold := p_data.GoldCount
 	for k, v := range handle.soils {
@@ -83,6 +85,45 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 			p_data.PetBar[k].State = datastruct.Unlocked
 		}
 	}
+
+	tmpLoginData:=new(datastruct.TmpLoginData)
+    if p_data.SpeedUp != nil{
+		sec:=p_data.SpeedUp.Ending-current_UpdateTime
+		if sec > 0{
+			beforeSpeed_Sec:= p_data.SpeedUp.Starting - last_UpdateTime
+			if beforeSpeed_Sec > 0{
+			   //normal 无加速计算 秒数为beforeSpeed_Sec
+			   //speed 加速计算 秒数为current_UpdateTime-p_data.SpeedUp.Starting
+			} else {
+			   //speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
+			}
+			tmpLoginData.Sec_EndingSpeedUp = p_data.SpeedUp.Ending - current_UpdateTime
+		} else{
+		    if last_UpdateTime >= p_data.SpeedUp.Ending{
+			   //normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+			} else {    
+			 afterSpeed_Sec:=current_UpdateTime-p_data.SpeedUp.Ending //afterSpeed_Sec 为加速完成后还剩多少时间
+			 log.Debug("afterSpeed_Sec:%d",afterSpeed_Sec)
+		
+			 beforeSpeed_Sec:= p_data.SpeedUp.Starting - last_UpdateTime //beforeSpeed_Sec 没有加速前的正常时间
+			 if beforeSpeed_Sec > 0{
+				//normal 无加速计算 秒数为beforeSpeed_Sec
+				//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
+				//normal 无加速计算 秒数为afterSpeed_Sec
+			 } else{
+				//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
+				//normal 无加速计算 秒数为afterSpeed_Sec
+			 }
+			}
+		    p_data.SpeedUp = nil
+		}
+	} else {
+        //normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+	}
+	p_data.UpdateTime = current_UpdateTime
+	//compute 计算 金币，蜂蜜，体力(阈值30)，狗(盾牌)
+
+	return tmpLoginData
 }
 
 func (handle *EventHandler) fromRedisToMysql(token string) {

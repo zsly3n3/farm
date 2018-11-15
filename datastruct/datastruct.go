@@ -56,6 +56,7 @@ const NickNameField = "NickName"
 const AvatarField = "Avatar"
 
 const SoilLevelField = "SoilLevel"
+const SpeedUpField = "SpeedUp"
 
 const PlayerPetbarField = "PlayerPetbar"
 
@@ -85,6 +86,7 @@ type PlayerInfo struct {
 type PlayerSpeedUp struct {
 	Id     int `xorm:"not null pk INT(11)"` //关联UserInfo中id
 	Factor int `xorm:"not null INT(11)"`//加速系数
+	Starting int64 `xorm:"not null bigint"`//开始时间，时间戳
 	Ending int64 `xorm:"not null bigint"`//结束时间，时间戳
 }
 
@@ -148,11 +150,12 @@ type PlayerData struct{
 }
 
 type SpeedUpData struct{
-	Factor int `json:"factor"`//加速系数
-	Ending int64 `json:"ending"`//加速结束时间,多少秒之后结束
+	Factor int//加速系数
+	Starting int64//加速开始时间,时间戳
+	Ending int64//加速结束时间,时间戳
 }
 
-type GoodsState int 
+type GoodsState int
 const (
 	Locked GoodsState = iota //有锁
 	Unlocked//解锁未购买
@@ -340,7 +343,7 @@ const (
 	Deity//神
 )
 
-func ResponseLoginData(p_data *PlayerData,plants []Plant,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
+func ResponseLoginData(tmp *TmpLoginData,p_data *PlayerData,plants []Plant,petbars map[AnimalType]PetbarData,ani_mp map[AnimalType]map[int]Animal)map[string]interface{}{
 	if p_data == nil{
 	   return nil
 	}
@@ -352,7 +355,10 @@ func ResponseLoginData(p_data *PlayerData,plants []Plant,petbars map[AnimalType]
 	mp["soil"] = responsePlayerSoil(p_data,plants)
 	mp["petbar"] = responsePetbarData(p_data,petbars,ani_mp)
 	if p_data.SpeedUp != nil{
-	   mp["speedup"] = p_data.SpeedUp	
+	   resp_speed:=new(ResponesSpeedUpData)
+	   resp_speed.Factor=p_data.SpeedUp.Factor
+	   resp_speed.Ending=tmp.Sec_EndingSpeedUp
+	   mp["speedup"] = resp_speed
 	}
 	return mp
 }
@@ -446,6 +452,11 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 	 return rs
 }
 
+//Tmp数据，用于传递，不保存redis和mysql
+type TmpLoginData struct{
+	Sec_EndingSpeedUp int64 //还剩多少秒结束加速
+}
+
 
 //response 
 type ResponseUpgradeSoil struct{
@@ -464,6 +475,11 @@ type ResponseAnimalUpgrade struct{
 type ResponseAddHoney struct{
 	HoneyCount int64
 	CD int64
+}
+
+type ResponesSpeedUpData struct{
+	Factor int `json:"factor"`//加速系数
+	Ending int64 `json:"ending"`//加速结束时间,多少秒之后结束
 }
 
 
