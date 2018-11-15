@@ -354,7 +354,7 @@ func ResponseLoginData(tmp *TmpLoginData,p_data *PlayerData,plants []Plant,petba
 	mp["honeycount"] = &(p_data.HoneyCount)
 	mp["soil"] = responsePlayerSoil(p_data,plants)
 	mp["petbar"] = responsePetbarData(p_data,petbars,ani_mp)
-	if p_data.SpeedUp != nil{
+	if p_data.SpeedUp != nil && tmp != nil{
 	   resp_speed:=new(ResponesSpeedUpData)
 	   resp_speed.Factor=p_data.SpeedUp.Factor
 	   resp_speed.Ending=tmp.Sec_EndingSpeedUp

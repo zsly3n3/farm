@@ -111,7 +111,7 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 				//normal 无加速计算 秒数为beforeSpeed_Sec
 				//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
 				//normal 无加速计算 秒数为afterSpeed_Sec
-			 } else{
+			 }else{
 				//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
 				//normal 无加速计算 秒数为afterSpeed_Sec
 			 }
