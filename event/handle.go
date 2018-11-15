@@ -74,12 +74,12 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 
 	gold := p_data.GoldCount
 	for k, v := range handle.soils {
-		if gold >= int64(v.Price) {
+		if gold >= v.Price {
 			p_data.Soil[k].State = datastruct.Unlocked
 		}
 	}
 	for k, v := range handle.petbars {
-		if gold >= int64(v.Price) {
+		if gold >= v.Price {
 			p_data.PetBar[k].State = datastruct.Unlocked
 		}
 	}
@@ -242,6 +242,14 @@ func (handle *EventHandler)AnimalUpgrade(key string,c *gin.Context)(datastruct.C
 	return code,resp_data
 }
 
+
+func (handle *EventHandler)AddHoneyCount(key string)(datastruct.CodeType,*datastruct.ResponseAddHoney){
+	var resp_data *datastruct.ResponseAddHoney
+	resp_data = nil
+	var code datastruct.CodeType
+	code,resp_data = handle.cacheHandler.AddHoneyCount(key)
+	return code,resp_data
+}
 
 func (handle *EventHandler) Test1(c *gin.Context) {
 	var body datastruct.UserLogin

@@ -35,6 +35,7 @@ const (
 	SoilRequireUnlock//土地未到达解锁条件
 	ExpIsNotFullForUpgradeAnimal//升级动物失败,经验值不满足 value=13
 	HoneyCountIsNotEnoughForUpgradeAnimal//升级动物失败,蜂蜜不足 value=14
+	AddHoneyCD//采集时间未到
 )
 
 
@@ -81,7 +82,11 @@ type PlayerInfo struct {
 	SoilLevel int `xorm:"not null INT(11) "`//玩家的土地购买等级
 }
 
-
+type PlayerSpeedUp struct {
+	Id     int `xorm:"not null pk INT(11)"` //关联UserInfo中id
+	Factor int `xorm:"not null INT(11)"`//加速系数
+	Ending int64 `xorm:"not null bigint"`//结束时间，时间戳
+}
 
 //植物类型表
 type PlantClass struct {
@@ -100,7 +105,7 @@ type Plant struct {
 	ClassId int `xorm:"not null INT(11)" json:"type"`//关联PlantClass中id
 	Level int `xorm:"not null INT(11)" json:"level"`//要求玩家种植等级
 	CName string `xorm:"VARCHAR(64) not null" json:"c_name"`//植物中文名称
-	HoneyCount int64 `xorm:"not null INT(11)" json:"income"`//蜂蜜产量
+	HoneyCount int64 `xorm:"not null INT(11)" json:"honey_count"`//蜂蜜产量
 }
 
 
@@ -108,7 +113,7 @@ type Plant struct {
 type Animal struct {
     Id int    `xorm:"not null pk autoincr INT(11)"`
     Name  string `xorm:"VARCHAR(64) not null "` //名称
-	InCome int `xorm:"not null INT(11) "`//初始收益
+	InCome int64 `xorm:"not null INT(11) "`//初始收益
 	Exp int64 `xorm:"not null bigint"`//升级所需经验
 	HoneyCount int64 `xorm:"not null bigint"`//升级所需的蜂蜜
 	ClassId int `xorm:"not null INT(11) "` //关联AnimalClass中id
@@ -125,7 +130,6 @@ type ShopData struct{
 	Plants []*ResponsePlant `json:"plants"`
 }
 
-
 //save reids,save mysql 
 type PlayerData struct{
 	Id int //对应数据库中userinfo表中的id
@@ -140,8 +144,13 @@ type PlayerData struct{
 	SoilLevel int //可购买土地的等级
 	Soil map[int]*PlayerSoil //玩家土地信息
 	PetBar map[AnimalType]*PlayerPetbar //宠物栏信息
+	SpeedUp *SpeedUpData//全局加速数据
 }
 
+type SpeedUpData struct{
+	Factor int `json:"factor"`//加速系数
+	Ending int64 `json:"ending"`//加速结束时间,多少秒之后结束
+}
 
 type GoodsState int 
 const (
@@ -233,7 +242,7 @@ type Petbar4 struct{
 
 type SoilData struct{
 	Level int //土地默认等级
-	Price int //购买价格 
+	Price int64 //购买价格 
 	Factor int //生产系数
 	Require int //开启条件
 	LastId int //上一个土地id
@@ -241,8 +250,8 @@ type SoilData struct{
 
 type PlayerSoilBase struct{
 	Level int `json:"level"`//土地等级
-	Price int  `json:"price"`//购买价格
-	UpgradeLevelPrice int `json:"upgradelevelprice"`//升下一级的价格
+	Price int64  `json:"price"`//购买价格
+	UpgradeLevelPrice int64 `json:"upgradelevelprice"`//升下一级的价格
 	Factor int `json:"factor"`//生产系数
 	State GoodsState `json:"state"`//土地状态
 }
@@ -265,7 +274,7 @@ type ResponsePlayerSoil struct{
 
 type ResponseSoilPlant struct{
 	 Name string `json:"name"`
-	 InCome int `json:"income"`
+	 InCome int64 `json:"income"`
 	 ExpForAnimal int64 `json:"expforanimal"`
 	 Type int `json:"type"`
 }
@@ -278,7 +287,7 @@ type ResponseSoil struct{
 
 
 type PetbarData struct{
-	Price int //单价
+	Price int64 //单价
 	Require int //开启条件
 	Id int //土地id
 	LastId int //上一个土地id
@@ -297,14 +306,14 @@ type ResponsePetbar struct{
 
 type ResponsePetbarBase struct{
 	Type AnimalType `json:"type"`//宠物栏类型
-	Price int `json:"price"`//单价
+	Price int64 `json:"price"`//单价
 	State GoodsState `json:"state"`
 	Id int`json:"id"`//宠物栏id
 }
 
 type ResponseAnimal struct{
 	Name  string `json:"name"`//名称
-	InCome int `json:"income"`//基本收益
+	InCome int64 `json:"income"`//基本收益
 	CurrentExp int64 `json:"currentexp"`//当前经验
 	Exp int64 `json:"exp"`//升级所需经验
 	HoneyCount int64 `json:"honeycount"`//升级所需蜂蜜
@@ -315,8 +324,6 @@ type ResponsePlant struct{
 	Plant
 	State GoodsState `json:"state"`
 }
-
-
 
 
 type PermissionType int //错误码
@@ -344,6 +351,9 @@ func ResponseLoginData(p_data *PlayerData,plants []Plant,petbars map[AnimalType]
 	mp["honeycount"] = &(p_data.HoneyCount)
 	mp["soil"] = responsePlayerSoil(p_data,plants)
 	mp["petbar"] = responsePetbarData(p_data,petbars,ani_mp)
+	if p_data.SpeedUp != nil{
+	   mp["speedup"] = p_data.SpeedUp	
+	}
 	return mp
 }
 
@@ -442,7 +452,7 @@ type ResponseUpgradeSoil struct{
 	GoldCount int64 `json:"goldcount"`
 	Level int `json:"level"`
 	Factor int `json:"factor"`
-	UpgradePrice int `json:"upgradeprice"`
+	UpgradePrice int64 `json:"upgradeprice"`
 }
 
 type ResponseAnimalUpgrade struct{
@@ -451,6 +461,10 @@ type ResponseAnimalUpgrade struct{
 	RightExp int64
 }
 
+type ResponseAddHoney struct{
+	HoneyCount int64
+	CD int64
+}
 
 
 //body
@@ -480,4 +494,5 @@ type AddExpForAnimal struct{
 	PetbarId int `json:"petbarid"`
 	SoilId int `json:"soilid"`
 }
+
 

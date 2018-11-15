@@ -227,6 +227,36 @@ func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
 	})
 }
 
+func addHoneyCount(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.GET("/user/addHoney", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c)
+		if !tf {
+			return
+		}
+		code,resp_data:= eventHandler.AddHoneyCount(token)
+		mp := make(map[string]interface{})
+		if code == datastruct.NULLError{
+			mp["addhony"]=resp_data.HoneyCount
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		} else if code == datastruct.AddHoneyCD{
+			mp["time"]=resp_data.CD
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		} else{
+			c.JSON(200, gin.H{
+				"code": code,
+			})
+		}
+	})
+}
 
 
 func test1(r *gin.Engine, eventHandler *event.EventHandler) {
@@ -288,6 +318,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	buyPetbar(r,eventHandler)
 	addExpForAnimal(r,eventHandler)
 	animalUpgrade(r,eventHandler)
+	addHoneyCount(r,eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }

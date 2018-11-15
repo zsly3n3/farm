@@ -49,6 +49,10 @@ func (handle *EventHandler)createUser(code string,permissionId int,nickName stri
     player.SoilLevel = 0
     player.Soil = createSoil(handle.soils)
     player.PetBar = createPetbar(handle.petbars)
+    //player.SpeedUp = nil
+    player.SpeedUp = new(datastruct.SpeedUpData)
+    player.SpeedUp.Factor = 2
+    player.SpeedUp.Ending = 1000
     return player
 }
 

@@ -179,7 +179,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 		return datastruct.GetDataFailed, resp_tmp
 	}
 	tmp, _ := tools.BytesToPlayerSoil([]byte(value))
-	if tmp.State != datastruct.Owned || gold < int64(tmp.UpgradeLevelPrice) {
+	if tmp.State != datastruct.Owned || gold < tmp.UpgradeLevelPrice {
 		resp_tmp := new(datastruct.ResponseUpgradeSoil)
 		resp_tmp.Level = tmp.Level
 		resp_tmp.UpgradePrice = tmp.UpgradeLevelPrice
@@ -229,12 +229,12 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 
-	if gold < int64(plant.Price) {
+	if gold < plant.Price {
 		return datastruct.GoldIsNotEnoughForPlant, gold, plant.CName, -1
 	}
 
 	if plantLevel+1 == plant.Level {
-		gold = gold - int64(plant.Price)
+		gold = gold - plant.Price
 		plantLevel = plant.Level
 		player_soil.PlantLevel = plantLevel
 	} else {
@@ -245,7 +245,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	player_soil.PlantId = plantInSoil.PlantId
 	if player_soil.State != datastruct.Owned {
 		soil := soils[plantInSoil.SoilId]
-		if gold < int64(soil.Price) {
+		if gold < soil.Price {
 			return datastruct.GoldIsNotEnoughForSoil, gold, "", -1
 		}
 		value, err = redis.String(conn.Do("hget", key, datastruct.SoilLevelField))
@@ -255,7 +255,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 		}
 		soilLevel := tools.StringToInt(value)
 		if soilLevel+1 == soil.Require {
-			gold = gold - int64(soil.Price)
+			gold = gold - soil.Price
 			soilLevel = soil.Require
 			player_soil.State = datastruct.Owned
 		} else {
@@ -326,7 +326,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
-	if gold < int64(tmp.Price) {
+	if gold < tmp.Price {
 		return datastruct.GoldIsNotEnoughForSoil, gold, animal, soil_id
 	}
 
@@ -341,7 +341,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 		soil_id = tmp.LastId
 		return datastruct.SoilRequireUnlock, gold, animal, soil_id
 	}
-	gold = gold - int64(tmp.Price)
+	gold = gold - tmp.Price
 	soilLevel = tmp.Require
 	rs_tmp.State = datastruct.Owned
 	animalNumber := 1
@@ -562,6 +562,17 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 	}
     currentExp=playerPetbar.CurrentExp
 	return datastruct.NULLError,currentExp
+}
+
+
+func (handle *CACHEHandler)AddHoneyCount(key string)(datastruct.CodeType,*datastruct.ResponseAddHoney){
+	var resp_data *datastruct.ResponseAddHoney
+	resp_data = nil
+	
+	
+
+
+	return datastruct.NULLError,resp_data
 }
 
 

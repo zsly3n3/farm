@@ -64,6 +64,7 @@ func GetPlantsInfo()[]datastruct.Plant{
 		cell_AddExp:= fmt.Sprintf("E%d",index)
 		cell_Level:= fmt.Sprintf("F%d",index)
 		cell_ChName:= fmt.Sprintf("G%d",index)
+		cell_honey:= fmt.Sprintf("H%d",index)
 		name := xlsx.GetCellValue(tableName, cell_Name)
 		cid := xlsx.GetCellValue(tableName, cell_ClassId)
 		price := xlsx.GetCellValue(tableName, cell_Price)
@@ -71,16 +72,18 @@ func GetPlantsInfo()[]datastruct.Plant{
 		exp := xlsx.GetCellValue(tableName, cell_AddExp)
 		level := xlsx.GetCellValue(tableName, cell_Level)
 		chName := xlsx.GetCellValue(tableName, cell_ChName)
+		honeyCount := xlsx.GetCellValue(tableName, cell_honey)
         if name == "" {
             break
         }
         var plant datastruct.Plant
 		plant.Name = name
 		plant.ClassId = StringToInt(cid)
-		plant.Price = StringToInt(price)
-		plant.InCome = StringToInt(income)
+		plant.Price = StringToInt64(price)
+		plant.InCome = StringToInt64(income)
 		plant.ExpForAnimal = StringToInt64(exp)
 		plant.Level = StringToInt(level)
+		plant.HoneyCount = StringToInt64(honeyCount)
 		plant.CName = chName
         plants = append(plants,plant)
         index++
@@ -115,7 +118,7 @@ func GetAnimalInfo()[]datastruct.Animal{
         var animal datastruct.Animal
 		animal.Name = name
 		animal.ClassId = StringToInt(cid)
-		animal.InCome = StringToInt(income)
+		animal.InCome = StringToInt64(income)
 		animal.Exp = StringToInt64(exp)
 		animal.Number = StringToInt(number)
 		animal.HoneyCount = StringToInt64(honey)
@@ -150,7 +153,7 @@ func GetSoildInfo()(map[int]datastruct.SoilData,map[datastruct.AnimalType]datast
 		}
 		var soil datastruct.SoilData
 		soil_id := StringToInt(location)
-		soil.Price = StringToInt(price)
+		soil.Price = StringToInt64(price)
 		soil.Factor = StringToInt(factor)
 		soil.Require = StringToInt(require)
 		soil.LastId = StringToInt(last_id)
@@ -178,7 +181,7 @@ func GetSoildInfo()(map[int]datastruct.SoilData,map[datastruct.AnimalType]datast
 		}
 		var petbar datastruct.PetbarData
 		petbar_type:= datastruct.AnimalType(StringToInt(class))
-		petbar.Price = StringToInt(price)
+		petbar.Price = StringToInt64(price)
 		petbar.Require = StringToInt(require)
 		petbar.Id = StringToInt(id)
 		petbar.LastId = StringToInt(last_id)
@@ -263,10 +266,10 @@ func ComputeSoilLevelPrice(gold int64,level int,current *datastruct.PlayerSoil)(
 	rs_factor:=current.Factor
 	rs_level:=current.Level
 	for i:=current.Level;i<=level;i++{
-		if gold < int64(rs_UpgradePrice){
+		if gold < rs_UpgradePrice{
 		   break
 		}
-		gold -= int64(rs_UpgradePrice)
+		gold -= rs_UpgradePrice
 		rs_level += 1
 		rs_factor += + 20
 	    rs_UpgradePrice+=20
@@ -281,6 +284,6 @@ func ComputeSoilLevelPrice(gold int64,level int,current *datastruct.PlayerSoil)(
 	return gold,resp_upsoil
 }
 
-func GetUpgradeLevelPriceForSoil(currentLevel int)int{
+func GetUpgradeLevelPriceForSoil(currentLevel int)int64{
 	 return 100
 }
