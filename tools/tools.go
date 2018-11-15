@@ -307,7 +307,6 @@ func EnableSpeedUp(ending int64, current int64) int64 {
 	CD = 0
 	h4 := int64(4 * 3600)
 	h24 := int64(24 * 3600)
-	log.Debug("last:%d", last)
 	if last+h4 > h24 {
 		CD = h4 - (h24 - last)
 	}

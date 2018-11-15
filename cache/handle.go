@@ -596,18 +596,19 @@ func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 		rs_tmp = new(datastruct.SpeedUpData)
 		rs_tmp.Factor = 2
 		rs_tmp.Starting = now_Time.Unix()
+		hh, _ := time.ParseDuration("4h")
+		rs_tmp.Ending = now_Time.Add(hh).Unix()
 	} else {
 		rs_tmp, _ = tools.BytesToSpeedUp([]byte(value))
 		CD := tools.EnableSpeedUp(rs_tmp.Ending, now_Time.Unix())
-		log.Debug("CD:%v", CD)
 		if CD > 0 {
 			resp_data.CD = CD
 			return datastruct.AddHoneyCD, resp_data
 		}
 		rs_tmp.Factor += 2
+		rs_tmp.Ending += 4 * 3600
 	}
-	hh, _ := time.ParseDuration("4h")
-	rs_tmp.Ending = now_Time.Add(hh).Unix()
+
 	nextspeedcd := tools.EnableSpeedUp(rs_tmp.Ending, now_Time.Unix())
 	resp_data.CD = nextspeedcd
 
