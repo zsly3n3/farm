@@ -468,8 +468,9 @@ type ResponseAnimalUpgrade struct {
 }
 
 type ResponseAddHoney struct {
-	HoneyCount int64
-	CD         int64
+	HoneyCount int64                `json:"addhony"`
+	CD         int64                `json:"nextspeedcd"`
+	SpeedUp    *ResponesSpeedUpData `json:"speedup"`
 }
 
 type ResponesSpeedUpData struct {

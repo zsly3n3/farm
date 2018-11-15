@@ -286,11 +286,7 @@ func (handle *EventHandler) AnimalUpgrade(key string, c *gin.Context) (datastruc
 }
 
 func (handle *EventHandler) AddHoneyCount(key string) (datastruct.CodeType, *datastruct.ResponseAddHoney) {
-	var resp_data *datastruct.ResponseAddHoney
-	resp_data = nil
-	var code datastruct.CodeType
-	code, resp_data = handle.cacheHandler.AddHoneyCount(key)
-	return code, resp_data
+	return handle.cacheHandler.AddHoneyCount(key)
 }
 
 func (handle *EventHandler) EnableCollectHoney(key string) (datastruct.CodeType, int64) {

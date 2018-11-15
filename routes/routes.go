@@ -3,7 +3,8 @@ package routes
 import (
 	"farm/datastruct"
 	"farm/event"
-    "farm/tools"
+	"farm/tools"
+
 	"github.com/gin-gonic/gin"
 	//"farm/log"
 )
@@ -41,7 +42,7 @@ func getShopData(r *gin.Engine, eventHandler *event.EventHandler) {
 			return
 		}
 		soil_id := c.Param("soilid")
-		eventHandler.GetShopData(c, token,tools.StringToInt(soil_id))
+		eventHandler.GetShopData(c, token, tools.StringToInt(soil_id))
 	})
 }
 
@@ -173,15 +174,15 @@ func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		code,currentExp:= eventHandler.AddExpForAnimal(token, c)
-		if code == datastruct.NULLError{
+		code, currentExp := eventHandler.AddExpForAnimal(token, c)
+		if code == datastruct.NULLError {
 			mp := make(map[string]interface{})
-			mp["currentexp"]=currentExp
+			mp["currentexp"] = currentExp
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
 			})
-		}else{
+		} else {
 			c.JSON(200, gin.H{
 				"code": code,
 			})
@@ -198,28 +199,28 @@ func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		code,resp_data:= eventHandler.AnimalUpgrade(token, c)
+		code, resp_data := eventHandler.AnimalUpgrade(token, c)
 		mp := make(map[string]interface{})
-		if code == datastruct.NULLError{
-			mp["honeycount"]=resp_data.HoneyCount
-			mp["animal"]=resp_data.Animal
+		if code == datastruct.NULLError {
+			mp["honeycount"] = resp_data.HoneyCount
+			mp["animal"] = resp_data.Animal
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
 			})
-		} else if code == datastruct.ExpIsNotFullForUpgradeAnimal{
-			mp["currentexp"]=resp_data.RightExp
+		} else if code == datastruct.ExpIsNotFullForUpgradeAnimal {
+			mp["currentexp"] = resp_data.RightExp
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
 			})
-		} else if code == datastruct.HoneyCountIsNotEnoughForUpgradeAnimal{
-			mp["honeycount"]=resp_data.HoneyCount
+		} else if code == datastruct.HoneyCountIsNotEnoughForUpgradeAnimal {
+			mp["honeycount"] = resp_data.HoneyCount
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
 			})
-		}else{
+		} else {
 			c.JSON(200, gin.H{
 				"code": code,
 			})
@@ -236,21 +237,20 @@ func addHoneyCount(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		code,resp_data:= eventHandler.AddHoneyCount(token)
-		mp := make(map[string]interface{})
-		if code == datastruct.NULLError{
-			mp["addhony"]=resp_data.HoneyCount
+		code, resp_data := eventHandler.AddHoneyCount(token)
+		if code == datastruct.NULLError {
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": resp_data,
+			})
+		} else if code == datastruct.AddHoneyCD {
+			mp := make(map[string]interface{})
+			mp["speedcd"] = resp_data.CD
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
 			})
-		} else if code == datastruct.AddHoneyCD{
-			mp["time"]=resp_data.CD
-			c.JSON(200, gin.H{
-				"code": code,
-				"data": mp,
-			})
-		} else{
+		} else {
 			c.JSON(200, gin.H{
 				"code": code,
 			})
@@ -267,23 +267,21 @@ func enableCollectHoney(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		code,resp_data:= eventHandler.EnableCollectHoney(token)
+		code, resp_data := eventHandler.EnableCollectHoney(token)
 		mp := make(map[string]interface{})
-		if code == datastruct.NULLError{
-			mp["speedcd"]=resp_data
+		if code == datastruct.NULLError {
+			mp["speedcd"] = resp_data
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
 			})
-		} else{
+		} else {
 			c.JSON(200, gin.H{
 				"code": code,
 			})
 		}
 	})
 }
-
-
 
 func test1(r *gin.Engine, eventHandler *event.EventHandler) {
 	r.POST("/Test1", func(c *gin.Context) {
@@ -341,11 +339,11 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	updatePermisson(r, eventHandler)
 	plant(r, eventHandler)
 	upgradeSoil(r, eventHandler)
-	buyPetbar(r,eventHandler)
-	addExpForAnimal(r,eventHandler)
-	animalUpgrade(r,eventHandler)
-	addHoneyCount(r,eventHandler)
-	enableCollectHoney(r,eventHandler)
+	buyPetbar(r, eventHandler)
+	addExpForAnimal(r, eventHandler)
+	animalUpgrade(r, eventHandler)
+	addHoneyCount(r, eventHandler)
+	enableCollectHoney(r, eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }

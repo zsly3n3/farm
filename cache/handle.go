@@ -580,38 +580,52 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 }
 
 func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *datastruct.ResponseAddHoney) {
-	/*
-			conn := handle.GetConn()
-			defer conn.Close()
-			if !isExistUser(conn, key) {
-			   return datastruct.GetDataFailed,nil
-			}
-			value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
-			if err != nil {
-				return datastruct.GetDataFailed,nil
-			}
-		    var rs_tmp *datastruct.SpeedUpData
-			if value == ""{
-			   rs_tmp = new(datastruct.SpeedUpData)
-			   rs_tmp.Factor = 2
-			   now_Time:=time.Now()
-			   rs_tmp.Starting = now_Time.Unix()
-			   hh, _ := time.ParseDuration("4h")
-			   rs_tmp.Ending = now_Time.Add(hh).Unix()
-			}else{
-			   rs_tmp, _ = tools.BytesToSpeedUp([]byte(value))
-			   rs_tmp.Ending
-			   if {
-				 return
-			   }
-			   hh, _ := time.ParseDuration("4h")
-			   rs_tmp.Ending = now_Time.Add(hh).Unix()
-			}
+	conn := handle.GetConn()
+	defer conn.Close()
+	if !isExistUser(conn, key) {
+		return datastruct.GetDataFailed, nil
+	}
+	value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
+	if err != nil {
+		return datastruct.GetDataFailed, nil
+	}
+	var rs_tmp *datastruct.SpeedUpData
+	resp_data := new(datastruct.ResponseAddHoney)
+	now_Time := time.Now()
+	if value == "" {
+		rs_tmp = new(datastruct.SpeedUpData)
+		rs_tmp.Factor = 2
+		rs_tmp.Starting = now_Time.Unix()
+	} else {
+		rs_tmp, _ = tools.BytesToSpeedUp([]byte(value))
+		CD := tools.EnableSpeedUp(rs_tmp.Ending, now_Time.Unix())
+		if CD > 0 {
+			resp_data.CD = CD
+			return datastruct.AddHoneyCD, resp_data
+		}
+		rs_tmp.Factor += 2
+	}
+	hh, _ := time.ParseDuration("4h")
+	rs_tmp.Ending = now_Time.Add(hh).Unix()
+	nextspeedcd := tools.EnableSpeedUp(rs_tmp.Ending, now_Time.Unix())
+	resp_data.CD = nextspeedcd
 
-			//compute honeyCount
-	*/
-	var resp_data *datastruct.ResponseAddHoney
-	resp_data = nil
+	value, err = redis.String(conn.Do("hget", key, datastruct.HoneyField))
+	if err != nil {
+		return datastruct.GetDataFailed, nil
+	}
+	honeyCount := tools.StringToInt64(value)
+
+	//compute honeyCount
+	honeyCount += 100
+
+	resp_data.HoneyCount = honeyCount
+	value, _ = tools.SpeedUpToString(rs_tmp)
+	_, err = conn.Do("hmset", key, datastruct.HoneyField, honeyCount, datastruct.SpeedUpField, value)
+	if err != nil {
+		log.Debug("CACHEHandler AddHoneyCount err:%s", err.Error())
+	}
+
 	return datastruct.NULLError, resp_data
 }
 
