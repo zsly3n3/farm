@@ -599,6 +599,7 @@ func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 	} else {
 		rs_tmp, _ = tools.BytesToSpeedUp([]byte(value))
 		CD := tools.EnableSpeedUp(rs_tmp.Ending, now_Time.Unix())
+		log.Debug("CD:%v", CD)
 		if CD > 0 {
 			resp_data.CD = CD
 			return datastruct.AddHoneyCD, resp_data
