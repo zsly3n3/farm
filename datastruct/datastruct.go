@@ -344,12 +344,16 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	mp["honeycount"] = &(p_data.HoneyCount)
 	mp["soil"] = responsePlayerSoil(p_data, plants)
 	mp["petbar"] = responsePetbarData(p_data, petbars, ani_mp)
-	mp["speedcd"] = tmp.CD
-	if p_data.SpeedUp != nil && tmp != nil {
-		resp_speed := new(ResponesSpeedUpData)
-		resp_speed.Factor = p_data.SpeedUp.Factor
-		resp_speed.Ending = tmp.Sec_EndingSpeedUp
-		mp["speedup"] = resp_speed
+	if tmp == nil {
+		mp["speedcd"] = 0
+	} else {
+		mp["speedcd"] = tmp.CD
+		if p_data.SpeedUp != nil {
+			resp_speed := new(ResponesSpeedUpData)
+			resp_speed.Factor = p_data.SpeedUp.Factor
+			resp_speed.Ending = tmp.Sec_EndingSpeedUp
+			mp["speedup"] = resp_speed
+		}
 	}
 	return mp
 }
