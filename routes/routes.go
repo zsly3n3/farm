@@ -270,7 +270,7 @@ func enableCollectHoney(r *gin.Engine, eventHandler *event.EventHandler) {
 		code,resp_data:= eventHandler.EnableCollectHoney(token)
 		mp := make(map[string]interface{})
 		if code == datastruct.NULLError{
-			mp["time"]=resp_data
+			mp["speedcd"]=resp_data
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
