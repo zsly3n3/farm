@@ -586,7 +586,6 @@ func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 		return datastruct.GetDataFailed, nil
 	}
 	value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
-	log.Debug("hget:%v", value)
 	if err != nil {
 		return datastruct.GetDataFailed, nil
 	}
@@ -622,12 +621,14 @@ func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 
 	resp_data.HoneyCount = honeyCount
 	value, _ = tools.SpeedUpToString(rs_tmp)
-	log.Debug("hmset:%v", value)
 	_, err = conn.Do("hmset", key, datastruct.HoneyField, honeyCount, datastruct.SpeedUpField, value)
 	if err != nil {
 		log.Debug("CACHEHandler AddHoneyCount err:%s", err.Error())
+		return datastruct.GetDataFailed, nil
 	}
-
+	resp_data.SpeedUp = new(datastruct.ResponesSpeedUpData)
+	resp_data.SpeedUp.Factor = rs_tmp.Factor
+	resp_data.SpeedUp.Ending = rs_tmp.Ending
 	return datastruct.NULLError, resp_data
 }
 
