@@ -345,6 +345,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	addExpForAnimal(r,eventHandler)
 	animalUpgrade(r,eventHandler)
 	addHoneyCount(r,eventHandler)
+	enableCollectHoney(r,eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }
