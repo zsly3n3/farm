@@ -5,6 +5,7 @@ import (
 	"farm/log"
 	"farm/tools"
 	"fmt"
+	"time"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -582,19 +583,60 @@ func (handle *CACHEHandler) AddExpForAnimal(key string,body *datastruct.AddExpFo
 
 
 func (handle *CACHEHandler)AddHoneyCount(key string)(datastruct.CodeType,*datastruct.ResponseAddHoney){
+	/*
 	conn := handle.GetConn()
 	defer conn.Close()
 	if !isExistUser(conn, key) {
+	   return datastruct.GetDataFailed,nil
+	}
+	value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
+	if err != nil {
 		return datastruct.GetDataFailed,nil
 	}
-   
+    var rs_tmp *datastruct.SpeedUpData
+	if value == ""{
+	   rs_tmp = new(datastruct.SpeedUpData)
+	   rs_tmp.Factor = 2
+	   now_Time:=time.Now()
+	   rs_tmp.Starting = now_Time.Unix()
+	   hh, _ := time.ParseDuration("4h")
+	   rs_tmp.Ending = now_Time.Add(hh).Unix()
+	}else{
+	   rs_tmp, _ = tools.BytesToSpeedUp([]byte(value))
+	   rs_tmp.Ending
+	   if {
+		 return  
+	   }
+	   hh, _ := time.ParseDuration("4h")
+	   rs_tmp.Ending = now_Time.Add(hh).Unix()
+	}
 	
-	
-
+	//compute honeyCount
+	*/
     var resp_data *datastruct.ResponseAddHoney
 	resp_data = nil 
 	return datastruct.NULLError,resp_data
 }
+
+func (handle *CACHEHandler)EnableCollectHoney(key string)(datastruct.CodeType,int64){	
+	conn := handle.GetConn()
+	defer conn.Close()
+	if !isExistUser(conn, key) {
+	   return datastruct.GetDataFailed,-1
+	}
+	value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
+	if err != nil {
+		return datastruct.GetDataFailed,-1
+	}
+	if value == ""{
+	   return datastruct.NULLError,0
+	}
+	rs_tmp, _ := tools.BytesToSpeedUp([]byte(value))
+	nowtime:=time.Now().Unix()
+	CD:=tools.EnableSpeedUp(rs_tmp.Ending,nowtime)
+	return datastruct.NULLError,CD
+}
+
 
 
 func (handle *CACHEHandler) TestMoney(key string) {

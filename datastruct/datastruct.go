@@ -358,6 +358,7 @@ func ResponseLoginData(tmp *TmpLoginData,p_data *PlayerData,plants []Plant,petba
 	   resp_speed:=new(ResponesSpeedUpData)
 	   resp_speed.Factor=p_data.SpeedUp.Factor
 	   resp_speed.Ending=tmp.Sec_EndingSpeedUp
+	   resp_speed.CD = tmp.CD
 	   mp["speedup"] = resp_speed
 	}
 	return mp
@@ -455,6 +456,7 @@ func responsePetbarData(p_data *PlayerData,petbars map[AnimalType]PetbarData,ani
 //Tmp数据，用于传递，不保存redis和mysql
 type TmpLoginData struct{
 	Sec_EndingSpeedUp int64 //还剩多少秒结束加速
+	CD int64 `json:"time"`//还有多少时间，才能使用加速
 }
 
 
@@ -480,6 +482,7 @@ type ResponseAddHoney struct{
 type ResponesSpeedUpData struct{
 	Factor int `json:"factor"`//加速系数
 	Ending int64 `json:"ending"`//加速结束时间,多少秒之后结束
+	CD int64 `json:"time"`//还有多少时间，才能使用加速
 }
 
 

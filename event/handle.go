@@ -4,7 +4,7 @@ import (
 	"farm/datastruct"
 	"time"
 	"github.com/gin-gonic/gin"
-	//"farm/tools"
+	"farm/tools"
 	"farm/log"
 )
 
@@ -85,7 +85,7 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 			p_data.PetBar[k].State = datastruct.Unlocked
 		}
 	}
-
+    
 	tmpLoginData:=new(datastruct.TmpLoginData)
     if p_data.SpeedUp != nil{
 		sec:=p_data.SpeedUp.Ending-current_UpdateTime
@@ -97,6 +97,7 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 			} else {
 			   //speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
 			}
+			tmpLoginData.CD = tools.EnableSpeedUp(p_data.SpeedUp.Ending,current_UpdateTime)
 			tmpLoginData.Sec_EndingSpeedUp = p_data.SpeedUp.Ending - current_UpdateTime
 		} else{
 		    if last_UpdateTime >= p_data.SpeedUp.Ending{
@@ -292,6 +293,10 @@ func (handle *EventHandler)AddHoneyCount(key string)(datastruct.CodeType,*datast
 	return code,resp_data
 }
 
+func (handle *EventHandler)EnableCollectHoney(key string)(datastruct.CodeType,int64){
+    return handle.cacheHandler.EnableCollectHoney(key)
+}
+
 func (handle *EventHandler) Test1(c *gin.Context) {
 	var body datastruct.UserLogin
 	c.BindJSON(&body)
@@ -300,6 +305,7 @@ func (handle *EventHandler) Test1(c *gin.Context) {
 		"code": 0,
 	})
 }
+
 
 func (handle *EventHandler) Test2(c *gin.Context) {
 	var body datastruct.UserLogin

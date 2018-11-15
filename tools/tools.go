@@ -305,6 +305,18 @@ func ComputeSoilLevelPrice(gold int64,level int,current *datastruct.PlayerSoil)(
 	return gold,resp_upsoil
 }
 
+func EnableSpeedUp(ending int64,current int64)int64{
+	last:= ending - current
+	var CD int64
+	CD = 0
+	h4:=int64(4 * 3600)
+	h24:=int64(24 * 3600)
+	if last + h4 > h24{
+	   CD=h4-(h24-last)
+	}
+	return CD
+}
+
 func GetUpgradeLevelPriceForSoil(currentLevel int)int64{
 	 return 100
 }
