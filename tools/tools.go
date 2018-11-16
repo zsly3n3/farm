@@ -259,7 +259,6 @@ func BytesToSpeedUp(bytes []byte)(*datastruct.SpeedUpData,bool){
 
 
 
-
 func SliceIntToString(tmp []int)(string,bool){
 	jsons, err := json.Marshal(tmp) //转换成JSON返回的是byte[]
 	if err != nil {
