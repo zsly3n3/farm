@@ -528,10 +528,10 @@ type ResponesStaminaData struct {
 }
 
 type ResponesLotteryData struct {
-	Stamina   int   `json:"currentstamina"` //当前体力值
-	GoldCount int64 `json:"goldcount"`
-	Shield    int   `json:"dogs"`
-	Stolen    *ResponseStolen
+	Stamina   int             `json:"currentstamina"` //当前体力值
+	GoldCount int64           `json:"goldcount"`
+	Shield    int             `json:"dogs"`
+	Stolen    *ResponseStolen `json:"stolen"`
 }
 
 type ResponseStolen struct {
