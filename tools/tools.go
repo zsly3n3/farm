@@ -317,12 +317,24 @@ func GetUpgradeLevelPriceForSoil(currentLevel int) int64 {
 	return 100
 }
 
-func ComputeSteal(p_data *datastruct.PlayerData) (*datastruct.ResponesLotteryData, int64, int64) {
+func ComputeSteal(p_data *datastruct.PlayerData, expend int) (*datastruct.ResponesLotteryData, int64, int64) {
+
+	//compute
 	resp_data := new(datastruct.ResponesLotteryData)
+	resp_data.Stolen = new(datastruct.ResponseStolen)
+	resp_data.Stolen.Succeed = 1
+	if p_data.Shield > 0 {
+		resp_data.Stolen.Succeed = 0
+	}
 	var addGold int64
 	var addHoney int64
-	addGold = 100
-	addHoney = 100
+	if resp_data.Stolen.Succeed == 1 {
+		addGold = int64(1000 * expend)
+		addHoney = int64(1000 * expend)
+	} else {
+		addGold = int64(100 * expend)
+		addHoney = int64(100 * expend)
+	}
 
 	return resp_data, addGold, addHoney
 }

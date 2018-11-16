@@ -315,8 +315,16 @@ func lottery(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		code, resp_data := eventHandler.Lottery(token, c)
+		code, resp_data, reward_type := eventHandler.Lottery(token, c)
 		if code == datastruct.NULLError {
+			mp := make(map[string]interface{})
+			mp["goldcount"] = resp_data.GoldCount
+			mp["currentstamina"] = resp_data.Stamina
+			if reward_type == datastruct.Gog {
+				mp["dogs"] = resp_data.Shield
+			} else if reward_type == datastruct.Steal {
+				mp["stolen"] = resp_data.Stolen
+			}
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": resp_data,
