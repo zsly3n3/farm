@@ -292,7 +292,7 @@ func getStamina(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		code, resp_data := eventHandler.getStamina(token)
+		code, resp_data := eventHandler.GetStamina(token)
 		if code == datastruct.NULLError {
 			c.JSON(200, gin.H{
 				"code": code,
