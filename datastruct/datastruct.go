@@ -361,24 +361,27 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 		return nil
 	}
 	mp := make(map[string]interface{})
+	farm_mp := make(map[string]interface{})
+	mp["farm"] = farm_mp
 	mp["permissionid"] = &(p_data.PermissionId)
 	mp["token"] = &(p_data.Token)
-	mp["goldcount"] = &(p_data.GoldCount)
-	mp["honeycount"] = &(p_data.HoneyCount)
-	mp["soil"] = responsePlayerSoil(p_data, plants)
-	mp["petbar"] = responsePetbarData(p_data, petbars, ani_mp)
 	mp["lottery"] = responesLottery(p_data)
+	farm_mp["goldcount"] = &(p_data.GoldCount)
+	farm_mp["honeycount"] = &(p_data.HoneyCount)
+	farm_mp["soil"] = responsePlayerSoil(p_data, plants)
+	farm_mp["petbar"] = responsePetbarData(p_data, petbars, ani_mp)
 	if tmp == nil {
-		mp["speedcd"] = 0
+		farm_mp["speedcd"] = 0
 	} else {
-		mp["speedcd"] = tmp.CD
+		farm_mp["speedcd"] = tmp.CD
 		if p_data.SpeedUp != nil {
 			resp_speed := new(ResponesSpeedUpData)
 			resp_speed.Factor = p_data.SpeedUp.Factor
 			resp_speed.Ending = tmp.Sec_EndingSpeedUp
-			mp["speedup"] = resp_speed
+			farm_mp["speedup"] = resp_speed
 		}
 	}
+
 	return mp
 }
 
