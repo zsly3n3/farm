@@ -131,6 +131,13 @@ func (handle *DBHandler) InsertRewardStamina(player_id int) {
 	return
 }
 
+func (handle *DBHandler) IsGetStamina(player_id int) bool {
+	engine := handle.mysqlEngine
+	var rewardStamina datastruct.RewardStamina
+	has, _ := engine.Where("id=?", player_id).Get(&rewardStamina)
+	return has
+}
+
 func (handle *DBHandler) GetPlantsSlice() []datastruct.Plant {
 	engine := handle.mysqlEngine
 	plants := make([]datastruct.Plant, 0)

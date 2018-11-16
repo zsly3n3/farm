@@ -124,6 +124,12 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 	} else {
 		//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
 	}
+
+	isGetedStamina := handle.dbHandler.IsGetStamina(p_data.Id)
+	log.Debug("isGetedStamina:%d", isGetedStamina)
+	if !isGetedStamina && p_data.Stamina < datastruct.MaxStamina {
+		p_data.Stamina = datastruct.MaxStamina
+	}
 	p_data.UpdateTime = current_UpdateTime
 	//compute 计算 金币，蜂蜜，体力(阈值30)，狗(盾牌)
 
@@ -134,10 +140,10 @@ func (handle *EventHandler) fromRedisToMysql(token string) {
 	conn := handle.cacheHandler.GetConn()
 	defer conn.Close()
 	p_data := handle.cacheHandler.ReadPlayerData(conn, token)
-	user_id := handle.dbHandler.SetPlayerData(p_data)
-	if p_data.Id <= 0 && user_id > 0 {
-		handle.cacheHandler.SetPlayerID(conn, token, user_id)
-	}
+	handle.dbHandler.SetPlayerData(p_data)
+	// if p_data.Id <= 0 && user_id > 0 {
+	// 	handle.cacheHandler.SetPlayerID(conn, token, user_id)
+	// }
 }
 
 func getPermissionId(isauth int) int {
