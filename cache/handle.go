@@ -732,6 +732,11 @@ func (handle *CACHEHandler) LotteryNomal(key string, body *datastruct.LotteryBod
 		resp_data.Stamina = stamina
 		value, _ = redis.String(conn.Do("hget", datastruct.ShieldField, key))
 		shields := tools.StringToInt(value)
+		shields += body.Expend * 1
+		if shields >= datastruct.MaxShield {
+			shields = datastruct.MaxShield
+		}
+		resp_data.Shield = shields
 		_, err := conn.Do("hmset", key, datastruct.ShieldField, shields, datastruct.StaminaField, stamina)
 		if err != nil {
 			log.Debug("CACHEHandler Lottery hmset_1 err:%s", err.Error())
@@ -769,6 +774,8 @@ func (handle *CACHEHandler) LotterySteal(key string, addGold int64, addHoney int
 		return datastruct.UpdateDataFailed, nil
 	}
 	resp_data := new(datastruct.ResponesLotteryData)
+	// resp_data.GoldCount =
+	// resp_data.=
 	return datastruct.NULLError, resp_data
 }
 
