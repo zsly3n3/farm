@@ -356,7 +356,7 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 	if code != datastruct.NULLError {
 		return code, nil, -1
 	}
-	resp_data, addGold, addHoney := tools.ComputeSteal(player_data)
+	resp_data, addGold, addHoney := tools.ComputeSteal(player_data, body.Expend)
 	code, resp_data = handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, resp_data, conn)
 	return code, resp_data, rewardType
 }
