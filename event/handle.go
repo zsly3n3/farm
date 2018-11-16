@@ -2,10 +2,11 @@ package event
 
 import (
 	"farm/datastruct"
-	"time"
-	"github.com/gin-gonic/gin"
-	"farm/tools"
 	"farm/log"
+	"farm/tools"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (handle *EventHandler) Login(c *gin.Context) {
@@ -38,16 +39,16 @@ func (handle *EventHandler) Login(c *gin.Context) {
 				if !isExistMysql {
 					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), "test", "avatar")
 				} else {
-					tmpLoginData=handle.refreshPlayerData(p_data, body.IsAuth)
+					tmpLoginData = handle.refreshPlayerData(p_data, body.IsAuth)
 				}
 				handle.cacheHandler.SetPlayerAllData(conn, p_data)
 			} else {
-				tmpLoginData=handle.refreshPlayerData(p_data, body.IsAuth)
+				tmpLoginData = handle.refreshPlayerData(p_data, body.IsAuth)
 				handle.cacheHandler.SetPlayerSomeData(conn, p_data)
 			}
 			c.JSON(200, gin.H{
 				"code": code,
-				"data": datastruct.ResponseLoginData(tmpLoginData,p_data, handle.plants, handle.petbars, handle.animals),
+				"data": datastruct.ResponseLoginData(tmpLoginData, p_data, handle.plants, handle.petbars, handle.animals),
 			})
 		} else {
 			c.JSON(200, gin.H{
@@ -66,13 +67,12 @@ func getOpenId(code string) string {
 	return code
 }
 
-func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isauth int)*datastruct.TmpLoginData{
+func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isauth int) *datastruct.TmpLoginData {
 	if isauth == 1 && p_data.PermissionId == int(datastruct.Guest) {
 		p_data.PermissionId = int(datastruct.Player)
 	}
 	last_UpdateTime := p_data.UpdateTime
-	current_UpdateTime:=time.Now().Unix()
-	
+	current_UpdateTime := time.Now().Unix()
 
 	gold := p_data.GoldCount
 	for k, v := range handle.soils {
@@ -85,41 +85,42 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 			p_data.PetBar[k].State = datastruct.Unlocked
 		}
 	}
-    
-	tmpLoginData:=new(datastruct.TmpLoginData)
-    if p_data.SpeedUp != nil{
-		sec:=p_data.SpeedUp.Ending-current_UpdateTime
-		if sec > 0{
-			beforeSpeed_Sec:= p_data.SpeedUp.Starting - last_UpdateTime
-			if beforeSpeed_Sec > 0{
-			   //normal 无加速计算 秒数为beforeSpeed_Sec
-			   //speed 加速计算 秒数为current_UpdateTime-p_data.SpeedUp.Starting
-			} else {
-			   //speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
-			}
-			tmpLoginData.CD = tools.EnableSpeedUp(p_data.SpeedUp.Ending,current_UpdateTime)
-			tmpLoginData.Sec_EndingSpeedUp = p_data.SpeedUp.Ending - current_UpdateTime
-		} else{
-		    if last_UpdateTime >= p_data.SpeedUp.Ending{
-			   //normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
-			} else {    
-			 afterSpeed_Sec:=current_UpdateTime-p_data.SpeedUp.Ending //afterSpeed_Sec 为加速完成后还剩多少时间
-			 log.Debug("afterSpeed_Sec:%d",afterSpeed_Sec)
-		
-			 beforeSpeed_Sec:= p_data.SpeedUp.Starting - last_UpdateTime //beforeSpeed_Sec 没有加速前的正常时间
-			 if beforeSpeed_Sec > 0{
+
+	tmpLoginData := new(datastruct.TmpLoginData)
+	tmpLoginData.CD = 0
+	if p_data.SpeedUp != nil {
+		sec := p_data.SpeedUp.Ending - current_UpdateTime
+		if sec > 0 {
+			beforeSpeed_Sec := p_data.SpeedUp.Starting - last_UpdateTime
+			if beforeSpeed_Sec > 0 {
 				//normal 无加速计算 秒数为beforeSpeed_Sec
-				//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
-				//normal 无加速计算 秒数为afterSpeed_Sec
-			 }else{
-				//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
-				//normal 无加速计算 秒数为afterSpeed_Sec
-			 }
+				//speed 加速计算 秒数为current_UpdateTime-p_data.SpeedUp.Starting
+			} else {
+				//speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
 			}
-		    p_data.SpeedUp = nil
+			tmpLoginData.CD = tools.EnableSpeedUp(p_data.SpeedUp.Ending, current_UpdateTime)
+			tmpLoginData.Sec_EndingSpeedUp = p_data.SpeedUp.Ending - current_UpdateTime
+		} else {
+			if last_UpdateTime >= p_data.SpeedUp.Ending {
+				//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+			} else {
+				afterSpeed_Sec := current_UpdateTime - p_data.SpeedUp.Ending //afterSpeed_Sec 为加速完成后还剩多少时间
+				log.Debug("afterSpeed_Sec:%d", afterSpeed_Sec)
+
+				beforeSpeed_Sec := p_data.SpeedUp.Starting - last_UpdateTime //beforeSpeed_Sec 没有加速前的正常时间
+				if beforeSpeed_Sec > 0 {
+					//normal 无加速计算 秒数为beforeSpeed_Sec
+					//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
+					//normal 无加速计算 秒数为afterSpeed_Sec
+				} else {
+					//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
+					//normal 无加速计算 秒数为afterSpeed_Sec
+				}
+			}
+			p_data.SpeedUp = nil
 		}
 	} else {
-        //normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+		//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
 	}
 	p_data.UpdateTime = current_UpdateTime
 	//compute 计算 金币，蜂蜜，体力(阈值30)，狗(盾牌)
@@ -206,15 +207,15 @@ func (handle *EventHandler) BuyPetbar(key string, c *gin.Context) (datastruct.Co
 	return code, gold, animal, soil_id
 }
 
-func (handle *EventHandler) GetShopData(c *gin.Context, token string,soil_id int) {
+func (handle *EventHandler) GetShopData(c *gin.Context, token string, soil_id int) {
 	_, tf := handle.soils[soil_id]
-    if !tf{
+	if !tf {
 		c.JSON(200, gin.H{
 			"code": datastruct.GetDataFailed,
 		})
 		return
 	}
-	code,plantlevel:= handle.cacheHandler.GetPlantLevel(token,soil_id)
+	code, plantlevel := handle.cacheHandler.GetPlantLevel(token, soil_id)
 	if code != datastruct.NULLError {
 		c.JSON(200, gin.H{
 			"code": code,
@@ -255,46 +256,41 @@ func (handle *EventHandler) GetShopData(c *gin.Context, token string,soil_id int
 	})
 }
 
-func (handle *EventHandler) AddExpForAnimal(key string,c *gin.Context)(datastruct.CodeType,int64){
+func (handle *EventHandler) AddExpForAnimal(key string, c *gin.Context) (datastruct.CodeType, int64) {
 	var body datastruct.AddExpForAnimal
 	err := c.BindJSON(&body)
 	var code datastruct.CodeType
 	var currentExp int64
-	if err != nil{
-	   return datastruct.JsonParseFailedFromPostBody,-1
+	if err != nil {
+		return datastruct.JsonParseFailedFromPostBody, -1
 	}
 	_, tf := handle.soils[body.SoilId]
 	if !tf {
-	   return datastruct.UpdateDataFailed,-1
+		return datastruct.UpdateDataFailed, -1
 	}
-    code,currentExp = handle.cacheHandler.AddExpForAnimal(key,&body,handle.petbars,handle.plants)
-	return code,currentExp
+	code, currentExp = handle.cacheHandler.AddExpForAnimal(key, &body, handle.petbars, handle.plants)
+	return code, currentExp
 }
 
-func (handle *EventHandler)AnimalUpgrade(key string,c *gin.Context)(datastruct.CodeType,*datastruct.ResponseAnimalUpgrade){
+func (handle *EventHandler) AnimalUpgrade(key string, c *gin.Context) (datastruct.CodeType, *datastruct.ResponseAnimalUpgrade) {
 	var resp_data *datastruct.ResponseAnimalUpgrade
-	resp_data = nil 
+	resp_data = nil
 	var body datastruct.BuyPetbar
 	err := c.BindJSON(&body)
 	var code datastruct.CodeType
-	if err != nil{
-	 return datastruct.JsonParseFailedFromPostBody,resp_data
+	if err != nil {
+		return datastruct.JsonParseFailedFromPostBody, resp_data
 	}
-    code,resp_data = handle.cacheHandler.AnimalUpgrade(key,body.PetbarId,handle.petbars,handle.animals)
-	return code,resp_data
+	code, resp_data = handle.cacheHandler.AnimalUpgrade(key, body.PetbarId, handle.petbars, handle.animals)
+	return code, resp_data
 }
 
-
-func (handle *EventHandler)AddHoneyCount(key string)(datastruct.CodeType,*datastruct.ResponseAddHoney){
-	var resp_data *datastruct.ResponseAddHoney
-	resp_data = nil
-	var code datastruct.CodeType
-	code,resp_data = handle.cacheHandler.AddHoneyCount(key)
-	return code,resp_data
+func (handle *EventHandler) AddHoneyCount(key string) (datastruct.CodeType, *datastruct.ResponseAddHoney) {
+	return handle.cacheHandler.AddHoneyCount(key)
 }
 
-func (handle *EventHandler)EnableCollectHoney(key string)(datastruct.CodeType,int64){
-    return handle.cacheHandler.EnableCollectHoney(key)
+func (handle *EventHandler) EnableCollectHoney(key string) (datastruct.CodeType, int64) {
+	return handle.cacheHandler.EnableCollectHoney(key)
 }
 
 func (handle *EventHandler) Test1(c *gin.Context) {
@@ -305,7 +301,6 @@ func (handle *EventHandler) Test1(c *gin.Context) {
 		"code": 0,
 	})
 }
-
 
 func (handle *EventHandler) Test2(c *gin.Context) {
 	var body datastruct.UserLogin
