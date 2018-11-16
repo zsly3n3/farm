@@ -4,6 +4,7 @@ import (
 	"farm/datastruct"
 	"farm/log"
 	"fmt"
+	"time"
 
 	"github.com/go-xorm/xorm"
 )
@@ -67,7 +68,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		rollback(str, session)
 		return userinfo.Id
 	}
-	sql := fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,soil_level)VALUES(%d,%d,%d,%d)", userinfo.Id, p_data.HoneyCount, p_data.GoldCount, p_data.SoilLevel)
+	sql := fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,soil_level,stamina)VALUES(%d,%d,%d,%d,%d)", userinfo.Id, p_data.HoneyCount, p_data.GoldCount, p_data.SoilLevel, p_data.Stamina)
 	_, err = session.Exec(sql)
 	if err != nil {
 		str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE PlayerInfo :%s", err.Error())
@@ -116,6 +117,18 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 func rollback(err_str string, session *xorm.Session) {
 	log.Debug("will rollback,err_str:%v", err_str)
 	session.Rollback()
+}
+
+func (handle *DBHandler) InsertRewardStamina(player_id int) {
+	engine := handle.mysqlEngine
+	var rewardStamina datastruct.RewardStamina
+	rewardStamina.Id = player_id
+	rewardStamina.GetTime = time.Now().Unix()
+	_, err := engine.Insert(&rewardStamina)
+	if err != nil {
+		log.Debug("InsertRewardStamina error:%v", err.Error())
+	}
+	return
 }
 
 func (handle *DBHandler) GetPlantsSlice() []datastruct.Plant {

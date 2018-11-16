@@ -8,6 +8,8 @@ type TestData struct {
 	Avatar   string
 }
 
+const MaxStamina = 30
+
 // DBSessionGetError//xorm事务中Get方法执行出错
 // DBSessionExecError//xorm事务中Exec方法执行出错
 // DBSessionInsertError//xorm事务中Insert方法执行出错
@@ -32,6 +34,18 @@ const (
 	ExpIsNotFullForUpgradeAnimal                          //升级动物失败,经验值不满足 value=13
 	HoneyCountIsNotEnoughForUpgradeAnimal                 //升级动物失败,蜂蜜不足 value=14
 	AddHoneyCD                                            //采集时间未到
+)
+
+type RewardType int //奖励类型
+const (
+	Gold_10k   CodeType = iota //10k金币
+	Gold_103k                  //103k金币
+	Energy_UI1                 //能量
+	Gold_48k                   //48k金币
+	Gold_16k                   //16k金币
+	Gog                        //看护狗
+	Steal                      //偷取
+	Energy_UI2                 //能量
 )
 
 type Platform int //平台
@@ -75,6 +89,7 @@ type PlayerInfo struct {
 	HoneyCount int64 `xorm:"bigint not null"`     //蜂蜜数量
 	GoldCount  int64 `xorm:"bigint not null"`     //金币数量
 	SoilLevel  int   `xorm:"not null INT(11) "`   //玩家的土地购买等级
+	Stamina    int   `xorm:"not null INT(11) "`   //玩家当前体力值
 }
 
 type PlayerSpeedUp struct {
@@ -82,6 +97,12 @@ type PlayerSpeedUp struct {
 	Factor   int   `xorm:"not null INT(11)"`    //加速系数
 	Starting int64 `xorm:"not null bigint"`     //开始时间，时间戳
 	Ending   int64 `xorm:"not null bigint"`     //结束时间，时间戳
+}
+
+/*用户领取的体力记录*/
+type RewardStamina struct {
+	Id      int   `xorm:"not null pk INT(11)"` //关联UserInfo中id
+	GetTime int64 `xorm:"not null bigint"`     //领取时间，时间戳
 }
 
 //植物类型表
@@ -133,6 +154,7 @@ type PlayerData struct {
 	UpdateTime   int64  //最近一次登录的时间
 	GoldCount    int64  //金币数量
 	HoneyCount   int64  //蜂蜜数量
+	Stamina      int    //玩家当前体力值
 	NickName     string
 	Avatar       string
 	SoilLevel    int                          //可购买土地的等级

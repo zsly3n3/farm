@@ -38,6 +38,8 @@ func (handle *EventHandler) Login(c *gin.Context) {
 				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
 				if !isExistMysql {
 					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), "test", "avatar")
+					p_data.Id = handle.dbHandler.SetPlayerData(p_data) //入库
+					handle.dbHandler.InsertRewardStamina(p_data.Id)
 				} else {
 					tmpLoginData = handle.refreshPlayerData(p_data, body.IsAuth)
 				}
