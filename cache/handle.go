@@ -775,7 +775,7 @@ func (handle *CACHEHandler) LotterySteal(key string, addGold int64, addHoney int
 	}
 	resp_data := new(datastruct.ResponesLotteryData)
 	resp_data.GoldCount = rs_goldCount
-	resp_data.HoneyCount = rs_honeyCount
+	// resp_data.HoneyCount = rs_honeyCount
 	return datastruct.NULLError, resp_data
 }
 
