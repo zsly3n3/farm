@@ -67,7 +67,8 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 		datastruct.NickNameField, p_data.NickName,
 		datastruct.AvatarField, p_data.Avatar,
 		datastruct.SoilLevelField, p_data.SoilLevel,
-		datastruct.SpeedUpField, speedup_str)
+		datastruct.SpeedUpField, speedup_str,
+		datastruct.StaminaField, p_data.Stamina)
 
 	for k, v := range p_data.Soil {
 		soiltableName := fmt.Sprintf("soil%d", k)
@@ -102,7 +103,8 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 	value, err := redis.Values(conn.Do("hmget", key,
 		datastruct.IdField, datastruct.GoldField, datastruct.HoneyField,
 		datastruct.PermissionIdField, datastruct.CreatedAtField, datastruct.UpdateTimeField,
-		datastruct.NickNameField, datastruct.AvatarField, datastruct.SpeedUpField))
+		datastruct.NickNameField, datastruct.AvatarField, datastruct.SpeedUpField,
+		datastruct.StaminaField))
 	length := len(value)
 	if err != nil {
 		log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s", err.Error(), key)
@@ -133,6 +135,8 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 			if str != "" {
 				rs.SpeedUp, _ = tools.BytesToSpeedUp(tmp)
 			}
+		case 9:
+			rs.Stamina = tools.StringToInt(str)
 		}
 	}
 

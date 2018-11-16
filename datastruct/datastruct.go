@@ -66,6 +66,7 @@ const AvatarField = "Avatar"
 
 const SoilLevelField = "SoilLevel"
 const SpeedUpField = "SpeedUp"
+const StaminaField = "Stamina"
 
 const PlayerPetbarField = "PlayerPetbar"
 
