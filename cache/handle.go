@@ -628,9 +628,10 @@ func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 		log.Debug("CACHEHandler AddHoneyCount err:%s", err.Error())
 		return datastruct.GetDataFailed, nil
 	}
+
 	resp_data.SpeedUp = new(datastruct.ResponesSpeedUpData)
 	resp_data.SpeedUp.Factor = rs_tmp.Factor
-	resp_data.SpeedUp.Ending = rs_tmp.Ending
+	resp_data.SpeedUp.Ending = rs_tmp.Ending - now_Time.Unix()
 	return datastruct.NULLError, resp_data
 }
 
