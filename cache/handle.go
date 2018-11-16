@@ -697,7 +697,7 @@ func (handle *CACHEHandler) LotteryNomal(key string, body *datastruct.LotteryBod
 
 	value, _ := redis.String(conn.Do("hget", datastruct.GoldField, key))
 	goldCount := tools.StringToInt64(value)
-
+	log.Debug("--------------hget goldCount:%d", goldCount)
 	resp_data := new(datastruct.ResponesLotteryData)
 	rewardType := datastruct.RewardType(body.RewardType)
 
@@ -716,7 +716,7 @@ func (handle *CACHEHandler) LotteryNomal(key string, body *datastruct.LotteryBod
 		goldCount += addGold * int64(body.Expend)
 		resp_data.GoldCount = goldCount
 		resp_data.Stamina = stamina
-
+		log.Debug("--------------hmset goldCount:%d", goldCount)
 		_, err := conn.Do("hmset", key, datastruct.GoldField, goldCount, datastruct.StaminaField, stamina)
 		if err != nil {
 			log.Debug("CACHEHandler Lottery hmset_0 err:%s", err.Error())
@@ -774,8 +774,8 @@ func (handle *CACHEHandler) LotterySteal(key string, addGold int64, addHoney int
 		return datastruct.UpdateDataFailed, nil
 	}
 	resp_data := new(datastruct.ResponesLotteryData)
-	// resp_data.GoldCount =
-	// resp_data.=
+	resp_data.GoldCount = rs_goldCount
+	resp_data.HoneyCount = rs_honeyCount
 	return datastruct.NULLError, resp_data
 }
 
