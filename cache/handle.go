@@ -658,6 +658,33 @@ func (handle *CACHEHandler) EnableCollectHoney(key string) (datastruct.CodeType,
 	return datastruct.NULLError, CD
 }
 
+func (handle *CACHEHandler) GetStamina(key string) (datastruct.CodeType, int, int) {
+	conn := handle.GetConn()
+	defer conn.Close()
+	if !isExistUser(conn, key) {
+		return datastruct.GetDataFailed, -1, -1
+	}
+	value, err := redis.Values(conn.Do("hmget", key, datastruct.IdField, datastruct.StaminaField))
+	length := len(value)
+	if err != nil {
+		log.Debug("CACHEHandler GetStamina err:%s ,player:%s", err.Error(), key)
+		return datastruct.GetDataFailed, -1, -1
+	}
+	var player_id int
+	var stamina int
+	for i := 0; i < length; i++ {
+		tmp := value[i].([]byte)
+		str := string(tmp[:])
+		switch i {
+		case 0:
+			player_id = tools.StringToInt(str)
+		case 1:
+			stamina = tools.StringToInt(str)
+		}
+	}
+	return datastruct.NULLError, player_id, stamina
+}
+
 func (handle *CACHEHandler) TestMoney(key string) {
 	conn := handle.GetConn()
 	defer conn.Close()

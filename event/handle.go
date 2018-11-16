@@ -126,7 +126,6 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 	}
 
 	isGetedStamina := handle.dbHandler.IsGetStamina(p_data.Id)
-	log.Debug("isGetedStamina:%d", isGetedStamina)
 	if !isGetedStamina && p_data.Stamina < datastruct.MaxStamina {
 		p_data.Stamina = datastruct.MaxStamina
 	}
@@ -299,6 +298,27 @@ func (handle *EventHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 
 func (handle *EventHandler) EnableCollectHoney(key string) (datastruct.CodeType, int64) {
 	return handle.cacheHandler.EnableCollectHoney(key)
+}
+
+func (handle *EventHandler) GetStamina(key string) (datastruct.CodeType, *datastruct.ResponesStaminaData) {
+	code, player_id, stamina := handle.cacheHandler.GetStamina(key)
+	if code != datastruct.NULLError {
+		return code, nil
+	}
+	isGetedStamina := handle.dbHandler.IsGetStamina(player_id)
+	if !isGetedStamina && stamina < datastruct.MaxStamina {
+		stamina = datastruct.MaxStamina
+	}
+	resp_data := new(datastruct.ResponesStaminaData)
+	resp_data.Stamina = stamina
+
+	now_Time := time.Now()
+	tomorrow := now_Time.Add(24 * time.Hour)
+	year, month, day := tomorrow.Date()
+	tomorrow_Time := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+	resp_data.NextRequest = tomorrow_Time.Unix() - now_Time.Unix()
+
+	return datastruct.NULLError, resp_data
 }
 
 func (handle *EventHandler) Test1(c *gin.Context) {

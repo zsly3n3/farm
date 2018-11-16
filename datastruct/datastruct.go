@@ -514,6 +514,11 @@ type ResponesLottery struct {
 	CurrentStamina int `json:"currentstamina"` //体力值
 }
 
+type ResponesStaminaData struct {
+	Stamina     int   `json:"currentstamina"` //当前体力值
+	NextRequest int64 `json:"nextrequest"`    //下一次请求时间，单位是秒
+}
+
 //body
 type UserLogin struct {
 	PlatformId Platform `json:"platformid"` //平台
