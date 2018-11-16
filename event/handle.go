@@ -301,13 +301,17 @@ func (handle *EventHandler) EnableCollectHoney(key string) (datastruct.CodeType,
 }
 
 func (handle *EventHandler) GetStamina(key string) (datastruct.CodeType, *datastruct.ResponesStaminaData) {
-	code, player_id, stamina := handle.cacheHandler.GetStamina(key)
+	conn := handle.cacheHandler.GetConn()
+	defer conn.Close()
+	code, player_id, stamina := handle.cacheHandler.GetStamina(key, conn)
 	if code != datastruct.NULLError {
 		return code, nil
 	}
 	isGetedStamina := handle.dbHandler.IsGetStamina(player_id)
 	if !isGetedStamina && stamina < datastruct.MaxStamina {
 		stamina = datastruct.MaxStamina
+		handle.cacheHandler.SetStamina(key, stamina, conn)
+
 	}
 	resp_data := new(datastruct.ResponesStaminaData)
 	resp_data.Stamina = stamina
@@ -317,8 +321,41 @@ func (handle *EventHandler) GetStamina(key string) (datastruct.CodeType, *datast
 	year, month, day := tomorrow.Date()
 	tomorrow_Time := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
 	resp_data.NextRequest = tomorrow_Time.Unix() - now_Time.Unix()
-
 	return datastruct.NULLError, resp_data
+}
+
+func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.CodeType, *datastruct.ResponesLotteryData) {
+	var body datastruct.LotteryBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		return datastruct.JsonParseFailedFromPostBody, nil
+	}
+	if body.RewardType < int(datastruct.Gold_10k) || body.RewardType > int(datastruct.Energy_UI2) {
+		return datastruct.UpdateDataFailed, nil
+	}
+	conn := handle.cacheHandler.GetConn()
+	defer conn.Close()
+	code, player_id, stamina := handle.cacheHandler.GetStamina(key, conn)
+	if code != datastruct.NULLError {
+		return code, nil
+	}
+	isGetedStamina := handle.dbHandler.IsGetStamina(player_id)
+	if !isGetedStamina && stamina < datastruct.MaxStamina {
+		stamina = datastruct.MaxStamina
+		handle.cacheHandler.SetStamina(key, stamina, conn)
+	}
+	if stamina < body.Expend {
+		return datastruct.UpdateDataFailed, nil
+	}
+	stamina -= body.Expend
+	if datastruct.RewardType(body.RewardType) != datastruct.Steal {
+		return handle.cacheHandler.LotteryNomal(key, &body, stamina, conn)
+	}
+	var addGold int64
+	var addHoney int64
+	addGold = 100
+	addHoney = 100
+	return handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, conn)
 }
 
 func (handle *EventHandler) Test1(c *gin.Context) {

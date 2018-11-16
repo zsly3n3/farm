@@ -39,21 +39,14 @@ const (
 
 type RewardType int //奖励类型
 const (
-	Gold_10k   CodeType = iota //10k金币  0
-	Gold_103k                  //103k金币 1
-	Energy_UI1                 //能量     2
-	Gold_48k                   //48k金币  3
-	Gold_16k                   //16k金币  4
-	Gog                        //看护狗   5
-	Steal                      //偷取     6
-	Energy_UI2                 //能量     7
-)
-
-type ConsumeStaminaType int //消耗体力类型
-const (
-	ConsumeStamina1 = 1 //消耗1点体力
-	ConsumeStamina2 = 2 //消耗2点体力
-	// ConsumeStamina4 = 4 //消耗4点体力
+	Gold_10k   RewardType = iota //10k金币  0
+	Gold_103k                    //103k金币 1
+	Energy_UI1                   //能量     2
+	Gold_48k                     //48k金币  3
+	Gold_16k                     //16k金币  4
+	Gog                          //看护狗   5
+	Steal                        //偷取     6
+	Energy_UI2                   //能量     7
 )
 
 type Platform int //平台
@@ -534,6 +527,18 @@ type ResponesStaminaData struct {
 	NextRequest int64 `json:"nextrequest"`    //下一次请求时间，单位是秒
 }
 
+type ResponesLotteryData struct {
+	Stamina   int   `json:"currentstamina"` //当前体力值
+	GoldCount int64 `json:"goldcount"`
+	Stolen    *ResponseStolen
+}
+
+type ResponseStolen struct {
+	StolenGold  int64 `json:"stolengold"`
+	StolenHoney int64 `json:"stolenhoney"`
+	Succeed     int   `json:"succeed"`
+}
+
 //body
 type UserLogin struct {
 	PlatformId Platform `json:"platformid"` //平台
@@ -560,4 +565,9 @@ type BuyPetbar struct {
 type AddExpForAnimal struct {
 	PetbarId int `json:"petbarid"`
 	SoilId   int `json:"soilid"`
+}
+
+type LotteryBody struct {
+	RewardType int `json:"rewardtype"`
+	Expend     int `json:"expend"`
 }
