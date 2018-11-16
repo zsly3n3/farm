@@ -366,6 +366,7 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	mp["honeycount"] = &(p_data.HoneyCount)
 	mp["soil"] = responsePlayerSoil(p_data, plants)
 	mp["petbar"] = responsePetbarData(p_data, petbars, ani_mp)
+	mp["lottery"] = responesLottery(p_data)
 	if tmp == nil {
 		mp["speedcd"] = 0
 	} else {
@@ -469,6 +470,12 @@ func responsePetbarData(p_data *PlayerData, petbars map[AnimalType]PetbarData, a
 	return rs
 }
 
+func responesLottery(p_data *PlayerData) *ResponesLottery {
+	lottery := new(ResponesLottery)
+	lottery.Stamina = p_data.Stamina
+	return lottery
+}
+
 //Tmp数据，用于传递，不保存redis和mysql
 type TmpLoginData struct {
 	Sec_EndingSpeedUp int64 //还剩多少秒结束加速
@@ -498,6 +505,10 @@ type ResponseAddHoney struct {
 type ResponesSpeedUpData struct {
 	Factor int   `json:"factor"` //加速系数
 	Ending int64 `json:"ending"` //加速结束时间,多少秒之后结束
+}
+
+type ResponesLottery struct {
+	Stamina int `json:"stamina"` //体力值
 }
 
 //body
