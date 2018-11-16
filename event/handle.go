@@ -324,20 +324,21 @@ func (handle *EventHandler) GetStamina(key string) (datastruct.CodeType, *datast
 	return datastruct.NULLError, resp_data
 }
 
-func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.CodeType, *datastruct.ResponesLotteryData) {
+func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.CodeType, *datastruct.ResponesLotteryData, datastruct.RewardType) {
 	var body datastruct.LotteryBody
 	err := c.BindJSON(&body)
 	if err != nil {
-		return datastruct.JsonParseFailedFromPostBody, nil
+		return datastruct.JsonParseFailedFromPostBody, nil, -1
 	}
 	if body.RewardType < int(datastruct.Gold_10k) || body.RewardType > int(datastruct.Energy_UI2) {
-		return datastruct.UpdateDataFailed, nil
+		return datastruct.UpdateDataFailed, nil, -1
 	}
+	rewardType := datastruct.RewardType(body.RewardType)
 	conn := handle.cacheHandler.GetConn()
 	defer conn.Close()
 	code, player_id, stamina := handle.cacheHandler.GetStamina(key, conn)
 	if code != datastruct.NULLError {
-		return code, nil
+		return code, nil, -1
 	}
 	isGetedStamina := handle.dbHandler.IsGetStamina(player_id)
 	if !isGetedStamina && stamina < datastruct.MaxStamina {
@@ -345,17 +346,19 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 		handle.cacheHandler.SetStamina(key, stamina, conn)
 	}
 	if stamina < body.Expend {
-		return datastruct.UpdateDataFailed, nil
+		return datastruct.UpdateDataFailed, nil, -1
 	}
 	stamina -= body.Expend
-	if datastruct.RewardType(body.RewardType) != datastruct.Steal {
-		return handle.cacheHandler.LotteryNomal(key, &body, stamina, conn)
+	if rewardType != datastruct.Steal {
+		return handle.cacheHandler.LotteryNomal(key, rewardType, body.Expend, stamina, conn)
 	}
-	var addGold int64
-	var addHoney int64
-	addGold = 100
-	addHoney = 100
-	return handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, conn)
+	code, player_data := handle.dbHandler.LotterySteal(player_id)
+	if code != datastruct.NULLError {
+		return code, nil, -1
+	}
+	resp_data, addGold, addHoney := tools.ComputeSteal(player_data)
+	code, resp_data = handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, resp_data, conn)
+	return code, resp_data, rewardType
 }
 
 func (handle *EventHandler) Test1(c *gin.Context) {

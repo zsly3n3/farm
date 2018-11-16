@@ -316,3 +316,13 @@ func EnableSpeedUp(ending int64, current int64) int64 {
 func GetUpgradeLevelPriceForSoil(currentLevel int) int64 {
 	return 100
 }
+
+func ComputeSteal(p_data *datastruct.PlayerData) (*datastruct.ResponesLotteryData, int64, int64) {
+	resp_data := new(datastruct.ResponesLotteryData)
+	var addGold int64
+	var addHoney int64
+	addGold = 100
+	addHoney = 100
+
+	return resp_data, addGold, addHoney
+}

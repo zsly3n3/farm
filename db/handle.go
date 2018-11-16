@@ -138,6 +138,12 @@ func (handle *DBHandler) IsGetStamina(player_id int) bool {
 	return has
 }
 
+func (handle *DBHandler) LotterySteal(player_id int) (datastruct.CodeType, *datastruct.PlayerData) {
+	//compute
+
+	return datastruct.NULLError, nil
+}
+
 func (handle *DBHandler) GetPlantsSlice() []datastruct.Plant {
 	engine := handle.mysqlEngine
 	plants := make([]datastruct.Plant, 0)
