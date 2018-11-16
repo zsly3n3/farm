@@ -9,6 +9,7 @@ type TestData struct {
 }
 
 const MaxStamina = 30
+const MaxShield = 3
 
 // DBSessionGetError//xorm事务中Get方法执行出错
 // DBSessionExecError//xorm事务中Exec方法执行出错
@@ -38,14 +39,21 @@ const (
 
 type RewardType int //奖励类型
 const (
-	Gold_10k   CodeType = iota //10k金币
-	Gold_103k                  //103k金币
-	Energy_UI1                 //能量
-	Gold_48k                   //48k金币
-	Gold_16k                   //16k金币
-	Gog                        //看护狗
-	Steal                      //偷取
-	Energy_UI2                 //能量
+	Gold_10k   CodeType = iota //10k金币  0
+	Gold_103k                  //103k金币 1
+	Energy_UI1                 //能量     2
+	Gold_48k                   //48k金币  3
+	Gold_16k                   //16k金币  4
+	Gog                        //看护狗   5
+	Steal                      //偷取     6
+	Energy_UI2                 //能量     7
+)
+
+type ConsumeStaminaType int //消耗体力类型
+const (
+	ConsumeStamina1 = 1 //消耗1点体力
+	ConsumeStamina2 = 2 //消耗2点体力
+	// ConsumeStamina4 = 4 //消耗4点体力
 )
 
 type Platform int //平台
@@ -67,6 +75,7 @@ const AvatarField = "Avatar"
 const SoilLevelField = "SoilLevel"
 const SpeedUpField = "SpeedUp"
 const StaminaField = "Stamina"
+const ShieldField = "Shield"
 
 const PlayerPetbarField = "PlayerPetbar"
 
@@ -91,6 +100,7 @@ type PlayerInfo struct {
 	GoldCount  int64 `xorm:"bigint not null"`     //金币数量
 	SoilLevel  int   `xorm:"not null INT(11) "`   //玩家的土地购买等级
 	Stamina    int   `xorm:"not null INT(11) "`   //玩家当前体力值
+	Shield     int   `xorm:"not null INT(11) "`   //玩家当前的盾牌，可防止被偷取数据，UI上显示为狗
 }
 
 type PlayerSpeedUp struct {
@@ -156,6 +166,7 @@ type PlayerData struct {
 	GoldCount    int64  //金币数量
 	HoneyCount   int64  //蜂蜜数量
 	Stamina      int    //玩家当前体力值
+	Shield       int    //当前盾牌数量
 	NickName     string
 	Avatar       string
 	SoilLevel    int                          //可购买土地的等级
