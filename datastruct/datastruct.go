@@ -379,6 +379,7 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	mp["lottery"] = responesLottery(p_data)
 	farm_mp["goldcount"] = &(p_data.GoldCount)
 	farm_mp["honeycount"] = &(p_data.HoneyCount)
+	farm_mp["dogs"] = &(p_data.Shield)
 	farm_mp["soil"] = responsePlayerSoil(p_data, plants)
 	farm_mp["petbar"] = responsePetbarData(p_data, petbars, ani_mp)
 	if tmp == nil {
