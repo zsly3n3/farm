@@ -472,7 +472,8 @@ func responsePetbarData(p_data *PlayerData, petbars map[AnimalType]PetbarData, a
 
 func responesLottery(p_data *PlayerData) *ResponesLottery {
 	lottery := new(ResponesLottery)
-	lottery.Stamina = p_data.Stamina
+	lottery.MaxStamina = MaxStamina
+	lottery.CurrentStamina = p_data.Stamina
 	return lottery
 }
 
@@ -508,7 +509,8 @@ type ResponesSpeedUpData struct {
 }
 
 type ResponesLottery struct {
-	Stamina int `json:"stamina"` //体力值
+	MaxStamina     int `json:"maxstamina"`     //体力值
+	CurrentStamina int `json:"currentstamina"` //体力值
 }
 
 //body
