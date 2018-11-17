@@ -134,6 +134,7 @@ func (handle *DBHandler) LotterySteal(player_id int) *datastruct.PlayerData {
 	engine.Where("id <> ?", player_id).Find(&users)
 	var user datastruct.UserInfo
 	length := len(users)
+	log.Debug("users:%d", length)
 	if length <= 0 {
 		engine.Where("id = ?", player_id).Get(&user)
 	} else {
