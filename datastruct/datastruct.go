@@ -187,7 +187,7 @@ type Soil1 struct {
 	PId               int        `xorm:"not null pk INT(11)"` //玩家id
 	Level             int        `xorm:"not null INT(11)"`    //土地等级
 	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int        `xorm:"not null INT(11)"`    //升下一级的价格
+	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
 	Factor            int        `xorm:"not null INT(11)"`    //生产系数
 	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
 	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
@@ -197,7 +197,7 @@ type Soil2 struct {
 	PId               int        `xorm:"not null pk INT(11)"` //玩家id
 	Level             int        `xorm:"not null INT(11)"`    //土地等级
 	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int        `xorm:"not null INT(11)"`    //升下一级的价格
+	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
 	Factor            int        `xorm:"not null INT(11)"`    //生产系数
 	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
 	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
@@ -207,7 +207,7 @@ type Soil3 struct {
 	PId               int        `xorm:"not null pk INT(11)"` //玩家id
 	Level             int        `xorm:"not null INT(11)"`    //土地等级
 	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int        `xorm:"not null INT(11)"`    //升下一级的价格
+	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
 	Factor            int        `xorm:"not null INT(11)"`    //生产系数
 	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
 	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
@@ -217,7 +217,7 @@ type Soil4 struct {
 	PId               int        `xorm:"not null pk INT(11)"` //玩家id
 	Level             int        `xorm:"not null INT(11)"`    //土地等级
 	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int        `xorm:"not null INT(11)"`    //升下一级的价格
+	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
 	Factor            int        `xorm:"not null INT(11)"`    //生产系数
 	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
 	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
@@ -227,7 +227,7 @@ type Soil5 struct {
 	PId               int        `xorm:"not null pk INT(11)"` //玩家id
 	Level             int        `xorm:"not null INT(11)"`    //土地等级
 	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int        `xorm:"not null INT(11)"`    //升下一级的价格
+	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
 	Factor            int        `xorm:"not null INT(11)"`    //生产系数
 	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
 	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级

@@ -36,7 +36,7 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			var tmpLoginData *datastruct.TmpLoginData
 			p_data, isExistRedis = handle.cacheHandler.GetPlayerData(conn, openid) //find in redis
 			if !isExistRedis {
-				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
+				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid, handle.soils) //find in mysql
 				if !isExistMysql {
 					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), body.NickName, body.Avatar)
 					p_data.Id = handle.dbHandler.SetPlayerData(p_data) //入库
@@ -361,11 +361,8 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 	if rewardType != datastruct.Steal {
 		return handle.cacheHandler.LotteryNomal(key, rewardType, body.Expend, stamina, conn)
 	}
-	player_data := handle.dbHandler.LotterySteal(player_id)
+	player_data := handle.dbHandler.LotterySteal(player_id, handle.soils)
 	var tmpLoginData *datastruct.TmpLoginData
-	if player_data == nil {
-
-	}
 	resp_data, addGold, addHoney := handle.computeSteal(player_data, tmpLoginData, body.Expend)
 	code, resp_data = handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, resp_data, conn)
 	return code, resp_data, rewardType

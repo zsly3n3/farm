@@ -333,3 +333,63 @@ func RandInt(min int, max int) int {
 func GetUpgradeLevelPriceForSoil(currentLevel int) int64 {
 	return 100
 }
+
+func CreatePlayerSoil1(soil *datastruct.Soil1, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+	rs := new(datastruct.PlayerSoil)
+	rs.Factor = soil.Factor
+	rs.Level = soil.Level
+	rs.PlantId = soil.PlantId
+	rs.PlantLevel = soil.PlantLevel
+	rs.State = soil.State
+	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
+	rs.Price = soil_data.Price
+	return rs
+}
+
+func CreatePlayerSoil2(soil *datastruct.Soil2, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+	rs := new(datastruct.PlayerSoil)
+	rs.Factor = soil.Factor
+	rs.Level = soil.Level
+	rs.PlantId = soil.PlantId
+	rs.PlantLevel = soil.PlantLevel
+	rs.State = soil.State
+	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
+	rs.Price = soil_data.Price
+	return rs
+}
+
+func CreatePlayerSoil3(soil *datastruct.Soil3, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+	rs := new(datastruct.PlayerSoil)
+	rs.Factor = soil.Factor
+	rs.Level = soil.Level
+	rs.PlantId = soil.PlantId
+	rs.PlantLevel = soil.PlantLevel
+	rs.State = soil.State
+	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
+	rs.Price = soil_data.Price
+	return rs
+}
+
+func CreatePlayerSoil4(soil *datastruct.Soil4, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+	rs := new(datastruct.PlayerSoil)
+	rs.Factor = soil.Factor
+	rs.Level = soil.Level
+	rs.PlantId = soil.PlantId
+	rs.PlantLevel = soil.PlantLevel
+	rs.State = soil.State
+	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
+	rs.Price = soil_data.Price
+	return rs
+}
+
+func CreatePlayerSoil5(soil *datastruct.Soil5, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+	rs := new(datastruct.PlayerSoil)
+	rs.Factor = soil.Factor
+	rs.Level = soil.Level
+	rs.PlantId = soil.PlantId
+	rs.PlantLevel = soil.PlantLevel
+	rs.State = soil.State
+	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
+	rs.Price = soil_data.Price
+	return rs
+}
