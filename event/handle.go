@@ -157,8 +157,13 @@ func getPermissionId(isauth int) int {
 	return rs
 }
 
-func (handle *EventHandler) UpdatePermisson(key string, permissionId int) datastruct.CodeType {
-	code := handle.cacheHandler.UpdatePermisson(key, permissionId)
+func (handle *EventHandler) UpdatePermisson(key string, permissionId int, c *gin.Context) datastruct.CodeType {
+	var body datastruct.UserAuthBody
+	err := c.BindJSON(&body)
+	if err != nil {
+		return datastruct.JsonParseFailedFromPostBody
+	}
+	code := handle.cacheHandler.UpdatePermisson(key, permissionId, &body)
 	return code
 }
 

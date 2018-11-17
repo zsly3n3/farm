@@ -168,14 +168,13 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 	return rs
 }
 
-func (handle *CACHEHandler) UpdatePermisson(key string, permissionId int) datastruct.CodeType {
+func (handle *CACHEHandler) UpdatePermisson(key string, permissionId int, body *datastruct.UserAuthBody) datastruct.CodeType {
 	conn := handle.GetConn()
 	defer conn.Close()
 	if !isExistUser(conn, key) {
 		return datastruct.TokenError
 	}
-	rep, err := conn.Do("hset", key, datastruct.PermissionIdField, permissionId)
-	log.Debug("rep:%v", rep)
+	_, err := conn.Do("hmset", key, datastruct.PermissionIdField, permissionId, datastruct.NickNameField, body.NickName, datastruct.AvatarField, body.Avatar)
 	code := datastruct.NULLError
 	if err != nil {
 		code = datastruct.UpdateDataFailed

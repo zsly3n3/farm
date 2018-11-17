@@ -158,7 +158,7 @@ func updatePermisson(r *gin.Engine, eventHandler *event.EventHandler) {
 			return
 		}
 		permissonId := 2
-		code := eventHandler.UpdatePermisson(token, permissonId)
+		code := eventHandler.UpdatePermisson(token, permissonId, c)
 		c.JSON(200, gin.H{
 			"code": code,
 		})

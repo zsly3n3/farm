@@ -573,3 +573,8 @@ type LotteryBody struct {
 	RewardType int `json:"rewardtype"`
 	Expend     int `json:"expend"`
 }
+
+type UserAuthBody struct {
+	NickName string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+}
