@@ -3,6 +3,7 @@ package event
 import (
 	"farm/datastruct"
 	"farm/log"
+	"farm/thirdParty"
 	"farm/tools"
 	"time"
 
@@ -31,7 +32,7 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			conn := handle.cacheHandler.GetConn()
 			defer conn.Close()
 
-			openid := getOpenId(body.Code)
+			openid := getOpenId(body.Code, body.PlatformId)
 			var tmpLoginData *datastruct.TmpLoginData
 			p_data, isExistRedis = handle.cacheHandler.GetPlayerData(conn, openid) //find in redis
 			if !isExistRedis {
@@ -65,8 +66,11 @@ func (handle *EventHandler) Login(c *gin.Context) {
 	}
 }
 
-func getOpenId(code string) string {
-	return code
+func getOpenId(code string, platform datastruct.Platform) string {
+	if platform != datastruct.WX_Platform {
+		return code
+	}
+	return thirdParty.GetWXOpenID(code)
 }
 
 func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isauth int) *datastruct.TmpLoginData {
