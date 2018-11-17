@@ -385,6 +385,8 @@ func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, expend i
 		addGold = int64(100 * expend)
 		addHoney = int64(100 * expend)
 	}
+	resp_data.Stolen.StolenGold = addGold
+	resp_data.Stolen.StolenHoney = addHoney
 	player_mp := make(map[string]interface{})
 	farm_mp := make(map[string]interface{})
 	farm_mp["goldcount"] = &(p_data.GoldCount)
