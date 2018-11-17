@@ -66,7 +66,6 @@ func createSoil(soils map[int]datastruct.SoilData) map[int]*datastruct.PlayerSoi
 		}
 		tmp.Factor = v.Factor
 		tmp.Level = v.Level
-		tmp.Price = v.Price
 		tmp.UpgradeLevelPrice = tools.GetUpgradeLevelPriceForSoil(tmp.Level)
 		tmp.State = state
 		tmp.PlantLevel = 0

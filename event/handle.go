@@ -36,7 +36,7 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			var tmpLoginData *datastruct.TmpLoginData
 			p_data, isExistRedis = handle.cacheHandler.GetPlayerData(conn, openid) //find in redis
 			if !isExistRedis {
-				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid, handle.soils) //find in mysql
+				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
 				if !isExistMysql {
 					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), body.NickName, body.Avatar)
 					p_data.Id = handle.dbHandler.SetPlayerData(p_data) //入库
@@ -51,7 +51,7 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			}
 			c.JSON(200, gin.H{
 				"code": code,
-				"data": datastruct.ResponseLoginData(tmpLoginData, p_data, handle.plants, handle.petbars, handle.animals),
+				"data": datastruct.ResponseLoginData(tmpLoginData, p_data, handle.soils, handle.plants, handle.petbars, handle.animals),
 			})
 		} else {
 			c.JSON(200, gin.H{
@@ -361,14 +361,13 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 	if rewardType != datastruct.Steal {
 		return handle.cacheHandler.LotteryNomal(key, rewardType, body.Expend, stamina, conn)
 	}
-	player_data := handle.dbHandler.LotterySteal(player_id, handle.soils)
-	var tmpLoginData *datastruct.TmpLoginData
-	resp_data, addGold, addHoney := handle.computeSteal(player_data, tmpLoginData, body.Expend)
+	player_data := handle.dbHandler.LotterySteal(player_id)
+	resp_data, addGold, addHoney := handle.computeSteal(player_data, body.Expend)
 	code, resp_data = handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, resp_data, conn)
 	return code, resp_data, rewardType
 }
 
-func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, tmp *datastruct.TmpLoginData, expend int) (*datastruct.ResponesLotteryData, int64, int64) {
+func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, expend int) (*datastruct.ResponesLotteryData, int64, int64) {
 
 	//compute
 	resp_data := new(datastruct.ResponesLotteryData)
@@ -391,20 +390,9 @@ func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, tmp *dat
 	farm_mp["goldcount"] = &(p_data.GoldCount)
 	farm_mp["honeycount"] = &(p_data.HoneyCount)
 	farm_mp["dogs"] = &(p_data.Shield)
-	farm_mp["soil"] = datastruct.GetResponsePlayerSoil(p_data, handle.plants)
+	farm_mp["soil"] = datastruct.GetResponsePlayerSoil(p_data, handle.plants, handle.soils)
 	farm_mp["petbar"] = datastruct.GetResponsePetbarData(p_data, handle.petbars, handle.animals)
 
-	if tmp == nil {
-		farm_mp["speedcd"] = 0
-	} else {
-		farm_mp["speedcd"] = tmp.CD
-		if p_data.SpeedUp != nil {
-			resp_speed := new(datastruct.ResponesSpeedUpData)
-			resp_speed.Factor = p_data.SpeedUp.Factor
-			resp_speed.Ending = tmp.Sec_EndingSpeedUp
-			farm_mp["speedup"] = resp_speed
-		}
-	}
 	player_mp["nickname"] = &p_data.NickName
 	player_mp["avatar"] = &p_data.Avatar
 	player_mp["farm"] = farm_mp

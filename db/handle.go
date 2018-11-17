@@ -10,7 +10,7 @@ import (
 	"github.com/go-xorm/xorm"
 )
 
-func (handle *DBHandler) GetPlayerData(code string, soils map[int]datastruct.SoilData) (*datastruct.PlayerData, bool) {
+func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData, bool) {
 	isExist := false
 	var p_data *datastruct.PlayerData
 	user := new(datastruct.UserInfo)
@@ -18,7 +18,7 @@ func (handle *DBHandler) GetPlayerData(code string, soils map[int]datastruct.Soi
 	has, _ := engine.Where("identity_id=?", code).Get(user)
 	if has {
 		isExist = true
-		p_data = handle.getPlayerData(user, soils)
+		p_data = handle.getPlayerData(user)
 	}
 	return p_data, isExist
 }
@@ -127,7 +127,7 @@ func (handle *DBHandler) IsGetStamina(player_id int) bool {
 	return has
 }
 
-func (handle *DBHandler) LotterySteal(player_id int, soils map[int]datastruct.SoilData) *datastruct.PlayerData {
+func (handle *DBHandler) LotterySteal(player_id int) *datastruct.PlayerData {
 	//compute
 	engine := handle.mysqlEngine
 	users := make([]*datastruct.UserInfo, 0)
@@ -140,11 +140,11 @@ func (handle *DBHandler) LotterySteal(player_id int, soils map[int]datastruct.So
 		randIndex := tools.RandInt(0, length)
 		user = *(users[randIndex])
 	}
-	p_data := handle.getPlayerData(&user, soils)
+	p_data := handle.getPlayerData(&user)
 	return p_data
 }
 
-func (handle *DBHandler) getPlayerData(user *datastruct.UserInfo, soils map[int]datastruct.SoilData) *datastruct.PlayerData {
+func (handle *DBHandler) getPlayerData(user *datastruct.UserInfo) *datastruct.PlayerData {
 	engine := handle.mysqlEngine
 	p_data := new(datastruct.PlayerData)
 	p_data.Avatar = user.Avatar
@@ -167,52 +167,51 @@ func (handle *DBHandler) getPlayerData(user *datastruct.UserInfo, soils map[int]
 	petBar_mp := make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
 
 	var soil_1 datastruct.Soil1
-	engine.Where("p_id = ?", p_data.Id).Find(&soil_1)
-	soild_data := soils[1]
-	soil_mp[1] = tools.CreatePlayerSoil1(&soil_1, &soild_data)
+	engine.Where("p_id = ?", p_data.Id).Get(&soil_1)
+	soil_mp[1] = tools.CreatePlayerSoil1(&soil_1)
 
 	var soil_2 datastruct.Soil2
-	engine.Where("p_id = ?", p_data.Id).Find(&soil_2)
-	soild_data = soils[2]
-	soil_mp[2] = tools.CreatePlayerSoil2(&soil_2, &soild_data)
+	engine.Where("p_id = ?", p_data.Id).Get(&soil_2)
+	soil_mp[2] = tools.CreatePlayerSoil2(&soil_2)
 
 	var soil_3 datastruct.Soil3
-	engine.Where("p_id = ?", p_data.Id).Find(&soil_3)
-	soild_data = soils[3]
-	soil_mp[3] = tools.CreatePlayerSoil3(&soil_3, &soild_data)
+	engine.Where("p_id = ?", p_data.Id).Get(&soil_3)
+	soil_mp[3] = tools.CreatePlayerSoil3(&soil_3)
 
 	var soil_4 datastruct.Soil4
-	engine.Where("p_id = ?", p_data.Id).Find(&soil_4)
-	soild_data = soils[4]
-	soil_mp[4] = tools.CreatePlayerSoil4(&soil_4, &soild_data)
+	engine.Where("p_id = ?", p_data.Id).Get(&soil_4)
+	soil_mp[4] = tools.CreatePlayerSoil4(&soil_4)
 
 	var soil_5 datastruct.Soil5
-	engine.Where("p_id = ?", p_data.Id).Find(&soil_5)
-	soild_data = soils[5]
-	soil_mp[5] = tools.CreatePlayerSoil5(&soil_5, &soild_data)
+	engine.Where("p_id = ?", p_data.Id).Get(&soil_5)
+	soil_mp[5] = tools.CreatePlayerSoil5(&soil_5)
 
-	//PetBar       map[AnimalType]*PlayerPetbar //宠物栏信息
-	// SpeedUp      *SpeedUpData                 //全局加速数据
+	var petbar1 datastruct.Petbar1
+	engine.Where("p_id = ?", p_data.Id).Get(&petbar1)
+	petBar_mp[datastruct.Sea] = tools.CreatePetbar1(&petbar1)
 
-	// if p_data.SpeedUp != nil {
-	// 	sql := fmt.Sprintf("REPLACE INTO player_speed_up (id,factor,starting,ending)VALUES(%d,%d,%d,%d)", userinfo.Id, p_data.SpeedUp.Factor, p_data.SpeedUp.Starting, p_data.SpeedUp.Ending)
-	// 	_, err = session.Exec(sql)
-	// 	if err != nil {
-	// 		str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE player_speed_up :%s", err.Error())
-	// 		rollback(str, session)
-	// 		return userinfo.Id
-	// 	}
-	// }
+	var petbar2 datastruct.Petbar2
+	engine.Where("p_id = ?", p_data.Id).Get(&petbar2)
+	petBar_mp[datastruct.Land] = tools.CreatePetbar2(&petbar2)
 
-	// for k, v := range p_data.PetBar {
-	// 	sql = fmt.Sprintf("REPLACE INTO petbar%d (p_id,animal_number,current_exp,state)VALUES(%d,%d,%d,%d)", int(k), userinfo.Id, v.AnimalNumber, v.CurrentExp, int(v.State))
-	// 	_, err = session.Exec(sql)
-	// 	if err != nil {
-	// 		str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE PetBar :%s", err.Error())
-	// 		rollback(str, session)
-	// 		return userinfo.Id
-	// 	}
-	// }
+	var petbar3 datastruct.Petbar3
+	engine.Where("p_id = ?", p_data.Id).Get(&petbar3)
+	petBar_mp[datastruct.Fly] = tools.CreatePetbar3(&petbar3)
+
+	var petbar4 datastruct.Petbar4
+	engine.Where("p_id = ?", p_data.Id).Get(&petbar4)
+	petBar_mp[datastruct.Deity] = tools.CreatePetbar4(&petbar4)
+
+	var playerSpeedUp datastruct.PlayerSpeedUp
+	has, _ := engine.Where("id = ?", p_data.Id).Get(&playerSpeedUp)
+	if has {
+		speedup := new(datastruct.SpeedUpData)
+		speedup.Factor = playerSpeedUp.Factor
+		speedup.Starting = playerSpeedUp.Starting
+		speedup.Ending = playerSpeedUp.Ending
+	} else {
+		p_data.SpeedUp = nil
+	}
 	p_data.Soil = soil_mp
 	p_data.PetBar = petBar_mp
 	return p_data

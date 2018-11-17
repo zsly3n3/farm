@@ -272,7 +272,6 @@ type SoilData struct {
 
 type PlayerSoilBase struct {
 	Level             int        `json:"level"`             //土地等级
-	Price             int64      `json:"price"`             //购买价格
 	UpgradeLevelPrice int64      `json:"upgradelevelprice"` //升下一级的价格
 	Factor            int        `json:"factor"`            //生产系数
 	State             GoodsState `json:"state"`             //土地状态
@@ -286,7 +285,8 @@ type PlayerSoil struct {
 
 type ResponsePlayerSoilBase struct {
 	PlayerSoilBase
-	Id int `json:"id"` //土地id
+	Price int64 `json:"price"` //购买价格
+	Id    int   `json:"id"`    //土地id
 }
 
 type ResponsePlayerSoil struct {
@@ -360,7 +360,7 @@ const (
 	Deity                       //神
 )
 
-func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, petbars map[AnimalType]PetbarData, ani_mp map[AnimalType]map[int]Animal) map[string]interface{} {
+func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, soils map[int]SoilData, plants []Plant, petbars map[AnimalType]PetbarData, ani_mp map[AnimalType]map[int]Animal) map[string]interface{} {
 	if p_data == nil {
 		return nil
 	}
@@ -375,7 +375,7 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	farm_mp["goldcount"] = &(p_data.GoldCount)
 	farm_mp["honeycount"] = &(p_data.HoneyCount)
 	farm_mp["dogs"] = &(p_data.Shield)
-	farm_mp["soil"] = GetResponsePlayerSoil(p_data, plants)
+	farm_mp["soil"] = GetResponsePlayerSoil(p_data, plants, soils)
 	farm_mp["petbar"] = GetResponsePetbarData(p_data, petbars, ani_mp)
 	if tmp == nil {
 		farm_mp["speedcd"] = 0
@@ -392,7 +392,7 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	return mp
 }
 
-func GetResponsePlayerSoil(p_data *PlayerData, plants []Plant) []interface{} {
+func GetResponsePlayerSoil(p_data *PlayerData, plants []Plant, soils map[int]SoilData) []interface{} {
 	length := len(p_data.Soil)
 	start_index := 1
 	rs := make([]interface{}, length, length)
@@ -401,7 +401,7 @@ func GetResponsePlayerSoil(p_data *PlayerData, plants []Plant) []interface{} {
 		resp_base := new(ResponsePlayerSoilBase)
 		resp_base.Id = k
 		resp_base.Level = v.Level
-		resp_base.Price = v.Price
+		resp_base.Price = soils[k].Price
 		resp_base.UpgradeLevelPrice = v.UpgradeLevelPrice
 		resp_base.Factor = v.Factor
 		resp_base.State = v.State

@@ -334,7 +334,7 @@ func GetUpgradeLevelPriceForSoil(currentLevel int) int64 {
 	return 100
 }
 
-func CreatePlayerSoil1(soil *datastruct.Soil1, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+func CreatePlayerSoil1(soil *datastruct.Soil1) *datastruct.PlayerSoil {
 	rs := new(datastruct.PlayerSoil)
 	rs.Factor = soil.Factor
 	rs.Level = soil.Level
@@ -342,11 +342,10 @@ func CreatePlayerSoil1(soil *datastruct.Soil1, soil_data *datastruct.SoilData) *
 	rs.PlantLevel = soil.PlantLevel
 	rs.State = soil.State
 	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
-	rs.Price = soil_data.Price
 	return rs
 }
 
-func CreatePlayerSoil2(soil *datastruct.Soil2, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+func CreatePlayerSoil2(soil *datastruct.Soil2) *datastruct.PlayerSoil {
 	rs := new(datastruct.PlayerSoil)
 	rs.Factor = soil.Factor
 	rs.Level = soil.Level
@@ -354,11 +353,10 @@ func CreatePlayerSoil2(soil *datastruct.Soil2, soil_data *datastruct.SoilData) *
 	rs.PlantLevel = soil.PlantLevel
 	rs.State = soil.State
 	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
-	rs.Price = soil_data.Price
 	return rs
 }
 
-func CreatePlayerSoil3(soil *datastruct.Soil3, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+func CreatePlayerSoil3(soil *datastruct.Soil3) *datastruct.PlayerSoil {
 	rs := new(datastruct.PlayerSoil)
 	rs.Factor = soil.Factor
 	rs.Level = soil.Level
@@ -366,11 +364,10 @@ func CreatePlayerSoil3(soil *datastruct.Soil3, soil_data *datastruct.SoilData) *
 	rs.PlantLevel = soil.PlantLevel
 	rs.State = soil.State
 	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
-	rs.Price = soil_data.Price
 	return rs
 }
 
-func CreatePlayerSoil4(soil *datastruct.Soil4, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+func CreatePlayerSoil4(soil *datastruct.Soil4) *datastruct.PlayerSoil {
 	rs := new(datastruct.PlayerSoil)
 	rs.Factor = soil.Factor
 	rs.Level = soil.Level
@@ -378,11 +375,10 @@ func CreatePlayerSoil4(soil *datastruct.Soil4, soil_data *datastruct.SoilData) *
 	rs.PlantLevel = soil.PlantLevel
 	rs.State = soil.State
 	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
-	rs.Price = soil_data.Price
 	return rs
 }
 
-func CreatePlayerSoil5(soil *datastruct.Soil5, soil_data *datastruct.SoilData) *datastruct.PlayerSoil {
+func CreatePlayerSoil5(soil *datastruct.Soil5) *datastruct.PlayerSoil {
 	rs := new(datastruct.PlayerSoil)
 	rs.Factor = soil.Factor
 	rs.Level = soil.Level
@@ -390,6 +386,37 @@ func CreatePlayerSoil5(soil *datastruct.Soil5, soil_data *datastruct.SoilData) *
 	rs.PlantLevel = soil.PlantLevel
 	rs.State = soil.State
 	rs.UpgradeLevelPrice = soil.UpgradeLevelPrice
-	rs.Price = soil_data.Price
+	return rs
+}
+
+func CreatePetbar1(petbar *datastruct.Petbar1) *datastruct.PlayerPetbar {
+	rs := new(datastruct.PlayerPetbar)
+	rs.AnimalNumber = petbar.AnimalNumber
+	rs.CurrentExp = petbar.CurrentExp
+	rs.State = petbar.State
+	return rs
+}
+
+func CreatePetbar2(petbar *datastruct.Petbar2) *datastruct.PlayerPetbar {
+	rs := new(datastruct.PlayerPetbar)
+	rs.AnimalNumber = petbar.AnimalNumber
+	rs.CurrentExp = petbar.CurrentExp
+	rs.State = petbar.State
+	return rs
+}
+
+func CreatePetbar3(petbar *datastruct.Petbar3) *datastruct.PlayerPetbar {
+	rs := new(datastruct.PlayerPetbar)
+	rs.AnimalNumber = petbar.AnimalNumber
+	rs.CurrentExp = petbar.CurrentExp
+	rs.State = petbar.State
+	return rs
+}
+
+func CreatePetbar4(petbar *datastruct.Petbar4) *datastruct.PlayerPetbar {
+	rs := new(datastruct.PlayerPetbar)
+	rs.AnimalNumber = petbar.AnimalNumber
+	rs.CurrentExp = petbar.CurrentExp
+	rs.State = petbar.State
 	return rs
 }
