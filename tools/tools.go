@@ -1,14 +1,26 @@
 package tools
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"farm/datastruct"
 	"farm/log"
 	"fmt"
+	"math/rand"
 	"strconv"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
+
+func Int64ToBytes(i int64) []byte {
+	var buf = make([]byte, 8)
+	binary.BigEndian.PutUint64(buf, uint64(i))
+	return buf
+}
+
+func BytesToInt64(buf []byte) int64 {
+	return int64(binary.BigEndian.Uint64(buf))
+}
 
 func Int64ToString(tmp int64) string {
 	return strconv.FormatInt(tmp, 10)
@@ -278,6 +290,7 @@ func BytesToSliceInt(bytes []byte) ([]int, bool) {
 
 //level为升到当前多少级,price为土地初始价格
 func ComputeSoilLevelPrice(gold int64, level int, current *datastruct.PlayerSoil) (int64, *datastruct.ResponseUpgradeSoil) {
+	//compute
 	resp_upsoil := new(datastruct.ResponseUpgradeSoil)
 	rs_UpgradePrice := current.UpgradeLevelPrice
 	rs_factor := current.Factor
@@ -313,28 +326,10 @@ func EnableSpeedUp(ending int64, current int64) int64 {
 	return CD
 }
 
-func GetUpgradeLevelPriceForSoil(currentLevel int) int64 {
-	return 100
+func RandInt(min int, max int) int {
+	return min + rand.Intn(max-min)
 }
 
-func ComputeSteal(p_data *datastruct.PlayerData, expend int) (*datastruct.ResponesLotteryData, int64, int64) {
-
-	//compute
-	resp_data := new(datastruct.ResponesLotteryData)
-	resp_data.Stolen = new(datastruct.ResponseStolen)
-	resp_data.Stolen.Succeed = 1
-	if p_data.Shield > 0 {
-		resp_data.Stolen.Succeed = 0
-	}
-	var addGold int64
-	var addHoney int64
-	if resp_data.Stolen.Succeed == 1 {
-		addGold = int64(1000 * expend)
-		addHoney = int64(1000 * expend)
-	} else {
-		addGold = int64(100 * expend)
-		addHoney = int64(100 * expend)
-	}
-
-	return resp_data, addGold, addHoney
+func GetUpgradeLevelPriceForSoil(currentLevel int) int64 {
+	return 100
 }

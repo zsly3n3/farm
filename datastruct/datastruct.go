@@ -74,12 +74,12 @@ const PlayerPetbarField = "PlayerPetbar"
 
 type UserInfo struct {
 	Id           int    `xorm:"not null pk autoincr INT(11)"`
-	IdentityId   string `xorm:"VARCHAR(128) not null"` //标识id
-	PermissionId int    `xorm:"not null INT(11)"`      //权限id
-	CreatedAt    int64  `xorm:"bigint not null"`       //创建用户的时间
-	UpdateTime   int64  `xorm:"bigint not null"`       //最近一次离开或者登陆的时间
-	NickName     string `xorm:"VARCHAR(255) not null"` //昵称
-	Avatar       string `xorm:"VARCHAR(255) not null"` //头像
+	IdentityId   string `xorm:"VARCHAR(128) pk not null"` //标识id
+	PermissionId int    `xorm:"not null INT(11)"`         //权限id
+	CreatedAt    int64  `xorm:"bigint not null"`          //创建用户的时间
+	UpdateTime   int64  `xorm:"bigint not null"`          //最近一次离开或者登陆的时间
+	NickName     string `xorm:"VARCHAR(255) not null"`    //昵称
+	Avatar       string `xorm:"VARCHAR(255) not null"`    //头像
 }
 
 type Permission struct {
@@ -155,7 +155,7 @@ type PlayerData struct {
 	PermissionId int    //权限id
 	Token        string //标识id IdentityId
 	CreatedAt    int64  //创建用户的时间
-	UpdateTime   int64  //最近一次登录的时间
+	UpdateTime   int64  //最近一次操作的时间
 	GoldCount    int64  //金币数量
 	HoneyCount   int64  //蜂蜜数量
 	Stamina      int    //玩家当前体力值
@@ -373,8 +373,8 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	farm_mp["goldcount"] = &(p_data.GoldCount)
 	farm_mp["honeycount"] = &(p_data.HoneyCount)
 	farm_mp["dogs"] = &(p_data.Shield)
-	farm_mp["soil"] = responsePlayerSoil(p_data, plants)
-	farm_mp["petbar"] = responsePetbarData(p_data, petbars, ani_mp)
+	farm_mp["soil"] = GetResponsePlayerSoil(p_data, plants)
+	farm_mp["petbar"] = GetResponsePetbarData(p_data, petbars, ani_mp)
 	if tmp == nil {
 		farm_mp["speedcd"] = 0
 	} else {
@@ -390,7 +390,7 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	return mp
 }
 
-func responsePlayerSoil(p_data *PlayerData, plants []Plant) []interface{} {
+func GetResponsePlayerSoil(p_data *PlayerData, plants []Plant) []interface{} {
 	length := len(p_data.Soil)
 	start_index := 1
 	rs := make([]interface{}, length, length)
@@ -431,7 +431,7 @@ func createResponseSoilPlant(plant_id int, plants []Plant) *ResponseSoilPlant {
 	return rs
 }
 
-func responsePetbarData(p_data *PlayerData, petbars map[AnimalType]PetbarData, ani_mp map[AnimalType]map[int]Animal) []interface{} {
+func GetResponsePetbarData(p_data *PlayerData, petbars map[AnimalType]PetbarData, ani_mp map[AnimalType]map[int]Animal) []interface{} {
 	length := len(p_data.PetBar)
 	rs := make([]interface{}, length, length)
 	start_index := 6
@@ -535,9 +535,10 @@ type ResponesLotteryData struct {
 }
 
 type ResponseStolen struct {
-	StolenGold  int64 `json:"stolengold"`
-	StolenHoney int64 `json:"stolenhoney"`
-	Succeed     int   `json:"succeed"`
+	StolenGold  int64                  `json:"stolengold"`
+	StolenHoney int64                  `json:"stolenhoney"`
+	Succeed     int                    `json:"succeed"`
+	PlayerData  map[string]interface{} `json:"playerdata"`
 }
 
 //body

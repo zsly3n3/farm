@@ -38,7 +38,7 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			if !isExistRedis {
 				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
 				if !isExistMysql {
-					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), "test", "avatar")
+					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), body.NickName, body.Avatar)
 					p_data.Id = handle.dbHandler.SetPlayerData(p_data) //入库
 					handle.dbHandler.InsertRewardStamina(p_data.Id)
 				} else {
@@ -356,13 +356,58 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 	if rewardType != datastruct.Steal {
 		return handle.cacheHandler.LotteryNomal(key, rewardType, body.Expend, stamina, conn)
 	}
-	code, player_data := handle.dbHandler.LotterySteal(player_id)
-	if code != datastruct.NULLError {
-		return code, nil, -1
+	player_data := handle.dbHandler.LotterySteal(player_id)
+	var tmpLoginData *datastruct.TmpLoginData
+	if player_data == nil {
+
 	}
-	resp_data, addGold, addHoney := tools.ComputeSteal(player_data, body.Expend)
+	resp_data, addGold, addHoney := handle.computeSteal(player_data, tmpLoginData, body.Expend)
 	code, resp_data = handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, resp_data, conn)
 	return code, resp_data, rewardType
+}
+
+func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, tmp *datastruct.TmpLoginData, expend int) (*datastruct.ResponesLotteryData, int64, int64) {
+
+	//compute
+	resp_data := new(datastruct.ResponesLotteryData)
+	resp_data.Stolen = new(datastruct.ResponseStolen)
+	resp_data.Stolen.Succeed = 1
+	if p_data.Shield > 0 {
+		resp_data.Stolen.Succeed = 0
+	}
+	var addGold int64
+	var addHoney int64
+	if resp_data.Stolen.Succeed == 1 {
+		addGold = int64(1000 * expend)
+		addHoney = int64(1000 * expend)
+	} else {
+		addGold = int64(100 * expend)
+		addHoney = int64(100 * expend)
+	}
+	player_mp := make(map[string]interface{})
+	farm_mp := make(map[string]interface{})
+	farm_mp["goldcount"] = &(p_data.GoldCount)
+	farm_mp["honeycount"] = &(p_data.HoneyCount)
+	farm_mp["dogs"] = &(p_data.Shield)
+	farm_mp["soil"] = datastruct.GetResponsePlayerSoil(p_data, handle.plants)
+	farm_mp["petbar"] = datastruct.GetResponsePetbarData(p_data, handle.petbars, handle.animals)
+
+	if tmp == nil {
+		farm_mp["speedcd"] = 0
+	} else {
+		farm_mp["speedcd"] = tmp.CD
+		if p_data.SpeedUp != nil {
+			resp_speed := new(datastruct.ResponesSpeedUpData)
+			resp_speed.Factor = p_data.SpeedUp.Factor
+			resp_speed.Ending = tmp.Sec_EndingSpeedUp
+			farm_mp["speedup"] = resp_speed
+		}
+	}
+	player_mp["nickname"] = p_data.NickName
+	player_mp["avatar"] = p_data.Avatar
+	player_mp["farm"] = farm_mp
+	resp_data.Stolen.PlayerData = player_mp
+	return resp_data, addGold, addHoney
 }
 
 func (handle *EventHandler) Test1(c *gin.Context) {

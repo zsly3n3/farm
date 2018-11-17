@@ -482,6 +482,7 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 }
 
 func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (datastruct.CodeType, int64) {
+	//compute
 	value, err := redis.String(conn.Do("hget", key, datastruct.GoldField))
 	code := datastruct.NULLError
 	if err != nil {

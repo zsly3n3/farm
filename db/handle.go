@@ -3,6 +3,7 @@ package db
 import (
 	"farm/datastruct"
 	"farm/log"
+	"farm/tools"
 	"fmt"
 	"time"
 
@@ -11,27 +12,15 @@ import (
 
 func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData, bool) {
 	isExist := false
-	var rs *datastruct.PlayerData
+	var p_data *datastruct.PlayerData
 	user := new(datastruct.UserInfo)
 	engine := handle.mysqlEngine
 	has, _ := engine.Where("identity_id=?", code).Get(user)
 	if has {
 		isExist = true
-		//add
-		rs = new(datastruct.PlayerData)
-		rs.Avatar = user.Avatar
-		rs.CreatedAt = user.CreatedAt
-		rs.Id = user.Id
-		rs.NickName = user.NickName
-		rs.PermissionId = user.PermissionId
-		rs.Token = user.IdentityId
-		rs.UpdateTime = user.UpdateTime
-		var playerInfo datastruct.PlayerInfo
-		engine.Id(rs.Id).Get(&playerInfo)
-		rs.GoldCount = playerInfo.GoldCount
-		rs.HoneyCount = playerInfo.HoneyCount
+		p_data = handle.getPlayerData(user)
 	}
-	return rs, isExist
+	return p_data, isExist
 }
 
 func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
@@ -138,10 +127,67 @@ func (handle *DBHandler) IsGetStamina(player_id int) bool {
 	return has
 }
 
-func (handle *DBHandler) LotterySteal(player_id int) (datastruct.CodeType, *datastruct.PlayerData) {
+func (handle *DBHandler) LotterySteal(player_id int) *datastruct.PlayerData {
+	engine := handle.mysqlEngine
+	users := make([]*datastruct.UserInfo, 0)
+	err := engine.Where("id <> ?", player_id).Find(&users)
+	if err != nil || len(users) <= 0 {
+		return nil
+	}
 	//compute
+	randIndex := tools.RandInt(0, len(users))
+	p_data := handle.getPlayerData(users[randIndex])
+	return p_data
+}
 
-	return datastruct.NULLError, nil
+func (handle *DBHandler) getPlayerData(user *datastruct.UserInfo) *datastruct.PlayerData {
+	engine := handle.mysqlEngine
+	p_data := new(datastruct.PlayerData)
+	p_data.Avatar = user.Avatar
+	p_data.CreatedAt = user.CreatedAt
+	p_data.Id = user.Id
+	p_data.NickName = user.NickName
+	p_data.PermissionId = user.PermissionId
+	p_data.Token = user.IdentityId
+	p_data.UpdateTime = user.UpdateTime
+
+	var playerInfo datastruct.PlayerInfo
+	engine.Id(p_data.Id).Get(&playerInfo)
+	p_data.GoldCount = playerInfo.GoldCount
+	p_data.HoneyCount = playerInfo.HoneyCount
+	p_data.Stamina = playerInfo.Stamina
+	p_data.Shield = playerInfo.Shield
+	p_data.SoilLevel = playerInfo.SoilLevel
+
+	soil_mp := make(map[int]*datastruct.PlayerSoil)
+	petBar_mp := make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
+
+	// for k, _ := range soils {
+	// 	sql := fmt.Sprintf("select * from soil%d where p_id = %d", k, p_data.Id)
+	// 	results, err := engine.Query(sql)
+	// 	results[0][""]
+
+	// 	playerSoil := new(datastruct.PlayerSoil)
+	// 	playerSoil.Factor = results[0][""]
+	// 	soil_mp[k] = playerSoil
+	// }
+
+	// for k, v := range p_data.Soil {
+	// 	sql = fmt.Sprintf("REPLACE INTO soil%d (p_id,level,plant_id,upgrade_level_price,factor,state,plant_level)VALUES(%d,%d,%d,%d,%d,%d,%d)", k, userinfo.Id, v.Level, v.PlantId, v.UpgradeLevelPrice, v.Factor, int(v.State), v.PlantLevel)
+	// 	_, err = session.Exec(sql)
+	// 	if err != nil {
+	// 		str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE PetBar :%s", err.Error())
+	// 		rollback(str, session)
+	// 		return userinfo.Id
+	// 	}
+	// }
+
+	// Soil         map[int]*PlayerSoil          //玩家土地信息
+	// PetBar       map[AnimalType]*PlayerPetbar //宠物栏信息
+	// SpeedUp      *SpeedUpData                 //全局加速数据
+	p_data.Soil = soil_mp
+	p_data.PetBar = petBar_mp
+	return p_data
 }
 
 func (handle *DBHandler) GetPlantsSlice() []datastruct.Plant {
