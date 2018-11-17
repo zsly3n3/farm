@@ -327,7 +327,7 @@ func lottery(r *gin.Engine, eventHandler *event.EventHandler) {
 			}
 			c.JSON(200, gin.H{
 				"code": code,
-				"data": resp_data,
+				"data": mp,
 			})
 		} else {
 			c.JSON(200, gin.H{
