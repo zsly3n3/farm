@@ -191,8 +191,28 @@ func (handle *DBHandler) getPlayerData(user *datastruct.UserInfo, soils map[int]
 	soild_data = soils[5]
 	soil_mp[5] = tools.CreatePlayerSoil5(&soil_5, &soild_data)
 
-	// PetBar       map[AnimalType]*PlayerPetbar //宠物栏信息
+	//PetBar       map[AnimalType]*PlayerPetbar //宠物栏信息
 	// SpeedUp      *SpeedUpData                 //全局加速数据
+
+	// if p_data.SpeedUp != nil {
+	// 	sql := fmt.Sprintf("REPLACE INTO player_speed_up (id,factor,starting,ending)VALUES(%d,%d,%d,%d)", userinfo.Id, p_data.SpeedUp.Factor, p_data.SpeedUp.Starting, p_data.SpeedUp.Ending)
+	// 	_, err = session.Exec(sql)
+	// 	if err != nil {
+	// 		str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE player_speed_up :%s", err.Error())
+	// 		rollback(str, session)
+	// 		return userinfo.Id
+	// 	}
+	// }
+
+	// for k, v := range p_data.PetBar {
+	// 	sql = fmt.Sprintf("REPLACE INTO petbar%d (p_id,animal_number,current_exp,state)VALUES(%d,%d,%d,%d)", int(k), userinfo.Id, v.AnimalNumber, v.CurrentExp, int(v.State))
+	// 	_, err = session.Exec(sql)
+	// 	if err != nil {
+	// 		str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE PetBar :%s", err.Error())
+	// 		rollback(str, session)
+	// 		return userinfo.Id
+	// 	}
+	// }
 	p_data.Soil = soil_mp
 	p_data.PetBar = petBar_mp
 	return p_data

@@ -405,8 +405,8 @@ func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, tmp *dat
 			farm_mp["speedup"] = resp_speed
 		}
 	}
-	player_mp["nickname"] = p_data.NickName
-	player_mp["avatar"] = p_data.Avatar
+	player_mp["nickname"] = &p_data.NickName
+	player_mp["avatar"] = &p_data.Avatar
 	player_mp["farm"] = farm_mp
 	resp_data.Stolen.PlayerData = player_mp
 	return resp_data, addGold, addHoney

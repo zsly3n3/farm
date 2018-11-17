@@ -367,6 +367,8 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, plants []Plant, pe
 	mp := make(map[string]interface{})
 	farm_mp := make(map[string]interface{})
 	mp["farm"] = farm_mp
+	mp["nickname"] = &p_data.NickName
+	mp["avatar"] = &p_data.Avatar
 	mp["permissionid"] = &(p_data.PermissionId)
 	mp["token"] = &(p_data.Token)
 	mp["lottery"] = responesLottery(p_data)
