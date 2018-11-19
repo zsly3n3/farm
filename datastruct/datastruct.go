@@ -10,6 +10,7 @@ type TestData struct {
 
 const MaxStamina = 30
 const MaxShield = 3
+const DefaultSpeedUpFactor = 1
 
 // DBSessionGetError//xorm事务中Get方法执行出错
 // DBSessionExecError//xorm事务中Exec方法执行出错

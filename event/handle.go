@@ -2,7 +2,6 @@ package event
 
 import (
 	"farm/datastruct"
-	"farm/log"
 	"farm/thirdParty"
 	"farm/tools"
 	"time"
@@ -94,39 +93,50 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 
 	tmpLoginData := new(datastruct.TmpLoginData)
 	tmpLoginData.CD = 0
+	var addGold int64
+	addGold = 0
 	if p_data.SpeedUp != nil {
 		sec := p_data.SpeedUp.Ending - current_UpdateTime
 		if sec > 0 {
 			beforeSpeed_Sec := p_data.SpeedUp.Starting - last_UpdateTime
 			if beforeSpeed_Sec > 0 {
 				//normal 无加速计算 秒数为beforeSpeed_Sec
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
 				//speed 加速计算 秒数为current_UpdateTime-p_data.SpeedUp.Starting
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, current_UpdateTime-p_data.SpeedUp.Starting)
 			} else {
 				//speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, current_UpdateTime-last_UpdateTime)
 			}
 			tmpLoginData.CD = tools.EnableSpeedUp(p_data.SpeedUp.Ending, current_UpdateTime)
 			tmpLoginData.Sec_EndingSpeedUp = p_data.SpeedUp.Ending - current_UpdateTime
 		} else {
 			if last_UpdateTime >= p_data.SpeedUp.Ending {
 				//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
 			} else {
 				afterSpeed_Sec := current_UpdateTime - p_data.SpeedUp.Ending //afterSpeed_Sec 为加速完成后还剩多少时间
-				log.Debug("afterSpeed_Sec:%d", afterSpeed_Sec)
 
 				beforeSpeed_Sec := p_data.SpeedUp.Starting - last_UpdateTime //beforeSpeed_Sec 没有加速前的正常时间
 				if beforeSpeed_Sec > 0 {
 					//normal 无加速计算 秒数为beforeSpeed_Sec
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
 					//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, p_data.SpeedUp.Ending-p_data.SpeedUp.Starting)
 					//normal 无加速计算 秒数为afterSpeed_Sec
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
 				} else {
 					//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, p_data.SpeedUp.Ending-last_UpdateTime)
 					//normal 无加速计算 秒数为afterSpeed_Sec
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
 				}
 			}
 			p_data.SpeedUp = nil
 		}
 	} else {
 		//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+		addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
 	}
 
 	isGetedStamina := handle.dbHandler.IsGetStamina(p_data.Id)
@@ -134,8 +144,7 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 		p_data.Stamina = datastruct.MaxStamina
 	}
 	p_data.UpdateTime = current_UpdateTime
-	//compute 计算 金币，蜂蜜，体力(阈值30)，狗(盾牌)
-
+	p_data.GoldCount += addGold
 	return tmpLoginData
 }
 

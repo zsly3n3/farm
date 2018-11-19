@@ -442,3 +442,8 @@ func UniqueId() string {
 	}
 	return getMd5String(base64.URLEncoding.EncodeToString(b))
 }
+
+func ComputeCurrentGold(soil map[int]*datastruct.PlayerSoil, petbar map[datastruct.AnimalType]*datastruct.PlayerPetbar, factor int, sec int64) int64 {
+
+	return 0
+}
