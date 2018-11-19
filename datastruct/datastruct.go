@@ -119,7 +119,7 @@ type PlantClass struct {
 //植物表
 type Plant struct {
 	Id           int    `xorm:"not null pk autoincr INT(11)" json:"id"`
-	Name         string `xorm:"VARCHAR(64) not null" json:"name"`    //植物名称
+	Name         string `xorm:"VARCHAR(64) not null" json:"name"`    //ui图片名称
 	Price        int64  `xorm:"not null INT(11)" json:"price"`       //价格
 	InCome       int64  `xorm:"not null INT(11)" json:"income"`      //初始收益
 	ExpForAnimal int64  `xorm:"not null bigint" json:"exp"`          //增加动物经验
@@ -132,12 +132,13 @@ type Plant struct {
 //动物表
 type Animal struct {
 	Id         int    `xorm:"not null pk autoincr INT(11)"`
-	Name       string `xorm:"VARCHAR(64) not null "` //名称
+	Name       string `xorm:"VARCHAR(64) not null "` //ui图片名称
 	InCome     int64  `xorm:"not null INT(11) "`     //初始收益
 	Exp        int64  `xorm:"not null bigint"`       //升级所需经验
 	HoneyCount int64  `xorm:"not null bigint"`       //升级所需的蜂蜜
 	ClassId    int    `xorm:"not null INT(11) "`     //关联AnimalClass中id
 	Number     int    `xorm:"not null INT(11) "`     //动物编号
+	CName      string `xorm:"VARCHAR(64) not null"`  //动物中文名称
 }
 
 //动物类型表
