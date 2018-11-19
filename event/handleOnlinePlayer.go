@@ -31,10 +31,9 @@ func (handle *EventHandler) selectTicker() {
 }
 
 func (handle *EventHandler) checkOnlinePlayer() {
-
 	currentTime := time.Now().Unix()
-	slice := make([]interface{}, 1, 1)
-	slice[0] = "tmp"
+	slice := make([]interface{}, 0)
+	slice = append(slice, "tmp")
 	handle.onlinePlayers.Lock.Lock()
 	defer handle.onlinePlayers.Lock.Unlock()
 	for k, v := range handle.onlinePlayers.Bm {
@@ -49,7 +48,7 @@ func (handle *EventHandler) checkOnlinePlayer() {
 			}
 		}
 	}
-	if len(slice) > 0 {
+	if len(slice) > 1 {
 		conn := handle.cacheHandler.GetConn()
 		defer conn.Close()
 		for _, v := range slice {

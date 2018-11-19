@@ -102,7 +102,9 @@ func (handle *CACHEHandler) DeletedKeys(keys []interface{}, petbars map[datastru
 	conn := handle.GetConn()
 	defer conn.Close()
 	conn.Send("MULTI")
-	conn.Send("del", keys[1:]...)
+	new_keys := keys[1:]
+	log.Debug("new_keys:%v", new_keys)
+	conn.Send("del", new_keys...)
 	for k, _ := range petbars {
 		petbarStr := fmt.Sprintf("petbar%d", int(k))
 		keys[0] = petbarStr
