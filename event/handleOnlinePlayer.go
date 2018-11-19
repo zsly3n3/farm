@@ -38,7 +38,6 @@ func (handle *EventHandler) checkOnlinePlayer() {
 	handle.onlinePlayers.Lock.Lock()
 	defer handle.onlinePlayers.Lock.Unlock()
 	for k, v := range handle.onlinePlayers.Bm {
-		log.Debug("----%v", v)
 		if v.WillDelete {
 			slice = append(slice, k)
 		} else {
@@ -56,6 +55,7 @@ func (handle *EventHandler) checkOnlinePlayer() {
 		for _, v := range slice {
 			delete(handle.onlinePlayers.Bm, v)
 		}
+		log.Debug("----%v", slice)
 		handle.deletefromRedis(slice)
 	}
 }
