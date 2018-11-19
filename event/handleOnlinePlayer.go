@@ -49,11 +49,16 @@ func (handle *EventHandler) checkOnlinePlayer() {
 		}
 	}
 	if len(slice) > 0 {
+		conn := handle.cacheHandler.GetConn()
+		defer conn.Close()
 		for _, v := range slice {
 			delete(handle.onlinePlayers.Bm, v)
 		}
-		//delete from redis with key
+		handle.deletefromRedis(slice)
 	}
+}
+func (handle *EventHandler) deletefromRedis(keys []string) {
+	handle.cacheHandler.DeletedKeys(keys, handle.petbars, handle.soils)
 }
 
 func (handle *EventHandler) createUser(code string, permissionId int, nickName string, avatar string) *datastruct.PlayerData {
