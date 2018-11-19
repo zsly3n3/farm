@@ -34,6 +34,7 @@ func (handle *EventHandler) checkOnlinePlayer() {
 
 	currentTime := time.Now().Unix()
 	slice := make([]interface{}, 1, 1)
+	slice[0] = "tmp"
 	handle.onlinePlayers.Lock.Lock()
 	defer handle.onlinePlayers.Lock.Unlock()
 	for k, v := range handle.onlinePlayers.Bm {
