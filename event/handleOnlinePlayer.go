@@ -2,9 +2,9 @@ package event
 
 import (
 	"farm/datastruct"
+	"farm/log"
 	"farm/tools"
 	"time"
-	// "farm/log"
 )
 
 func (handle *EventHandler) createTicker(times time.Duration) {
@@ -32,11 +32,13 @@ func (handle *EventHandler) selectTicker() {
 }
 
 func (handle *EventHandler) checkOnlinePlayer() {
+
 	currentTime := time.Now().Unix()
 	slice := make([]string, 0)
 	handle.onlinePlayers.Lock.Lock()
 	defer handle.onlinePlayers.Lock.Unlock()
 	for k, v := range handle.onlinePlayers.Bm {
+		log.Debug("----%v", v)
 		if v.WillDelete {
 			slice = append(slice, k)
 		} else {
