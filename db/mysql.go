@@ -1,6 +1,7 @@
 package db
 
 import (
+	"farm/conf"
 	"farm/datastruct"
 	"farm/log"
 	"farm/tools"
@@ -10,18 +11,13 @@ import (
 	"github.com/go-xorm/xorm"
 )
 
-const DB_IP = "localhost:3306"
-const DB_Name = "farm"
-const DB_UserName = "root"
-const DB_Pwd = "Zsly3n@s"
-
 type DBHandler struct {
 	mysqlEngine *xorm.Engine
 }
 
 func CreateDBHandler() *DBHandler {
 	dbHandler := new(DBHandler)
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4", DB_UserName, DB_Pwd, DB_IP, DB_Name)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4", conf.Server.DB_UserName, conf.Server.DB_Pwd, conf.Server.DB_IP, conf.Server.DB_Name)
 	engine, err := xorm.NewEngine("mysql", dsn)
 	errhandle(err)
 	err = engine.Ping()
@@ -65,7 +61,7 @@ func resetDB(engine *xorm.Engine) {
 }
 
 func initData(engine *xorm.Engine) {
-	execStr := fmt.Sprintf("ALTER DATABASE %s CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;", DB_Name)
+	execStr := fmt.Sprintf("ALTER DATABASE %s CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;", conf.Server.DB_Name)
 	_, err := engine.Exec(execStr)
 	errhandle(err)
 	_, err = engine.Exec("ALTER TABLE user_info CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;")

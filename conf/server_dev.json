@@ -1,0 +1,10 @@
+{
+	"HttpServer":"https://swnc.lemeow.cn/dev",
+	"Redis_IP":"localhost:6379",
+	"Redis_Name":"0",
+	"Redis_Pwd":"Zsly3n@s",
+	"DB_IP":"localhost:3306",
+	"DB_Name":"farm_dev",
+	"DB_UserName":"root",
+	"DB_Pwd":"Zsly3n@s"
+}
