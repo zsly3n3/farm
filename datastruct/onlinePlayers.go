@@ -4,32 +4,29 @@ import (
 	"sync"
 )
 
-type OnlinePlayer struct {
-}
-
 /*只统计执行过匹配的在线玩家们*/
 type OnlinePlayers struct {
-	Lock *sync.RWMutex           //读写互斥量
-	Bm   map[string]OnlinePlayer //map[int]*Player 根据Id保存
+	Lock *sync.RWMutex   //读写互斥量
+	Bm   map[string]bool //根据token保存
 }
 
 // NewOnlinePlayers return new OnlinePlayers
 func NewOnlinePlayers() *OnlinePlayers {
 	return &OnlinePlayers{
 		Lock: new(sync.RWMutex),
-		Bm:   make(map[string]OnlinePlayer),
+		Bm:   make(map[string]bool),
 	}
 }
 
 // Get from maps return the k's value
-func (m *OnlinePlayers) Get(k string) (OnlinePlayer, bool) {
+func (m *OnlinePlayers) Get(k string) (bool, bool) {
 	m.Lock.RLock()
 	defer m.Lock.RUnlock()
 	val, ok := m.Bm[k]
 	if ok {
 		return val, ok
 	}
-	return OnlinePlayer{}, ok
+	return false, ok
 }
 
 // func (m *OnlinePlayers) GetAndUpdateState(key []string,state PlayerEnterType,room_id string) []Player {
@@ -73,7 +70,7 @@ func (m *OnlinePlayers) Get(k string) (OnlinePlayer, bool) {
 // }
 
 // Check Returns true if k is exist in the map.
-func (m *OnlinePlayers) Check(k string) (OnlinePlayer, bool) {
+func (m *OnlinePlayers) Check(k string) (bool, bool) {
 	m.Lock.RLock()
 	defer m.Lock.RUnlock()
 	v, ok := m.Bm[k]
@@ -95,9 +92,9 @@ func (m *OnlinePlayers) Delete(k string) {
 }
 
 // Items returns all items in safemap.
-func (m *OnlinePlayers) Items() map[string]OnlinePlayer {
+func (m *OnlinePlayers) Items() map[string]bool {
 	m.Lock.RLock()
-	r := make(map[string]OnlinePlayer)
+	r := make(map[string]bool)
 	for k, v := range m.Bm {
 		r[k] = v
 	}
