@@ -52,6 +52,7 @@ func (handle *EventHandler) checkOnlinePlayer() {
 		for _, v := range slice {
 			delete(handle.onlinePlayers.Bm, v)
 		}
+		//delete from redis with key
 	}
 }
 
