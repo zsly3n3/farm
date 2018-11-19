@@ -337,6 +337,22 @@ func lottery(r *gin.Engine, eventHandler *event.EventHandler) {
 	})
 }
 
+func refreshOnlineState(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.GET("/user/refreshOnlineState", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c)
+		if !tf {
+			return
+		}
+		code := eventHandler.RefreshOnlineState(token)
+		c.JSON(200, gin.H{
+			"code": code,
+		})
+	})
+}
+
 func test1(r *gin.Engine, eventHandler *event.EventHandler) {
 	r.POST("/Test1", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
@@ -400,6 +416,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	enableCollectHoney(r, eventHandler)
 	getStamina(r, eventHandler)
 	lottery(r, eventHandler)
+	refreshOnlineState(r, eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }

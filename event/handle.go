@@ -429,6 +429,10 @@ func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, expend i
 	return resp_data, addGold, addHoney
 }
 
+func (handle *EventHandler) RefreshOnlineState(key string) datastruct.CodeType {
+	return datastruct.NULLError
+}
+
 func (handle *EventHandler) Test1(c *gin.Context) {
 	var body datastruct.UserLogin
 	c.BindJSON(&body)
