@@ -102,17 +102,17 @@ func (handle *CACHEHandler) DeletedKeys(keys []string, petbars map[datastruct.An
 	conn := handle.GetConn()
 	defer conn.Close()
 	conn.Send("MULTI")
-
 	for _, v := range keys {
 		conn.Send("del", v)
-		for k, _ := range petbars {
-			petbarStr := fmt.Sprintf("petbar%d", int(k))
-			conn.Send("hdel", petbarStr, v)
-		}
-		for k, _ := range soils {
-			soilStr := fmt.Sprintf("soil%d", int(k))
-			conn.Send("hdel", soilStr, v)
-		}
+		// for k, _ := range petbars {
+		// 	petbarStr := fmt.Sprintf("petbar%d", int(k))
+		// 	conn.Send("hdel", petbarStr, v)
+		// }
+		// for k, _ := range soils {
+		// 	soilStr := fmt.Sprintf("soil%d", int(k))
+		// 	conn.Send("hdel", soilStr, v)
+		// }
+		log.Debug("del key:%v", v)
 	}
 
 	_, err := conn.Do("EXEC")
