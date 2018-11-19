@@ -37,7 +37,7 @@ func getShopData(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -51,7 +51,7 @@ func plant(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -93,7 +93,7 @@ func buyPetbar(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -130,7 +130,7 @@ func upgradeSoil(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -153,7 +153,7 @@ func updatePermisson(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -170,7 +170,7 @@ func addExpForAnimal(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -195,7 +195,7 @@ func animalUpgrade(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -233,7 +233,7 @@ func addHoneyCount(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -263,7 +263,7 @@ func enableCollectHoney(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -288,7 +288,7 @@ func getStamina(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -311,7 +311,7 @@ func lottery(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -342,7 +342,7 @@ func refreshOnlineState(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
-		token, tf := checkToken(c)
+		token, tf := checkToken(c, eventHandler)
 		if !tf {
 			return
 		}
@@ -371,16 +371,20 @@ func test2(r *gin.Engine, eventHandler *event.EventHandler) {
 	})
 }
 
-func checkToken(c *gin.Context) (string, bool) {
+func checkToken(c *gin.Context, eventHandler *event.EventHandler) (string, bool) {
 	tokens, isExist := c.Request.Header["Apptoken"]
 	tf := false
 	var token string
 	if isExist {
 		token = tokens[0]
 		if token != "" {
-			tf = true
+			tf = eventHandler.IsExistUser(token)
+			if tf {
+				eventHandler.PlayerIsOnline(token)
+			}
 		}
-	} else {
+	}
+	if !tf {
 		c.JSON(200, gin.H{
 			"code": datastruct.TokenError,
 		})

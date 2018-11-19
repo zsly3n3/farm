@@ -32,7 +32,7 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			defer conn.Close()
 
 			openid := getOpenId(body.Code, body.PlatformId)
-			handle.playerIsOnline(openid)
+			handle.PlayerIsOnline(openid)
 			var tmpLoginData *datastruct.TmpLoginData
 			p_data, isExistRedis = handle.cacheHandler.GetPlayerData(conn, openid) //find in redis
 			if !isExistRedis {
@@ -383,7 +383,7 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 		var user *datastruct.UserInfo
 		randIndex := tools.RandInt(0, length)
 		user = users[randIndex]
-		if handle.cacheHandler.IsExistUser(conn, key) {
+		if handle.cacheHandler.IsExistUserWithConn(conn, key) {
 			player_data = handle.cacheHandler.ReadPlayerData(conn, key)
 		} else {
 			player_data = handle.dbHandler.GetPlayerDataFromDataBase(user)
@@ -396,7 +396,6 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 }
 
 func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, expend int) (*datastruct.ResponesLotteryData, int64, int64) {
-
 	//compute
 	resp_data := new(datastruct.ResponesLotteryData)
 	resp_data.Stolen = new(datastruct.ResponseStolen)
@@ -434,12 +433,20 @@ func (handle *EventHandler) RefreshOnlineState(key string) datastruct.CodeType {
 	return datastruct.NULLError
 }
 
-func (handle *EventHandler) playerIsOnline(token string) {
-	onlineTime := time.Now().Unix()
+func (handle *EventHandler) PlayerIsOnline(token string) {
+
+	now := time.Now()
+	mm, _ := time.ParseDuration(datastruct.AddMinute)
+	onlineTime := now.Add(mm)
+
 	onlinePlayerData := new(datastruct.OnlinePlayerData)
-	onlinePlayerData.OnlineTime = onlineTime
+	onlinePlayerData.OnlineTime = onlineTime.Unix()
 	onlinePlayerData.WillDelete = false
 	handle.onlinePlayers.Set(token, onlinePlayerData)
+}
+
+func (handle *EventHandler) IsExistUser(token string) bool {
+	return handle.cacheHandler.IsExistUser(token)
 }
 
 func (handle *EventHandler) Test1(c *gin.Context) {

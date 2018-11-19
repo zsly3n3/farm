@@ -447,6 +447,7 @@ func UniqueId() string {
 }
 
 func ComputeCurrentGold(soil map[int]*datastruct.PlayerSoil, petbar map[datastruct.AnimalType]*datastruct.PlayerPetbar, factor int, sec int64, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) int64 {
+	//compute
 	var addGold int64
 	addGold = 0
 	for _, v := range soil {

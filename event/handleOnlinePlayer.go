@@ -32,6 +32,7 @@ func (handle *EventHandler) selectTicker() {
 }
 
 func (handle *EventHandler) checkOnlinePlayer() {
+	currentTime := time.Now().Unix()
 	slice := make([]string, 0)
 	handle.onlinePlayers.Lock.Lock()
 	defer handle.onlinePlayers.Lock.Unlock()
@@ -39,7 +40,12 @@ func (handle *EventHandler) checkOnlinePlayer() {
 		if v.WillDelete {
 			slice = append(slice, k)
 		} else {
-			//v.OnlineTime = 100
+			if v.OnlineTime < currentTime {
+				onlinePlayerData := new(datastruct.OnlinePlayerData)
+				onlinePlayerData.WillDelete = true
+				handle.onlinePlayers.Bm[k] = *onlinePlayerData
+				go handle.fromRedisToMysql(k)
+			}
 		}
 	}
 	if len(slice) > 0 {
@@ -47,7 +53,6 @@ func (handle *EventHandler) checkOnlinePlayer() {
 			delete(handle.onlinePlayers.Bm, v)
 		}
 	}
-	//save location
 }
 
 func (handle *EventHandler) createUser(code string, permissionId int, nickName string, avatar string) *datastruct.PlayerData {
