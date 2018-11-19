@@ -33,7 +33,7 @@ func (handle *EventHandler) selectTicker() {
 func (handle *EventHandler) checkOnlinePlayer() {
 
 	currentTime := time.Now().Unix()
-	slice := make([]interface{}, 0)
+	slice := make([]interface{}, 1, 1)
 	handle.onlinePlayers.Lock.Lock()
 	defer handle.onlinePlayers.Lock.Unlock()
 	for k, v := range handle.onlinePlayers.Bm {
