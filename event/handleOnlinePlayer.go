@@ -2,7 +2,6 @@ package event
 
 import (
 	"farm/datastruct"
-	"farm/log"
 	"farm/tools"
 	"time"
 )
@@ -34,7 +33,7 @@ func (handle *EventHandler) selectTicker() {
 func (handle *EventHandler) checkOnlinePlayer() {
 
 	currentTime := time.Now().Unix()
-	slice := make([]string, 0)
+	slice := make([]interface{}, 0)
 	handle.onlinePlayers.Lock.Lock()
 	defer handle.onlinePlayers.Lock.Unlock()
 	for k, v := range handle.onlinePlayers.Bm {
@@ -53,13 +52,12 @@ func (handle *EventHandler) checkOnlinePlayer() {
 		conn := handle.cacheHandler.GetConn()
 		defer conn.Close()
 		for _, v := range slice {
-			delete(handle.onlinePlayers.Bm, v)
+			delete(handle.onlinePlayers.Bm, v.(string))
 		}
-		log.Debug("----%v", slice)
 		handle.deletefromRedis(slice)
 	}
 }
-func (handle *EventHandler) deletefromRedis(keys []string) {
+func (handle *EventHandler) deletefromRedis(keys []interface{}) {
 	handle.cacheHandler.DeletedKeys(keys, handle.petbars, handle.soils)
 }
 
