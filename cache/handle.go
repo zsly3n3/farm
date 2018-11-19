@@ -12,7 +12,7 @@ import (
 
 func (handle *CACHEHandler) GetPlayerData(conn redis.Conn, code string) (*datastruct.PlayerData, bool) {
 	var rs *datastruct.PlayerData
-	isExist := isExistUser(conn, code)
+	isExist := handle.IsExistUser(conn, code)
 	if isExist {
 		rs = handle.ReadPlayerData(conn, code)
 	}
@@ -171,7 +171,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 func (handle *CACHEHandler) UpdatePermisson(key string, permissionId int, body *datastruct.UserAuthBody) datastruct.CodeType {
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.TokenError
 	}
 	_, err := conn.Do("hmset", key, datastruct.PermissionIdField, permissionId, datastruct.NickNameField, body.NickName, datastruct.AvatarField, body.Avatar)
@@ -188,7 +188,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 	defer conn.Close()
 	var resp_tmp *datastruct.ResponseUpgradeSoil
 	resp_tmp = nil
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.UpdateDataFailed, resp_tmp
 	}
 
@@ -229,7 +229,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.PlantInSoil, plants []datastruct.Plant, soils map[int]datastruct.SoilData) (datastruct.CodeType, int64, string, int) {
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 
@@ -331,7 +331,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
@@ -414,7 +414,7 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.GetDataFailed, resp_data
 	}
 
@@ -500,7 +500,7 @@ func (handle *CACHEHandler) clearData() {
 func (handle *CACHEHandler) GetPlantLevel(key string, soil_id int) (datastruct.CodeType, int) {
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.GetDataFailed, -1
 	}
 	soiltableName := fmt.Sprintf("soil%d", soil_id)
@@ -514,7 +514,7 @@ func (handle *CACHEHandler) GetPlantLevel(key string, soil_id int) (datastruct.C
 	return datastruct.NULLError, player_soil.PlantLevel
 }
 
-func isExistUser(conn redis.Conn, key string) bool {
+func (handle *CACHEHandler) IsExistUser(conn redis.Conn, key string) bool {
 	isExist := false
 	ilen, err := conn.Do("hlen", key)
 	if err == nil && (ilen.(int64)) > 0 {
@@ -540,7 +540,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 	}
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.GetDataFailed, -1
 	}
 
@@ -589,7 +589,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *datastruct.ResponseAddHoney) {
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.GetDataFailed, nil
 	}
 	value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
@@ -645,7 +645,7 @@ func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 func (handle *CACHEHandler) EnableCollectHoney(key string) (datastruct.CodeType, int64) {
 	conn := handle.GetConn()
 	defer conn.Close()
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.GetDataFailed, -1
 	}
 	value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
@@ -662,7 +662,7 @@ func (handle *CACHEHandler) EnableCollectHoney(key string) (datastruct.CodeType,
 }
 
 func (handle *CACHEHandler) GetStamina(key string, conn redis.Conn) (datastruct.CodeType, int, int) {
-	if !isExistUser(conn, key) {
+	if !handle.IsExistUser(conn, key) {
 		return datastruct.GetDataFailed, -1, -1
 	}
 	value, err := redis.Values(conn.Do("hmget", key, datastruct.IdField, datastruct.StaminaField))

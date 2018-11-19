@@ -370,7 +370,23 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 	if rewardType != datastruct.Steal {
 		return handle.cacheHandler.LotteryNomal(key, rewardType, body.Expend, stamina, conn)
 	}
-	player_data := handle.dbHandler.LotterySteal(player_id)
+	//compute
+	users := handle.dbHandler.LotterySteal(player_id)
+	length := len(users)
+	var player_data *datastruct.PlayerData
+	if length <= 0 {
+		player_data = handle.cacheHandler.ReadPlayerData(conn, key)
+	} else {
+		var user *datastruct.UserInfo
+		randIndex := tools.RandInt(0, length)
+		user = users[randIndex]
+		if handle.cacheHandler.IsExistUser(conn, key) {
+			player_data = handle.cacheHandler.ReadPlayerData(conn, key)
+		} else {
+			player_data = handle.dbHandler.GetPlayerDataFromDataBase(user)
+		}
+	}
+
 	resp_data, addGold, addHoney := handle.computeSteal(player_data, body.Expend)
 	code, resp_data = handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, resp_data, conn)
 	return code, resp_data, rewardType

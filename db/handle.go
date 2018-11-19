@@ -18,7 +18,7 @@ func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData, boo
 	has, _ := engine.Where("identity_id=?", code).Get(user)
 	if has {
 		isExist = true
-		p_data = handle.getPlayerData(user)
+		p_data = handle.GetPlayerDataFromDataBase(user)
 	}
 	return p_data, isExist
 }
@@ -127,25 +127,15 @@ func (handle *DBHandler) IsGetStamina(player_id int) bool {
 	return has
 }
 
-func (handle *DBHandler) LotterySteal(player_id int) *datastruct.PlayerData {
+func (handle *DBHandler) LotterySteal(player_id int) []*datastruct.UserInfo {
 	//compute
 	engine := handle.mysqlEngine
 	users := make([]*datastruct.UserInfo, 0)
 	engine.Where("id <> ?", player_id).Find(&users)
-	var user datastruct.UserInfo
-	length := len(users)
-	log.Debug("users:%d", length)
-	if length <= 0 {
-		engine.Where("id = ?", player_id).Get(&user)
-	} else {
-		randIndex := tools.RandInt(0, length)
-		user = *(users[randIndex])
-	}
-	p_data := handle.getPlayerData(&user)
-	return p_data
+	return users
 }
 
-func (handle *DBHandler) getPlayerData(user *datastruct.UserInfo) *datastruct.PlayerData {
+func (handle *DBHandler) GetPlayerDataFromDataBase(user *datastruct.UserInfo) *datastruct.PlayerData {
 	engine := handle.mysqlEngine
 	p_data := new(datastruct.PlayerData)
 	p_data.Avatar = user.Avatar
