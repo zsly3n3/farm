@@ -29,45 +29,20 @@ func (m *OnlinePlayers) Get(k string) (bool, bool) {
 	return false, ok
 }
 
-// func (m *OnlinePlayers) GetAndUpdateState(key []string,state PlayerEnterType,room_id string) []Player {
-// 	m.lock.RLock()
-// 	defer m.lock.RUnlock()
-// 	if val, ok := m.bm[k]; ok {
-// 		return val
-// 	}
-// 	return Player{}
-// }
-
-// func (m *OnlinePlayers) GetWithAddr(addr string) (string,*Player) {
-// 	key:=NULLKEY
-// 	var pl *Player = nil
-// 	m.lock.RLock()
-// 	for k, v := range m.bm {
-// 		str:=v.Agent.RemoteAddr().String()
-// 		if str == addr{
-// 			key = k
-// 			pl = v
-// 			break
-// 		}
-// 	}
-// 	m.lock.RUnlock()
-// 	return key,pl
-// }
-
 // Set Maps the given key and value. Returns false
 // if the key is already in the map and changes nothing.
-// func (m *OnlinePlayers) Set(k string, v Player) bool {
-// 	m.Lock.Lock()
-// 	defer m.Lock.Unlock()
-// 	if val, ok := m.Bm[k]; !ok {
-// 		m.Bm[k] = v
-// 	} else if val != v {
-// 		m.Bm[k] = v
-// 	} else {
-// 		return false
-// 	}
-// 	return true
-// }
+func (m *OnlinePlayers) Set(k string, v bool) bool {
+	m.Lock.Lock()
+	defer m.Lock.Unlock()
+	if val, ok := m.Bm[k]; !ok {
+		m.Bm[k] = v
+	} else if val != v {
+		m.Bm[k] = v
+	} else {
+		return false
+	}
+	return true
+}
 
 // Check Returns true if k is exist in the map.
 func (m *OnlinePlayers) Check(k string) (bool, bool) {
