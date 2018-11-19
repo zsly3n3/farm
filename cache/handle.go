@@ -98,25 +98,19 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 	}
 }
 
-func (handle *CACHEHandler) DeletedKeys(keys []string, petbars map[datastruct.AnimalType]datastruct.PetbarData, soils map[int]datastruct.SoilData) {
+func (handle *CACHEHandler) DeletedKeys(keys []interface{}, petbars map[datastruct.AnimalType]datastruct.PetbarData, soils map[int]datastruct.SoilData) {
 	conn := handle.GetConn()
 	defer conn.Close()
 	conn.Send("MULTI")
-	conn.Send("del", keys[0])
-	log.Debug("del key:%v", keys[0])
-	// for _, v := range keys {
-	// 	conn.Send("del", v)
-	// 	// for k, _ := range petbars {
-	// 	// 	petbarStr := fmt.Sprintf("petbar%d", int(k))
-	// 	// 	conn.Send("hdel", petbarStr, v)
-	// 	// }
-	// 	// for k, _ := range soils {
-	// 	// 	soilStr := fmt.Sprintf("soil%d", int(k))
-	// 	// 	conn.Send("hdel", soilStr, v)
-	// 	// }
-	// 	log.Debug("del key:%v", v)
+	conn.Send("del", keys...)
+	// for k, _ := range petbars {
+	// 	petbarStr := fmt.Sprintf("petbar%d", int(k))
+	// 	conn.Send("hdel", petbarStr, keys...)
 	// }
-
+	// for k, _ := range soils {
+	// 	soilStr := fmt.Sprintf("soil%d", int(k))
+	// 	conn.Send("hdel", soilStr, keys...)
+	// }
 	_, err := conn.Do("EXEC")
 	if err != nil {
 		log.Debug("CACHEHandler DeletedKeys err:%s", err.Error())
