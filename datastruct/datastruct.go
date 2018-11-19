@@ -422,15 +422,11 @@ func GetResponsePlayerSoil(p_data *PlayerData, plants []Plant, soils map[int]Soi
 
 func createResponseSoilPlant(plant_id int, plants []Plant) *ResponseSoilPlant {
 	rs := new(ResponseSoilPlant)
-	for _, v := range plants {
-		if v.Id == plant_id {
-			rs.Name = v.Name
-			rs.InCome = v.InCome
-			rs.ExpForAnimal = v.ExpForAnimal
-			rs.Type = v.ClassId
-			break
-		}
-	}
+	v := plants[plant_id-1]
+	rs.Name = v.Name
+	rs.InCome = v.InCome
+	rs.ExpForAnimal = v.ExpForAnimal
+	rs.Type = v.ClassId
 	return rs
 }
 

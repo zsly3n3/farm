@@ -95,48 +95,50 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 	tmpLoginData.CD = 0
 	var addGold int64
 	addGold = 0
+	animals := handle.animals
+	plants := handle.plants
 	if p_data.SpeedUp != nil {
 		sec := p_data.SpeedUp.Ending - current_UpdateTime
 		if sec > 0 {
 			beforeSpeed_Sec := p_data.SpeedUp.Starting - last_UpdateTime
 			if beforeSpeed_Sec > 0 {
 				//normal 无加速计算 秒数为beforeSpeed_Sec
-				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec, plants, animals)
 				//speed 加速计算 秒数为current_UpdateTime-p_data.SpeedUp.Starting
-				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, current_UpdateTime-p_data.SpeedUp.Starting)
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, current_UpdateTime-p_data.SpeedUp.Starting, plants, animals)
 			} else {
 				//speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
-				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, current_UpdateTime-last_UpdateTime)
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, current_UpdateTime-last_UpdateTime, plants, animals)
 			}
 			tmpLoginData.CD = tools.EnableSpeedUp(p_data.SpeedUp.Ending, current_UpdateTime)
 			tmpLoginData.Sec_EndingSpeedUp = p_data.SpeedUp.Ending - current_UpdateTime
 		} else {
 			if last_UpdateTime >= p_data.SpeedUp.Ending {
 				//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
-				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
+				addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime, plants, animals)
 			} else {
 				afterSpeed_Sec := current_UpdateTime - p_data.SpeedUp.Ending //afterSpeed_Sec 为加速完成后还剩多少时间
 
 				beforeSpeed_Sec := p_data.SpeedUp.Starting - last_UpdateTime //beforeSpeed_Sec 没有加速前的正常时间
 				if beforeSpeed_Sec > 0 {
 					//normal 无加速计算 秒数为beforeSpeed_Sec
-					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec, plants, animals)
 					//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
-					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, p_data.SpeedUp.Ending-p_data.SpeedUp.Starting)
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, p_data.SpeedUp.Ending-p_data.SpeedUp.Starting, plants, animals)
 					//normal 无加速计算 秒数为afterSpeed_Sec
-					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec, plants, animals)
 				} else {
 					//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
-					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, p_data.SpeedUp.Ending-last_UpdateTime)
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, p_data.SpeedUp.Factor, p_data.SpeedUp.Ending-last_UpdateTime, plants, animals)
 					//normal 无加速计算 秒数为afterSpeed_Sec
-					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
+					addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec, plants, animals)
 				}
 			}
 			p_data.SpeedUp = nil
 		}
 	} else {
 		//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
-		addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
+		addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime, plants, animals)
 	}
 
 	isGetedStamina := handle.dbHandler.IsGetStamina(p_data.Id)
@@ -185,7 +187,7 @@ func (handle *EventHandler) UpgradeSoil(key string, c *gin.Context) (datastruct.
 	if err == nil {
 		_, tf := handle.soils[body.SoilId]
 		if tf {
-			code, resp_tmp = handle.cacheHandler.UpgradeSoil(key, &body, handle.soils)
+			code, resp_tmp = handle.cacheHandler.UpgradeSoil(key, &body, handle.soils, handle.plants, handle.animals)
 		} else {
 			code = datastruct.UpdateDataFailed
 		}
@@ -206,7 +208,7 @@ func (handle *EventHandler) PlantInSoil(key string, c *gin.Context) (datastruct.
 		_, tf := handle.soils[body.SoilId]
 		index := body.PlantId - 1
 		if tf && index >= 0 && index < len(handle.plants) {
-			code, gold, plantName, soil_id = handle.cacheHandler.PlantInSoil(key, &body, handle.plants, handle.soils)
+			code, gold, plantName, soil_id = handle.cacheHandler.PlantInSoil(key, &body, handle.soils, handle.plants, handle.animals)
 		} else {
 			code = datastruct.UpdateDataFailed
 		}
@@ -225,7 +227,7 @@ func (handle *EventHandler) BuyPetbar(key string, c *gin.Context) (datastruct.Co
 	var soil_id int
 	animal = nil
 	if err == nil {
-		code, gold, animal, soil_id = handle.cacheHandler.BuyPetbar(key, body.PetbarId, handle.petbars, handle.animals)
+		code, gold, animal, soil_id = handle.cacheHandler.BuyPetbar(key, body.PetbarId, handle.petbars, handle.plants, handle.animals)
 	} else {
 		code = datastruct.JsonParseFailedFromPostBody
 	}

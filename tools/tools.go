@@ -443,8 +443,19 @@ func UniqueId() string {
 	return getMd5String(base64.URLEncoding.EncodeToString(b))
 }
 
-func ComputeCurrentGold(soil map[int]*datastruct.PlayerSoil, petbar map[datastruct.AnimalType]*datastruct.PlayerPetbar, factor int, sec int64) int64 {
+func ComputeCurrentGold(soil map[int]*datastruct.PlayerSoil, petbar map[datastruct.AnimalType]*datastruct.PlayerPetbar, factor int, sec int64, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) int64 {
 	var addGold int64
 	addGold = 0
+	for _, v := range soil {
+		if v.PlantId > 0 {
+			addGold += plants[v.PlantId-1].InCome * sec * int64(v.Factor*factor)
+		}
+	}
+	for k, v := range petbar {
+		if v.AnimalNumber > 0 {
+			animal := animals[k][v.AnimalNumber]
+			addGold += animal.InCome * sec * int64(factor)
+		}
+	}
 	return addGold
 }

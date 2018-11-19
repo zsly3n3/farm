@@ -183,7 +183,7 @@ func (handle *CACHEHandler) UpdatePermisson(key string, permissionId int, body *
 	return code
 }
 
-func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.UpgradeSoil, soils map[int]datastruct.SoilData) (datastruct.CodeType, *datastruct.ResponseUpgradeSoil) {
+func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.UpgradeSoil, soils map[int]datastruct.SoilData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, *datastruct.ResponseUpgradeSoil) {
 	conn := handle.GetConn()
 	defer conn.Close()
 	var resp_tmp *datastruct.ResponseUpgradeSoil
@@ -192,7 +192,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 		return datastruct.UpdateDataFailed, resp_tmp
 	}
 
-	code, gold := handle.ComputeCurrentGold(conn, key)
+	code, gold := handle.ComputeCurrentGold(conn, key, plants, animals)
 
 	if code != datastruct.NULLError {
 		return datastruct.UpdateDataFailed, resp_tmp
@@ -227,7 +227,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 	return datastruct.NULLError, resp_tmp
 }
 
-func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.PlantInSoil, plants []datastruct.Plant, soils map[int]datastruct.SoilData) (datastruct.CodeType, int64, string, int) {
+func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.PlantInSoil, soils map[int]datastruct.SoilData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64, string, int) {
 	conn := handle.GetConn()
 	defer conn.Close()
 	if !handle.IsExistUser(conn, key) {
@@ -249,7 +249,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 		return datastruct.UpdateDataFailed, -1, "", -1
 	}
 
-	code, gold := handle.ComputeCurrentGold(conn, key)
+	code, gold := handle.ComputeCurrentGold(conn, key, plants, animals)
 	if code != datastruct.NULLError {
 		return datastruct.UpdateDataFailed, -1, "", -1
 	}
@@ -312,7 +312,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	return datastruct.NULLError, gold, "", -1
 }
 
-func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datastruct.AnimalType]datastruct.PetbarData, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64, *datastruct.ResponseAnimal, int) {
+func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datastruct.AnimalType]datastruct.PetbarData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64, *datastruct.ResponseAnimal, int) {
 	var animal *datastruct.ResponseAnimal
 	animal = nil
 	var tmp *datastruct.PetbarData
@@ -346,7 +346,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
 
-	code, gold := handle.ComputeCurrentGold(conn, key)
+	code, gold := handle.ComputeCurrentGold(conn, key, plants, animals)
 	if code != datastruct.NULLError {
 		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
@@ -481,7 +481,7 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 	return datastruct.NULLError, resp_data
 }
 
-func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (datastruct.CodeType, int64) {
+func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64) {
 
 	value, err := redis.Values(conn.Do("hmget", key, datastruct.GoldField, datastruct.UpdateTimeField, datastruct.SpeedUpField))
 	length := len(value)
@@ -537,40 +537,40 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (dat
 			beforeSpeed_Sec := currentSpeedUp.Starting - last_UpdateTime
 			if beforeSpeed_Sec > 0 {
 				//normal 无加速计算 秒数为beforeSpeed_Sec
-				addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
+				addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec, plants, animals)
 				//speed 加速计算 秒数为current_UpdateTime-p_data.SpeedUp.Starting
-				addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, current_UpdateTime-currentSpeedUp.Starting)
+				addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, current_UpdateTime-currentSpeedUp.Starting, plants, animals)
 			} else {
 				//speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
-				addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, current_UpdateTime-last_UpdateTime)
+				addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, current_UpdateTime-last_UpdateTime, plants, animals)
 			}
 		} else {
 			if last_UpdateTime >= currentSpeedUp.Ending {
 				//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
-				addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
+				addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime, plants, animals)
 			} else {
 				afterSpeed_Sec := current_UpdateTime - currentSpeedUp.Ending //afterSpeed_Sec 为加速完成后还剩多少时间
 
 				beforeSpeed_Sec := currentSpeedUp.Starting - last_UpdateTime //beforeSpeed_Sec 没有加速前的正常时间
 				if beforeSpeed_Sec > 0 {
 					//normal 无加速计算 秒数为beforeSpeed_Sec
-					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
+					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec, plants, animals)
 					//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
-					addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, currentSpeedUp.Ending-currentSpeedUp.Starting)
+					addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, currentSpeedUp.Ending-currentSpeedUp.Starting, plants, animals)
 					//normal 无加速计算 秒数为afterSpeed_Sec
-					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
+					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec, plants, animals)
 				} else {
 					//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
-					addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, currentSpeedUp.Ending-last_UpdateTime)
+					addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, currentSpeedUp.Ending-last_UpdateTime, plants, animals)
 					//normal 无加速计算 秒数为afterSpeed_Sec
-					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
+					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec, plants, animals)
 				}
 			}
 			currentSpeedUp = nil
 		}
 	} else {
 		//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
-		addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
+		addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime, plants, animals)
 	}
 	currentGold += addGold
 	if currentSpeedUp == nil {
