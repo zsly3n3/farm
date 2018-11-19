@@ -20,6 +20,7 @@ type EventHandler struct {
 	animals       map[datastruct.AnimalType]map[int]datastruct.Animal //按动物类型划分再根据动物编号 int为Number
 	petbars       map[datastruct.AnimalType]datastruct.PetbarData
 	soils         map[int]datastruct.SoilData //key为土地id
+	onlinePlayers *datastruct.OnlinePlayers
 }
 
 func CreateEventHandler() *EventHandler {
