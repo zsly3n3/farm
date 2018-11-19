@@ -51,7 +51,7 @@ func (handle *EventHandler) createUser(code string, permissionId int, nickName s
 	player.PetBar = createPetbar(handle.petbars)
 	player.SpeedUp = nil
 	player.Stamina = datastruct.MaxStamina
-	player.Shield = 0
+	player.Shield = 1
 	return player
 }
 

@@ -1,11 +1,16 @@
 package tools
 
 import (
+	"crypto/md5"
+	crypto_rand "crypto/rand"
+	"encoding/base64"
 	"encoding/binary"
+	"encoding/hex"
 	"encoding/json"
 	"farm/datastruct"
 	"farm/log"
 	"fmt"
+	"io"
 	"math/rand"
 	"strconv"
 
@@ -419,4 +424,21 @@ func CreatePetbar4(petbar *datastruct.Petbar4) *datastruct.PlayerPetbar {
 	rs.CurrentExp = petbar.CurrentExp
 	rs.State = petbar.State
 	return rs
+}
+
+//生成32位md5字串
+func getMd5String(s string) string {
+	h := md5.New()
+	h.Write([]byte(s))
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+//生成Guid字串
+func UniqueId() string {
+	// 生成节点实例
+	b := make([]byte, 48)
+	if _, err := io.ReadFull(crypto_rand.Reader, b); err != nil {
+		return ""
+	}
+	return getMd5String(base64.URLEncoding.EncodeToString(b))
 }
