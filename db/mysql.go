@@ -54,8 +54,11 @@ func resetDB(engine *xorm.Engine) {
 	speedup := &datastruct.PlayerSpeedUp{}
 	rewardStamina := &datastruct.RewardStamina{}
 
-	err := engine.DropTables(user, player, perm, plants, plantClass, animal, animalClass, soil1, soil2, soil3, soil4, soil5, petbar1, petbar2, petbar3, petbar4, speedup, rewardStamina)
-	errhandle(err)
+	var err error
+	if conf.Common.Mode == conf.Debug {
+		err = engine.DropTables(user, player, perm, plants, plantClass, animal, animalClass, soil1, soil2, soil3, soil4, soil5, petbar1, petbar2, petbar3, petbar4, speedup, rewardStamina)
+		errhandle(err)
+	}
 	err = engine.CreateTables(user, player, perm, plants, plantClass, animal, animalClass, soil1, soil2, soil3, soil4, soil5, petbar1, petbar2, petbar3, petbar4, speedup, rewardStamina)
 	errhandle(err)
 }

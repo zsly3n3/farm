@@ -35,7 +35,9 @@ func getRedisPool() *redis.Pool {
 func CreateCACHEHandler() *CACHEHandler {
 	cacheHandler := new(CACHEHandler)
 	cacheHandler.redisClient = getRedisPool()
-	cacheHandler.clearData()
+	if conf.Common.Mode == conf.Debug {
+		cacheHandler.clearData()
+	}
 	return cacheHandler
 }
 
