@@ -375,7 +375,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 
 	value, _ = tools.PlayerPetbarToString(rs_tmp)
 	conn.Send("MULTI")
-	conn.Send("hset", key, datastruct.GoldField, gold)
+	conn.Send("hmset", key, datastruct.GoldField, gold, datastruct.SoilLevelField, soilLevel)
 	conn.Send("hset", petbartableName, key, value)
 	_, err = conn.Do("EXEC")
 
