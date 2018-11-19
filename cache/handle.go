@@ -563,14 +563,14 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (dat
 					//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
 					addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, currentSpeedUp.Ending-last_UpdateTime)
 					//normal 无加速计算 秒数为afterSpeed_Sec
-					addGold += tools.ComputeCurrentGold(soils, petBars, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
+					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
 				}
 			}
 			currentSpeedUp = nil
 		}
 	} else {
 		//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
-		addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
+		addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
 	}
 	currentGold += addGold
 	if currentSpeedUp == nil {
@@ -580,7 +580,7 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (dat
 	}
 	if err != nil {
 		log.Debug("CACHEHandler ComputeCurrentGold err:%s", err.Error())
-		return datastruct.UpdateDataFailed, nil
+		return datastruct.UpdateDataFailed, -1
 	}
 	return datastruct.NULLError, currentGold
 }
