@@ -2,6 +2,7 @@ package event
 
 import (
 	"farm/cache"
+	"farm/conf"
 	"farm/datastruct"
 	"farm/db"
 	"farm/tools"
@@ -23,7 +24,7 @@ type EventHandler struct {
 
 func CreateEventHandler() *EventHandler {
 	eventHandler := new(EventHandler)
-	eventHandler.Version = "1.0.0.0"
+	eventHandler.Version = conf.Common.Version
 	eventHandler.soils, eventHandler.petbars = tools.GetSoildInfo()
 	eventHandler.cacheHandler = cache.CreateCACHEHandler()
 	eventHandler.dbHandler = db.CreateDBHandler()

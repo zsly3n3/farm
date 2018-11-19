@@ -38,8 +38,8 @@ func main() {
 	eventHandler = event.CreateEventHandler()
 	r := gin.Default()
 	var mode string
-	switch conf.Mode {
-	case conf.Dev:
+	switch conf.Common.Mode {
+	case conf.Debug:
 		mode = gin.DebugMode
 	case conf.Test:
 		mode = gin.TestMode

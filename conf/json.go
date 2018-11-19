@@ -6,14 +6,11 @@ import (
 	"io/ioutil"
 )
 
-type RunMode int //运行模式
 const (
-	Dev     RunMode = iota //开发
-	Test                   //测试
-	Release                //发布
+	Debug   = "debug"   //开发
+	Test    = "test"    //测试
+	Release = "release" //发布
 )
-
-const Mode = Dev
 
 var Server struct {
 	HttpServer  string
@@ -26,18 +23,32 @@ var Server struct {
 	DB_Pwd      string
 }
 
+var Common struct {
+	Version string
+	Mode    string
+}
+
 func init() {
 
+	data, err := ioutil.ReadFile("conf/server.json")
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+	err = json.Unmarshal(data, &Common)
+	if err != nil {
+		log.Fatal("%v", err)
+	}
+
 	var file_str string
-	switch Mode {
-	case Dev:
+	switch Common.Mode {
+	case Debug:
 		file_str = "conf/server_dev.json"
 	case Test:
 		file_str = "conf/server_test.json"
 	case Release:
 		file_str = "conf/server_release.json"
 	}
-	data, err := ioutil.ReadFile(file_str)
+	data, err = ioutil.ReadFile(file_str)
 	if err != nil {
 		log.Fatal("%v", err)
 	}
