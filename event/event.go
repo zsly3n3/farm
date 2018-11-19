@@ -32,5 +32,6 @@ func CreateEventHandler() *EventHandler {
 	eventHandler.createTicker(5 * time.Minute)
 	eventHandler.plants = eventHandler.dbHandler.GetPlantsSlice()
 	eventHandler.animals = eventHandler.dbHandler.GetAnimalsMap()
+	eventHandler.onlinePlayers = datastruct.NewOnlinePlayers()
 	return eventHandler
 }

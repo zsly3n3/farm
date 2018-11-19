@@ -32,6 +32,7 @@ func (handle *EventHandler) Login(c *gin.Context) {
 			defer conn.Close()
 
 			openid := getOpenId(body.Code, body.PlatformId)
+			handle.playerIsOnline(openid)
 			var tmpLoginData *datastruct.TmpLoginData
 			p_data, isExistRedis = handle.cacheHandler.GetPlayerData(conn, openid) //find in redis
 			if !isExistRedis {
@@ -431,6 +432,14 @@ func (handle *EventHandler) computeSteal(p_data *datastruct.PlayerData, expend i
 
 func (handle *EventHandler) RefreshOnlineState(key string) datastruct.CodeType {
 	return datastruct.NULLError
+}
+
+func (handle *EventHandler) playerIsOnline(token string) {
+	onlineTime := time.Now().Unix()
+	onlinePlayerData := new(datastruct.OnlinePlayerData)
+	onlinePlayerData.OnlineTime = onlineTime
+	onlinePlayerData.WillDelete = false
+	handle.onlinePlayers.Set(token, onlinePlayerData)
 }
 
 func (handle *EventHandler) Test1(c *gin.Context) {

@@ -32,7 +32,22 @@ func (handle *EventHandler) selectTicker() {
 }
 
 func (handle *EventHandler) checkOnlinePlayer() {
-
+	slice := make([]string, 0)
+	handle.onlinePlayers.Lock.Lock()
+	defer handle.onlinePlayers.Lock.Unlock()
+	for k, v := range handle.onlinePlayers.Bm {
+		if v.WillDelete {
+			slice = append(slice, k)
+		} else {
+			//v.OnlineTime = 100
+		}
+	}
+	if len(slice) > 0 {
+		for _, v := range slice {
+			delete(handle.onlinePlayers.Bm, v)
+		}
+	}
+	//save location
 }
 
 func (handle *EventHandler) createUser(code string, permissionId int, nickName string, avatar string) *datastruct.PlayerData {
