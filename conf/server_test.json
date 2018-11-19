@@ -1,5 +1,5 @@
 {
-	"HttpServer":"https://swnc.lemeow.cn/test",
+	"HttpServer":"127.0.0.1:9996",
 	"Redis_IP":"localhost:6379",
 	"Redis_Name":"1",
 	"Redis_Pwd":"Zsly3n@s",

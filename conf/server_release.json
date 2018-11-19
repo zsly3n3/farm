@@ -1,5 +1,5 @@
 {
-	"HttpServer":"https://swnc.lemeow.cn/release",
+	"HttpServer":"127.0.0.1:9997",
 	"Redis_IP":"localhost:6379",
 	"Redis_Name":"2",
 	"Redis_Pwd":"Zsly3n@s",

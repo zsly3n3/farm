@@ -1,6 +1,7 @@
 package main
 
 import (
+	"farm/conf"
 	"farm/event"
 	"farm/routes"
 	"net/http"
@@ -36,9 +37,17 @@ func cors() gin.HandlerFunc {
 func main() {
 	eventHandler = event.CreateEventHandler()
 	r := gin.Default()
+	var mode string
+	switch conf.Mode {
+	case conf.Dev:
+		mode = gin.DebugMode
+	case conf.Test:
+		mode = gin.TestMode
+	case conf.Release:
+		mode = gin.ReleaseMode
+	}
+	gin.SetMode(mode)
 	r.Use(cors())
 	routes.Register(r, eventHandler)
-
-	//r.Run("192.168.0.161:8080")
-	r.Run("127.0.0.1:9090") //listen and serve on 0.0.0.0:8080
+	r.Run(conf.Server.HttpServer) //listen and serve on 0.0.0.0:8080
 }

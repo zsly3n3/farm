@@ -8,10 +8,12 @@ import (
 
 type RunMode int //运行模式
 const (
-	dev     RunMode = iota //开发
-	test                   //测试
-	release                //发布
+	Dev     RunMode = iota //开发
+	Test                   //测试
+	Release                //发布
 )
+
+const Mode = Dev
 
 var Server struct {
 	HttpServer  string
@@ -25,15 +27,14 @@ var Server struct {
 }
 
 func init() {
-	var mode RunMode
-	mode = dev
+
 	var file_str string
-	switch mode {
-	case dev:
+	switch Mode {
+	case Dev:
 		file_str = "conf/server_dev.json"
-	case test:
+	case Test:
 		file_str = "conf/server_test.json"
-	case release:
+	case Release:
 		file_str = "conf/server_release.json"
 	}
 	data, err := ioutil.ReadFile(file_str)
