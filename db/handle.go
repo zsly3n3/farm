@@ -73,6 +73,17 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 			rollback(str, session)
 			return userinfo.Id
 		}
+	} else {
+		var speedup datastruct.PlayerSpeedUp
+		has, err := session.Where("id=?", userinfo.Id).Get(&speedup)
+		if has {
+			_, err = engine.Id(userinfo.Id).Delete(&speedup)
+			if err != nil {
+				str := fmt.Sprintf("DBHandler->SetPlayerData Delete player_speed_up :%s", err.Error())
+				rollback(str, session)
+				return userinfo.Id
+			}
+		}
 	}
 
 	for k, v := range p_data.PetBar {

@@ -444,6 +444,7 @@ func UniqueId() string {
 }
 
 func ComputeCurrentGold(soil map[int]*datastruct.PlayerSoil, petbar map[datastruct.AnimalType]*datastruct.PlayerPetbar, factor int, sec int64) int64 {
-
-	return 0
+	var addGold int64
+	addGold = 0
+	return addGold
 }

@@ -193,6 +193,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 	}
 
 	code, gold := handle.ComputeCurrentGold(conn, key)
+
 	if code != datastruct.NULLError {
 		return datastruct.UpdateDataFailed, resp_tmp
 	}
@@ -481,14 +482,107 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 }
 
 func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string) (datastruct.CodeType, int64) {
-	//compute
-	value, err := redis.String(conn.Do("hget", key, datastruct.GoldField))
-	code := datastruct.NULLError
+
+	value, err := redis.Values(conn.Do("hmget", key, datastruct.GoldField, datastruct.UpdateTimeField, datastruct.SpeedUpField))
+	length := len(value)
+	var currentGold int64
+	var playerUpdateTime int64
+	var currentSpeedUp *datastruct.SpeedUpData
+
+	for i := 0; i < length; i++ {
+		tmp := value[i].([]byte)
+		str := string(tmp[:])
+		switch i {
+		case 0:
+			currentGold = tools.StringToInt64(str)
+		case 1:
+			playerUpdateTime = tools.StringToInt64(str)
+		case 2:
+			currentSpeedUp = nil
+			if str != "" {
+				currentSpeedUp, _ = tools.BytesToSpeedUp(tmp)
+			}
+		}
+	}
+
+	len_soil := 5
+	soils := make(map[int]*datastruct.PlayerSoil)
+	for i := 1; i <= len_soil; i++ {
+		soiltableName := fmt.Sprintf("soil%d", i)
+		value, err := redis.String(conn.Do("hget", soiltableName, key))
+		if err == nil {
+			tmp, _ := tools.BytesToPlayerSoil([]byte(value))
+			soils[i] = tmp
+		}
+	}
+
+	len_petbar := int(datastruct.Deity)
+	petBars := make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
+	for i := int(datastruct.Sea); i <= len_petbar; i++ {
+		petbartableName := fmt.Sprintf("petbar%d", i)
+		value, err := redis.String(conn.Do("hget", petbartableName, key))
+		if err == nil {
+			tmp, _ := tools.BytesToPlayerPetbar([]byte(value))
+			petBars[datastruct.AnimalType(i)] = tmp
+		}
+	}
+
+	last_UpdateTime := playerUpdateTime
+	current_UpdateTime := time.Now().Unix()
+	var addGold int64
+	addGold = 0
+	if currentSpeedUp != nil {
+		sec := currentSpeedUp.Ending - current_UpdateTime
+		if sec > 0 {
+			beforeSpeed_Sec := currentSpeedUp.Starting - last_UpdateTime
+			if beforeSpeed_Sec > 0 {
+				//normal 无加速计算 秒数为beforeSpeed_Sec
+				addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
+				//speed 加速计算 秒数为current_UpdateTime-p_data.SpeedUp.Starting
+				addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, current_UpdateTime-currentSpeedUp.Starting)
+			} else {
+				//speed 加速计算 秒数为current_UpdateTime-last_UpdateTime
+				addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, current_UpdateTime-last_UpdateTime)
+			}
+		} else {
+			if last_UpdateTime >= currentSpeedUp.Ending {
+				//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+				addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
+			} else {
+				afterSpeed_Sec := current_UpdateTime - currentSpeedUp.Ending //afterSpeed_Sec 为加速完成后还剩多少时间
+
+				beforeSpeed_Sec := currentSpeedUp.Starting - last_UpdateTime //beforeSpeed_Sec 没有加速前的正常时间
+				if beforeSpeed_Sec > 0 {
+					//normal 无加速计算 秒数为beforeSpeed_Sec
+					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, beforeSpeed_Sec)
+					//speed 加速计算 秒数为p_data.SpeedUp.Ending - p_data.SpeedUp.Starting
+					addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, currentSpeedUp.Ending-currentSpeedUp.Starting)
+					//normal 无加速计算 秒数为afterSpeed_Sec
+					addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
+				} else {
+					//speed 加速计算  p_data.SpeedUp.Ending - last_UpdateTime
+					addGold += tools.ComputeCurrentGold(soils, petBars, currentSpeedUp.Factor, currentSpeedUp.Ending-last_UpdateTime)
+					//normal 无加速计算 秒数为afterSpeed_Sec
+					addGold += tools.ComputeCurrentGold(soils, petBars, p_data.PetBar, datastruct.DefaultSpeedUpFactor, afterSpeed_Sec)
+				}
+			}
+			currentSpeedUp = nil
+		}
+	} else {
+		//normal 无加速计算 秒数为current_UpdateTime-last_UpdateTime
+		addGold += tools.ComputeCurrentGold(p_data.Soil, p_data.PetBar, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime)
+	}
+	currentGold += addGold
+	if currentSpeedUp == nil {
+		_, err = conn.Do("hmset", key, datastruct.GoldField, currentGold, datastruct.SpeedUpField, "", datastruct.UpdateTimeField, current_UpdateTime)
+	} else {
+		_, err = conn.Do("hmset", key, datastruct.GoldField, currentGold, datastruct.UpdateTimeField, current_UpdateTime)
+	}
 	if err != nil {
 		log.Debug("CACHEHandler ComputeCurrentGold err:%s", err.Error())
-		return datastruct.UpdateDataFailed, -1
+		return datastruct.UpdateDataFailed, nil
 	}
-	return code, tools.StringToInt64(value)
+	return datastruct.NULLError, currentGold
 }
 
 func (handle *CACHEHandler) clearData() {
