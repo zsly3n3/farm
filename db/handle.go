@@ -209,8 +209,8 @@ func (handle *DBHandler) GetPlayerDataFromDataBase(user *datastruct.UserInfo) *d
 	if has {
 		speedup := new(datastruct.SpeedUpData)
 		speedup.Factor = playerSpeedUp.Factor
-		speedup.Starting = playerSpeedUp.Starting
-		speedup.Ending = playerSpeedUp.Ending
+		speedup.Starting = playerSpeedUp.Start
+		speedup.Ending = playerSpeedUp.End
 	} else {
 		p_data.SpeedUp = nil
 	}
