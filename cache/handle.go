@@ -55,21 +55,44 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 			return
 		}
 	}
+	args := make([]interface{}, 0, 40)
+	args = append(args, key)
 
-	conn.Send("MULTI")
-	conn.Send("hmset", key,
-		datastruct.IdField, p_data.Id,
-		datastruct.GoldField, p_data.GoldCount,
-		datastruct.HoneyField, p_data.HoneyCount,
-		datastruct.PermissionIdField, p_data.PermissionId,
-		datastruct.CreatedAtField, p_data.CreatedAt,
-		datastruct.UpdateTimeField, p_data.UpdateTime,
-		datastruct.NickNameField, p_data.NickName,
-		datastruct.AvatarField, p_data.Avatar,
-		datastruct.SoilLevelField, p_data.SoilLevel,
-		datastruct.SpeedUpField, speedup_str,
-		datastruct.StaminaField, p_data.Stamina,
-		datastruct.ShieldField, p_data.Shield)
+	args = append(args, datastruct.IdField)
+	args = append(args, p_data.Id)
+
+	args = append(args, datastruct.GoldField)
+	args = append(args, p_data.GoldCount)
+
+	args = append(args, datastruct.HoneyField)
+	args = append(args, p_data.HoneyCount)
+
+	args = append(args, datastruct.PermissionIdField)
+	args = append(args, p_data.PermissionId)
+
+	args = append(args, datastruct.CreatedAtField)
+	args = append(args, p_data.CreatedAt)
+
+	args = append(args, datastruct.UpdateTimeField)
+	args = append(args, p_data.UpdateTime)
+
+	args = append(args, datastruct.NickNameField)
+	args = append(args, p_data.NickName)
+
+	args = append(args, datastruct.AvatarField)
+	args = append(args, p_data.Avatar)
+
+	args = append(args, datastruct.SoilLevelField)
+	args = append(args, p_data.SoilLevel)
+
+	args = append(args, datastruct.SpeedUpField)
+	args = append(args, speedup_str)
+
+	args = append(args, datastruct.StaminaField)
+	args = append(args, p_data.Stamina)
+
+	args = append(args, datastruct.ShieldField)
+	args = append(args, p_data.Shield)
 
 	for k, v := range p_data.Soil {
 		soiltableName := fmt.Sprintf("soil%d", k)
@@ -78,7 +101,8 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 			log.Debug("CACHEHandler SetPlayerData PlayerSoilToString err:%s player:%s", soiltableName, key)
 			return
 		}
-		conn.Send("hset", soiltableName, key, value)
+		args = append(args, soiltableName)
+		args = append(args, value)
 	}
 
 	for k, v := range p_data.PetBar {
@@ -88,10 +112,11 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 			log.Debug("CACHEHandler SetPlayerData PlayerPetbarToString err:%s player:%s", petbartableName, key)
 			return
 		}
-		conn.Send("hset", petbartableName, key, value)
+		args = append(args, petbartableName)
+		args = append(args, value)
 	}
 
-	_, err := conn.Do("EXEC")
+	_, err := conn.Do("hmset", args...)
 
 	if err != nil {
 		log.Debug("CACHEHandler SetPlayerData err:%s", err.Error())
@@ -101,21 +126,7 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 func (handle *CACHEHandler) DeletedKeys(keys []interface{}, petbars map[datastruct.AnimalType]datastruct.PetbarData, soils map[int]datastruct.SoilData) {
 	conn := handle.GetConn()
 	defer conn.Close()
-	conn.Send("MULTI")
-	new_keys := keys[1:]
-	log.Debug("new_keys:%v", new_keys)
-	conn.Send("del", new_keys...)
-	for k, _ := range petbars {
-		petbarStr := fmt.Sprintf("petbar%d", int(k))
-		keys[0] = petbarStr
-		conn.Send("hdel", keys[0], keys)
-	}
-	for k, _ := range soils {
-		soilStr := fmt.Sprintf("soil%d", int(k))
-		keys[0] = soilStr
-		conn.Send("hdel", keys[0], keys)
-	}
-	_, err := conn.Do("EXEC")
+	_, err := conn.Do("del", keys...)
 	if err != nil {
 		log.Debug("CACHEHandler DeletedKeys err:%s", err.Error())
 	}
@@ -170,7 +181,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 	rs.Soil = make(map[int]*datastruct.PlayerSoil)
 	for i := 1; i <= len_soil; i++ {
 		soiltableName := fmt.Sprintf("soil%d", i)
-		value, err := redis.String(conn.Do("hget", soiltableName, key))
+		value, err := redis.String(conn.Do("hget", key, soiltableName))
 		if err == nil {
 			tmp, _ := tools.BytesToPlayerSoil([]byte(value))
 			rs.Soil[i] = tmp
@@ -181,7 +192,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 	rs.PetBar = make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
 	for i := int(datastruct.Sea); i <= len_petbar; i++ {
 		petbartableName := fmt.Sprintf("petbar%d", i)
-		value, err := redis.String(conn.Do("hget", petbartableName, key))
+		value, err := redis.String(conn.Do("hget", key, petbartableName))
 		if err == nil {
 			tmp, _ := tools.BytesToPlayerPetbar([]byte(value))
 			rs.PetBar[datastruct.AnimalType(i)] = tmp
@@ -216,7 +227,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 	}
 
 	soiltableName := fmt.Sprintf("soil%d", upgradeSoil.SoilId)
-	value, err := redis.String(conn.Do("hget", soiltableName, key))
+	value, err := redis.String(conn.Do("hget", key, soiltableName))
 	if err != nil {
 		return datastruct.GetDataFailed, resp_tmp
 	}
@@ -231,10 +242,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 	}
 	gold, resp_tmp = tools.ComputeSoilLevelPrice(gold, upgradeSoil.Level, tmp)
 	value, _ = tools.PlayerSoilToString(tmp)
-	conn.Send("MULTI")
-	conn.Send("hset", key, datastruct.GoldField, gold)
-	conn.Send("hset", soiltableName, key, value)
-	_, err = conn.Do("EXEC")
+	_, err = conn.Do("hmset", key, datastruct.GoldField, gold, soiltableName, value)
 
 	if err != nil {
 		log.Debug("CACHEHandler UpgradeSoil err:%s", err.Error())
@@ -248,7 +256,7 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	conn := handle.GetConn()
 	defer conn.Close()
 	soiltableName := fmt.Sprintf("soil%d", plantInSoil.SoilId)
-	value, err := redis.String(conn.Do("hget", soiltableName, key))
+	value, err := redis.String(conn.Do("hget", key, soiltableName))
 	var player_soil *datastruct.PlayerSoil
 	if err == nil {
 		player_soil, _ = tools.BytesToPlayerSoil([]byte(value))
@@ -281,6 +289,8 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	}
 
 	player_soil.PlantId = plantInSoil.PlantId
+	args := make([]interface{}, 0, 5)
+	args = append(args, key)
 	if player_soil.State != datastruct.Owned {
 		soil := soils[plantInSoil.SoilId]
 		if gold < soil.Price {
@@ -299,13 +309,8 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 		} else {
 			return datastruct.SoilRequireUnlock, gold, "", soil.LastId
 		}
-		conn.Send("MULTI")
-		conn.Send("hmset", key,
-			datastruct.GoldField, gold,
-			datastruct.SoilLevelField, soilLevel)
-	} else {
-		conn.Send("MULTI")
-		conn.Send("hset", key, datastruct.GoldField, gold)
+		args = append(args, datastruct.SoilLevelField)
+		args = append(args, soilLevel)
 	}
 
 	value, isError := tools.PlayerSoilToString(player_soil)
@@ -313,9 +318,12 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 		log.Debug("CACHEHandler PlantInSoil PlayerSoilToString err:%s player:%s", soiltableName, key)
 		return datastruct.UpdateDataFailed, -1, "", -1
 	}
-	conn.Send("hset", soiltableName, key, value)
+	args = append(args, datastruct.GoldField)
+	args = append(args, gold)
+	args = append(args, soiltableName)
+	args = append(args, value)
 
-	_, err = conn.Do("EXEC")
+	_, err = conn.Do("hmset", args...)
 
 	if err != nil {
 		log.Debug("CACHEHandler PlantInSoil MULTI set data err:%s", err.Error())
@@ -347,7 +355,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 	defer conn.Close()
 
 	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
-	value, err := redis.String(conn.Do("hget", petbartableName, key))
+	value, err := redis.String(conn.Do("hget", key, petbartableName))
 	if err != nil {
 		return datastruct.UpdateDataFailed, -1, animal, soil_id
 	}
@@ -384,10 +392,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 	rs_tmp.CurrentExp = 0
 
 	value, _ = tools.PlayerPetbarToString(rs_tmp)
-	conn.Send("MULTI")
-	conn.Send("hmset", key, datastruct.GoldField, gold, datastruct.SoilLevelField, soilLevel)
-	conn.Send("hset", petbartableName, key, value)
-	_, err = conn.Do("EXEC")
+	_, err = conn.Do("hmset", key, datastruct.GoldField, gold, datastruct.SoilLevelField, soilLevel, petbartableName, value)
 
 	if err != nil {
 		log.Debug("CACHEHandler UpgradeSoil err:%s", err.Error())
@@ -427,7 +432,7 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 	defer conn.Close()
 
 	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
-	value, err := redis.String(conn.Do("hget", petbartableName, key))
+	value, err := redis.String(conn.Do("hget", key, petbartableName))
 	if err != nil {
 		return datastruct.GetDataFailed, resp_data
 	}
@@ -466,10 +471,8 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 	}
 
 	value, _ = tools.PlayerPetbarToString(rs_tmp)
-	conn.Send("MULTI")
-	conn.Send("hset", key, datastruct.HoneyField, last_honey)
-	conn.Send("hset", petbartableName, key, value)
-	_, err = conn.Do("EXEC")
+
+	_, err = conn.Do("hmset", key, datastruct.HoneyField, last_honey, petbartableName, value)
 
 	if err != nil {
 		log.Debug("CACHEHandler AnimalUpgrade err:%s", err.Error())
@@ -516,7 +519,7 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string, plan
 	soils := make(map[int]*datastruct.PlayerSoil)
 	for i := 1; i <= len_soil; i++ {
 		soiltableName := fmt.Sprintf("soil%d", i)
-		value, err := redis.String(conn.Do("hget", soiltableName, key))
+		value, err := redis.String(conn.Do("hget", key, soiltableName))
 		if err == nil {
 			tmp, _ := tools.BytesToPlayerSoil([]byte(value))
 			soils[i] = tmp
@@ -527,7 +530,7 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string, plan
 	petBars := make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
 	for i := int(datastruct.Sea); i <= len_petbar; i++ {
 		petbartableName := fmt.Sprintf("petbar%d", i)
-		value, err := redis.String(conn.Do("hget", petbartableName, key))
+		value, err := redis.String(conn.Do("hget", key, petbartableName))
 		if err == nil {
 			tmp, _ := tools.BytesToPlayerPetbar([]byte(value))
 			petBars[datastruct.AnimalType(i)] = tmp
@@ -580,11 +583,17 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string, plan
 		addGold += tools.ComputeCurrentGold(soils, petBars, datastruct.DefaultSpeedUpFactor, current_UpdateTime-last_UpdateTime, plants, animals)
 	}
 	currentGold += addGold
+	args := make([]interface{}, 0, 5)
+	args = append(args, key)
 	if currentSpeedUp == nil {
-		_, err = conn.Do("hmset", key, datastruct.GoldField, currentGold, datastruct.SpeedUpField, "", datastruct.UpdateTimeField, current_UpdateTime)
-	} else {
-		_, err = conn.Do("hmset", key, datastruct.GoldField, currentGold, datastruct.UpdateTimeField, current_UpdateTime)
+		args = append(args, datastruct.SpeedUpField)
+		args = append(args, "")
 	}
+	args = append(args, datastruct.GoldField)
+	args = append(args, currentGold)
+	args = append(args, datastruct.UpdateTimeField)
+	args = append(args, current_UpdateTime)
+	_, err = conn.Do("hmset", args...)
 	if err != nil {
 		log.Debug("CACHEHandler ComputeCurrentGold err:%s", err.Error())
 		return datastruct.UpdateDataFailed, -1
@@ -602,7 +611,7 @@ func (handle *CACHEHandler) GetPlantLevel(key string, soil_id int) (datastruct.C
 	conn := handle.GetConn()
 	defer conn.Close()
 	soiltableName := fmt.Sprintf("soil%d", soil_id)
-	value, err := redis.String(conn.Do("hget", soiltableName, key))
+	value, err := redis.String(conn.Do("hget", key, soiltableName))
 	var player_soil *datastruct.PlayerSoil
 	if err == nil {
 		player_soil, _ = tools.BytesToPlayerSoil([]byte(value))
@@ -651,7 +660,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 	defer conn.Close()
 
 	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
-	value, err := redis.String(conn.Do("hget", petbartableName, key))
+	value, err := redis.String(conn.Do("hget", key, petbartableName))
 	if err != nil {
 		return datastruct.GetDataFailed, -1
 	}
@@ -662,7 +671,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 	}
 
 	soiltableName := fmt.Sprintf("soil%d", body.SoilId)
-	value, err = redis.String(conn.Do("hget", soiltableName, key))
+	value, err = redis.String(conn.Do("hget", key, soiltableName))
 	if err != nil {
 		return datastruct.GetDataFailed, -1
 	}
@@ -680,10 +689,7 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 
 	soil_value, _ := tools.PlayerSoilToString(player_soil)
 	petbar_value, _ := tools.PlayerPetbarToString(playerPetbar)
-	conn.Send("MULTI")
-	conn.Send("hset", soiltableName, key, soil_value)
-	conn.Send("hset", petbartableName, key, petbar_value)
-	_, err = conn.Do("EXEC")
+	_, err = conn.Do("hmset", key, soiltableName, soil_value, petbartableName, petbar_value)
 	if err != nil {
 		log.Debug("CACHEHandler AddExpForAnimal err:%s", err.Error())
 		return datastruct.UpdateDataFailed, -1
@@ -866,7 +872,7 @@ func (handle *CACHEHandler) LotterySteal(key string, addGold int64, addHoney int
 
 	_, err = conn.Do("hmset", key, datastruct.GoldField, rs_goldCount, datastruct.StaminaField, stamina, datastruct.HoneyField, rs_honeyCount)
 	if err != nil {
-		log.Debug("CACHEHandler LotterySteal hmset err:%s", err.Error())
+		log.Debug("CACHEHandler LotterySteal  err:%s", err.Error())
 		return datastruct.UpdateDataFailed, nil
 	}
 	resp_data.GoldCount = rs_goldCount
