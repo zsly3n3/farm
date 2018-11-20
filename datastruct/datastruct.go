@@ -1,5 +1,7 @@
 package datastruct
 
+import "time"
+
 const NULLSTRING = ""
 const NULLID = -1
 
@@ -12,7 +14,8 @@ const MaxStamina = 30
 const MaxShield = 3
 const DefaultSpeedUpFactor = 1
 
-const AddMinute = "10m" //玩家超过10分钟不操作,判定离线
+const AddMinute = "1m" //玩家超过10分钟不操作,判定离线
+const PerMin time.Duration = 1 * time.Minute
 
 // DBSessionGetError//xorm事务中Get方法执行出错
 // DBSessionExecError//xorm事务中Exec方法执行出错

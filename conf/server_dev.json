@@ -1,5 +1,5 @@
 {
-	"HttpServer":"127.0.0.1:9995",
+	"HttpServer":"192.168.0.161:9995",
 	"Redis_IP":"localhost:6379",
 	"Redis_Name":"0",
 	"Redis_Pwd":"Zsly3n@s",

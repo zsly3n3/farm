@@ -124,6 +124,7 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 func (handle *CACHEHandler) DeletedKeys(keys []interface{}, petbars map[datastruct.AnimalType]datastruct.PetbarData, soils map[int]datastruct.SoilData) {
 	conn := handle.GetConn()
 	defer conn.Close()
+	log.Debug("DeletedKeys:%v", keys)
 	_, err := conn.Do("del", keys...)
 	if err != nil {
 		log.Debug("CACHEHandler DeletedKeys err:%s", err.Error())
