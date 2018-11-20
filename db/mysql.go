@@ -26,8 +26,8 @@ func CreateDBHandler() *DBHandler {
 	engine.ShowSQL(true)
 	//设置连接池的空闲数大小
 	engine.SetMaxIdleConns(1)
-	resetDB(engine)
-	initData(engine)
+	//resetDB(engine)
+	//initData(engine)
 	dbHandler.mysqlEngine = engine
 	return dbHandler
 }
