@@ -54,6 +54,7 @@ func (handle *EventHandler) checkOnlinePlayer() {
 			delete(handle.onlinePlayers.Bm, v.(string))
 		}
 		handle.deletefromRedis(slice)
+		//游客超过3天,删除数据
 	}
 }
 func (handle *EventHandler) deletefromRedis(keys []interface{}) {
