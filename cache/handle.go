@@ -628,9 +628,8 @@ func (handle *CACHEHandler) clearData() {
 	conn.Do("flushdb")
 }
 
-func (handle *CACHEHandler) GetPlantLevel(key string, soil_id int) (datastruct.CodeType, int) {
-	conn := handle.GetConn()
-	defer conn.Close()
+func (handle *CACHEHandler) GetPlantLevel(conn redis.Conn, key string, soil_id int) (datastruct.CodeType, int) {
+
 	soiltableName := fmt.Sprintf("soil%d", soil_id)
 	value, err := redis.String(conn.Do("hget", key, soiltableName))
 	var player_soil *datastruct.PlayerSoil
@@ -835,10 +834,7 @@ func (handle *CACHEHandler) SetStamina(key string, stamina int, conn redis.Conn)
 	}
 }
 
-func (handle *CACHEHandler) LotteryNomal(key string, rewardType datastruct.RewardType, expend int, stamina int, conn redis.Conn) (datastruct.CodeType, *datastruct.ResponesLotteryData, datastruct.RewardType) {
-
-	value, _ := redis.String(conn.Do("hget", key, datastruct.GoldField))
-	goldCount := tools.StringToInt64(value)
+func (handle *CACHEHandler) LotteryNomal(key string, rewardType datastruct.RewardType, expend int, stamina int, conn redis.Conn, currentGold int64) (datastruct.CodeType, *datastruct.ResponesLotteryData, datastruct.RewardType) {
 
 	resp_data := new(datastruct.ResponesLotteryData)
 
@@ -854,24 +850,24 @@ func (handle *CACHEHandler) LotteryNomal(key string, rewardType datastruct.Rewar
 		case datastruct.Gold_16k:
 			addGold = 16 * 1000
 		}
-		goldCount += addGold * int64(expend)
-		resp_data.GoldCount = goldCount
+		currentGold += addGold * int64(expend)
+		resp_data.GoldCount = currentGold
 		resp_data.Stamina = stamina
 
-		_, err := conn.Do("hmset", key, datastruct.GoldField, goldCount, datastruct.StaminaField, stamina)
+		_, err := conn.Do("hmset", key, datastruct.GoldField, currentGold, datastruct.StaminaField, stamina)
 		if err != nil {
 			log.Debug("CACHEHandler Lottery hmset_0 err:%s", err.Error())
 			return datastruct.UpdateDataFailed, nil, -1
 		}
 	} else if rewardType == datastruct.Energy_UI1 || rewardType == datastruct.Energy_UI2 {
-		resp_data.GoldCount = goldCount
+		resp_data.GoldCount = currentGold
 		stamina += expend * 1
 		resp_data.Stamina = stamina
 		handle.SetStamina(key, stamina, conn)
 	} else if rewardType == datastruct.Gog {
-		resp_data.GoldCount = goldCount
+		resp_data.GoldCount = currentGold
 		resp_data.Stamina = stamina
-		value, _ = redis.String(conn.Do("hget", key, datastruct.ShieldField))
+		value, _ := redis.String(conn.Do("hget", key, datastruct.ShieldField))
 		shields := tools.StringToInt(value)
 		shields += expend * 1
 		if shields >= datastruct.MaxShield {
@@ -888,11 +884,13 @@ func (handle *CACHEHandler) LotteryNomal(key string, rewardType datastruct.Rewar
 }
 
 func (handle *CACHEHandler) LotterySteal(key string, addGold int64, addHoney int64, stamina int, resp_data *datastruct.ResponesLotteryData, conn redis.Conn) (datastruct.CodeType, *datastruct.ResponesLotteryData) {
+
 	value, err := redis.Values(conn.Do("hmget", key, datastruct.GoldField, datastruct.HoneyField))
 	if err != nil {
 		log.Debug("CACHEHandler LotterySteal hmget err:%s ,player:%s", err.Error(), key)
 		return datastruct.GetDataFailed, nil
 	}
+
 	var rs_goldCount int64
 	var rs_honeyCount int64
 	for i := 0; i < len(value); i++ {

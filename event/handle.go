@@ -243,7 +243,9 @@ func (handle *EventHandler) GetShopData(c *gin.Context, token string, soil_id in
 		})
 		return
 	}
-	code, plantlevel := handle.cacheHandler.GetPlantLevel(token, soil_id)
+	conn := handle.cacheHandler.GetConn()
+	defer conn.Close()
+	code, plantlevel := handle.cacheHandler.GetPlantLevel(conn, token, soil_id)
 	if code != datastruct.NULLError {
 		c.JSON(200, gin.H{
 			"code": code,
@@ -253,6 +255,8 @@ func (handle *EventHandler) GetShopData(c *gin.Context, token string, soil_id in
 	len := len(handle.plants)
 	index := 0
 	num := 40
+
+	_, currentGold := handle.cacheHandler.ComputeCurrentGold(conn, token, handle.plants, handle.animals)
 	plants := make([]*datastruct.ResponsePlant, 0, num)
 	for i := 0; i < len; i++ {
 		plant := new(datastruct.ResponsePlant)
@@ -261,8 +265,12 @@ func (handle *EventHandler) GetShopData(c *gin.Context, token string, soil_id in
 			plant.State = datastruct.Owned
 			plants = append(plants, plant)
 		} else if plantlevel+1 == plant.Level {
+			if currentGold >= plant.Price {
+				plant.State = datastruct.Unlocked
+			} else {
+				plant.State = datastruct.Locked
+			}
 			index = i + 1
-			plant.State = datastruct.Unlocked
 			plants = append(plants, plant)
 			break
 		}
@@ -277,7 +285,7 @@ func (handle *EventHandler) GetShopData(c *gin.Context, token string, soil_id in
 
 	shopData := new(datastruct.ShopData)
 	shopData.Plants = plants
-
+	shopData.GoldCount = currentGold
 	c.JSON(200, gin.H{
 		"code": code,
 		"data": shopData,
@@ -371,7 +379,8 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 	}
 	stamina -= body.Expend
 	if rewardType != datastruct.Steal {
-		return handle.cacheHandler.LotteryNomal(key, rewardType, body.Expend, stamina, conn)
+		_, goldCount := handle.cacheHandler.ComputeCurrentGold(conn, key, handle.plants, handle.animals)
+		return handle.cacheHandler.LotteryNomal(key, rewardType, body.Expend, stamina, conn, goldCount)
 	}
 	//compute
 	users := handle.dbHandler.LotterySteal(player_id)
@@ -391,6 +400,7 @@ func (handle *EventHandler) Lottery(key string, c *gin.Context) (datastruct.Code
 	}
 
 	resp_data, addGold, addHoney := handle.computeSteal(player_data, body.Expend)
+	handle.cacheHandler.ComputeCurrentGold(conn, key, handle.plants, handle.animals)
 	code, resp_data = handle.cacheHandler.LotterySteal(key, addGold, addHoney, stamina, resp_data, conn)
 	return code, resp_data, rewardType
 }

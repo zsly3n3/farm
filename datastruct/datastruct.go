@@ -153,7 +153,8 @@ type AnimalClass struct {
 }
 
 type ShopData struct {
-	Plants []*ResponsePlant `json:"plants"`
+	Plants    []*ResponsePlant `json:"plants"`
+	GoldCount int64            `json:"goldcount"`
 }
 
 //save reids,save mysql
