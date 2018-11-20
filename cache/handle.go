@@ -267,12 +267,11 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 	var soilLevel int
 	for i := 0; i < len(value); i++ {
 		tmp := value[i].([]byte)
-		str := string(tmp[:])
 		switch i {
 		case 0:
 			player_soil, _ = tools.BytesToPlayerSoil(tmp)
 		case 1:
-			soilLevel = tools.StringToInt(str)
+			soilLevel = tools.StringToInt(string(tmp[:]))
 		}
 	}
 
@@ -372,12 +371,11 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 	var soilLevel int
 	for i := 0; i < len(value); i++ {
 		tmp := value[i].([]byte)
-		str := string(tmp[:])
 		switch i {
 		case 0:
 			rs_tmp, _ = tools.BytesToPlayerPetbar(tmp)
 		case 1:
-			soilLevel = tools.StringToInt(str)
+			soilLevel = tools.StringToInt(string(tmp[:]))
 		}
 	}
 
@@ -457,12 +455,11 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 	var honeyCount int64
 	for i := 0; i < len(value); i++ {
 		tmp := value[i].([]byte)
-		str := string(tmp[:])
 		switch i {
 		case 0:
 			rs_tmp, _ = tools.BytesToPlayerPetbar(tmp)
 		case 1:
-			honeyCount = tools.StringToInt64(str)
+			honeyCount = tools.StringToInt64(string(tmp[:]))
 		}
 	}
 
@@ -685,22 +682,30 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 	defer conn.Close()
 
 	petbartableName := fmt.Sprintf("petbar%d", int(petbar_type))
-	value, err := redis.String(conn.Do("hget", key, petbartableName))
+	soiltableName := fmt.Sprintf("soil%d", body.SoilId)
+
+	value, err := redis.Values(conn.Do("hmget", key, petbartableName, soiltableName))
 	if err != nil {
+		log.Debug("CACHEHandler AddExpForAnimal hmget err:%s ,player:%s", err.Error(), key)
 		return datastruct.GetDataFailed, -1
 	}
-	playerPetbar, _ := tools.BytesToPlayerPetbar([]byte(value))
+
+	var playerPetbar *datastruct.PlayerPetbar
+	var player_soil *datastruct.PlayerSoil
+	for i := 0; i < len(value); i++ {
+		tmp := value[i].([]byte)
+		switch i {
+		case 0:
+			playerPetbar, _ = tools.BytesToPlayerPetbar(tmp)
+		case 1:
+			player_soil, _ = tools.BytesToPlayerSoil(tmp)
+		}
+	}
+
 	//没有购买宠物栏
 	if playerPetbar.State != datastruct.Owned {
 		return datastruct.UpdateDataFailed, -1
 	}
-
-	soiltableName := fmt.Sprintf("soil%d", body.SoilId)
-	value, err = redis.String(conn.Do("hget", key, soiltableName))
-	if err != nil {
-		return datastruct.GetDataFailed, -1
-	}
-	player_soil, _ := tools.BytesToPlayerSoil([]byte(value))
 
 	//没有植物可提供经验
 	if player_soil.PlantId == 0 || player_soil.State != datastruct.Owned {
@@ -726,21 +731,37 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *datastruct.ResponseAddHoney) {
 	conn := handle.GetConn()
 	defer conn.Close()
-	value, err := redis.String(conn.Do("hget", key, datastruct.SpeedUpField))
+
+	value, err := redis.Values(conn.Do("hmget", key, datastruct.SpeedUpField, datastruct.HoneyField))
 	if err != nil {
+		log.Debug("CACHEHandler AddHoneyCount hmget err:%s ,player:%s", err.Error(), key)
 		return datastruct.GetDataFailed, nil
 	}
+
+	var speedup_str string
+	var honeyCount int64
+	for i := 0; i < len(value); i++ {
+		tmp := value[i].([]byte)
+		str := string(tmp[:])
+		switch i {
+		case 0:
+			speedup_str = str
+		case 1:
+			honeyCount = tools.StringToInt64(str)
+		}
+	}
+
 	var rs_tmp *datastruct.SpeedUpData
 	resp_data := new(datastruct.ResponseAddHoney)
 	now_Time := time.Now()
-	if value == "" {
+	if speedup_str == "" {
 		rs_tmp = new(datastruct.SpeedUpData)
 		rs_tmp.Factor = 2
 		rs_tmp.Starting = now_Time.Unix()
 		hh, _ := time.ParseDuration("4h")
 		rs_tmp.Ending = now_Time.Add(hh).Unix()
 	} else {
-		rs_tmp, _ = tools.BytesToSpeedUp([]byte(value))
+		rs_tmp, _ = tools.BytesToSpeedUp([]byte(speedup_str))
 		CD := tools.EnableSpeedUp(rs_tmp.Ending, now_Time.Unix())
 		if CD > 0 {
 			resp_data.CD = CD
@@ -753,18 +774,12 @@ func (handle *CACHEHandler) AddHoneyCount(key string) (datastruct.CodeType, *dat
 	nextspeedcd := tools.EnableSpeedUp(rs_tmp.Ending, now_Time.Unix())
 	resp_data.CD = nextspeedcd
 
-	value, err = redis.String(conn.Do("hget", key, datastruct.HoneyField))
-	if err != nil {
-		return datastruct.GetDataFailed, nil
-	}
-	honeyCount := tools.StringToInt64(value)
-
 	//compute honeyCount
 	honeyCount += 100
 
 	resp_data.HoneyCount = honeyCount
-	value, _ = tools.SpeedUpToString(rs_tmp)
-	_, err = conn.Do("hmset", key, datastruct.HoneyField, honeyCount, datastruct.SpeedUpField, value)
+	speedup_str, _ = tools.SpeedUpToString(rs_tmp)
+	_, err = conn.Do("hmset", key, datastruct.HoneyField, honeyCount, datastruct.SpeedUpField, speedup_str)
 	if err != nil {
 		log.Debug("CACHEHandler AddHoneyCount err:%s", err.Error())
 		return datastruct.GetDataFailed, nil
