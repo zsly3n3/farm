@@ -449,8 +449,8 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 
 	value, err := redis.Values(conn.Do("hmget", key, petbartableName, datastruct.HoneyField))
 	if err != nil {
-		log.Debug("CACHEHandler BuyPetbar hmget err:%s ,player:%s", err.Error(), key)
-		return datastruct.GetDataFailed, -1, nil, -1
+		log.Debug("CACHEHandler AnimalUpgrade hmget err:%s ,player:%s", err.Error(), key)
+		return datastruct.GetDataFailed, nil
 	}
 
 	var rs_tmp *datastruct.PlayerPetbar
@@ -495,9 +495,9 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 		isLast = 1
 	}
 
-	value, _ = tools.PlayerPetbarToString(rs_tmp)
+	playerPetbar_str, _ := tools.PlayerPetbarToString(rs_tmp)
 
-	_, err = conn.Do("hmset", key, datastruct.HoneyField, last_honey, petbartableName, value)
+	_, err = conn.Do("hmset", key, datastruct.HoneyField, last_honey, petbartableName, playerPetbar_str)
 
 	if err != nil {
 		log.Debug("CACHEHandler AnimalUpgrade err:%s", err.Error())
