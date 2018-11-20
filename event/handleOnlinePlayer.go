@@ -25,7 +25,7 @@ func (handle *EventHandler) selectTicker() {
 	for {
 		select {
 		case <-handle.ticker.C:
-			// handle.checkOnlinePlayer()
+			handle.checkOnlinePlayer()
 		}
 	}
 }

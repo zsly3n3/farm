@@ -125,6 +125,7 @@ func (handle *CACHEHandler) DeletedKeys(keys []interface{}, petbars map[datastru
 	conn := handle.GetConn()
 	defer conn.Close()
 	_, err := conn.Do("del", keys...)
+	log.Debug("keys:%v", keys)
 	if err != nil {
 		log.Debug("CACHEHandler DeletedKeys err:%s", err.Error())
 	}
