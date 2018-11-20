@@ -34,9 +34,7 @@ func (handle *CACHEHandler) SetPlayerID(conn redis.Conn, key string, p_id int) {
 func (handle *CACHEHandler) SetPlayerSomeData(conn redis.Conn, p_data *datastruct.PlayerData) {
 	key := p_data.Token
 	//add
-	_, err := conn.Do("hmset", key,
-		datastruct.PermissionIdField, p_data.PermissionId,
-		datastruct.UpdateTimeField, p_data.UpdateTime)
+	_, err := conn.Do("hmset", key, datastruct.PermissionIdField, p_data.PermissionId, datastruct.UpdateTimeField, p_data.UpdateTime)
 	if err != nil {
 		log.Debug("CACHEHandler SetPlayerData err:%s", err.Error())
 	}
