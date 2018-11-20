@@ -66,7 +66,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	}
 
 	if p_data.SpeedUp != nil {
-		sql := fmt.Sprintf("REPLACE INTO player_speed_up (id,factor,starting,ending)VALUES(%d,%d,%d,%d)", userinfo.Id, p_data.SpeedUp.Factor, p_data.SpeedUp.Starting, p_data.SpeedUp.Ending)
+		sql := fmt.Sprintf("REPLACE INTO player_speed_up (id,factor,start,end)VALUES(%d,%d,%d,%d)", userinfo.Id, p_data.SpeedUp.Factor, p_data.SpeedUp.Starting, p_data.SpeedUp.Ending)
 		_, err = session.Exec(sql)
 		if err != nil {
 			str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE player_speed_up :%s", err.Error())

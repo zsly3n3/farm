@@ -103,10 +103,10 @@ type PlayerInfo struct {
 }
 
 type PlayerSpeedUp struct {
-	Id       int   `xorm:"not null pk INT(11)"` //关联UserInfo中id
-	Factor   int   `xorm:"not null INT(11)"`    //加速系数
-	Starting int64 `xorm:"not null bigint"`     //开始时间，时间戳
-	Ending   int64 `xorm:"not null bigint"`     //结束时间，时间戳
+	Id     int   `xorm:"not null pk INT(11)"` //关联UserInfo中id
+	Factor int   `xorm:"not null INT(11)"`    //加速系数
+	Start  int64 `xorm:"not null bigint"`     //开始时间，时间戳
+	End    int64 `xorm:"not null bigint"`     //结束时间，时间戳
 }
 
 /*用户领取的体力记录*/
