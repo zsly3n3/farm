@@ -452,7 +452,8 @@ func ComputeCurrentGold(soil map[int]*datastruct.PlayerSoil, petbar map[datastru
 	addGold = 0
 	for _, v := range soil {
 		if v.PlantId > 0 {
-			addGold += plants[v.PlantId-1].InCome * sec * int64(v.Factor*factor)
+			rs_factor := float64(v.Factor / 100.0)
+			addGold += int64(float64(plants[v.PlantId-1].InCome*sec*int64(factor)) * rs_factor)
 		}
 	}
 	for k, v := range petbar {
