@@ -29,7 +29,7 @@ func CreateEventHandler() *EventHandler {
 	eventHandler.soils, eventHandler.petbars = tools.GetSoildInfo()
 	eventHandler.cacheHandler = cache.CreateCACHEHandler()
 	eventHandler.dbHandler = db.CreateDBHandler()
-	eventHandler.createTicker(1 * time.Minute)
+	eventHandler.createTicker(5 * time.Minute)
 	eventHandler.plants = eventHandler.dbHandler.GetPlantsSlice()
 	eventHandler.animals = eventHandler.dbHandler.GetAnimalsMap()
 	eventHandler.onlinePlayers = datastruct.NewOnlinePlayers()
