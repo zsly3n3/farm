@@ -80,18 +80,6 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 	last_UpdateTime := p_data.UpdateTime
 	current_UpdateTime := time.Now().Unix()
 
-	gold := p_data.GoldCount
-	for k, v := range handle.soils {
-		if gold >= v.Price {
-			p_data.Soil[k].State = datastruct.Unlocked
-		}
-	}
-	for k, v := range handle.petbars {
-		if gold >= v.Price {
-			p_data.PetBar[k].State = datastruct.Unlocked
-		}
-	}
-
 	tmpLoginData := new(datastruct.TmpLoginData)
 	tmpLoginData.CD = 0
 	var addGold int64
@@ -148,6 +136,17 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 	}
 	p_data.UpdateTime = current_UpdateTime
 	p_data.GoldCount += addGold
+
+	for k, v := range handle.soils {
+		if p_data.Soil[k].State != datastruct.Owned && p_data.GoldCount >= v.Price {
+			p_data.Soil[k].State = datastruct.Unlocked
+		}
+	}
+	for k, v := range handle.petbars {
+		if p_data.PetBar[k].State != datastruct.Owned && p_data.GoldCount >= v.Price {
+			p_data.PetBar[k].State = datastruct.Unlocked
+		}
+	}
 	return tmpLoginData
 }
 
