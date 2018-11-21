@@ -23,6 +23,57 @@ func (handle *DBHandler) GetPlayerData(code string) (*datastruct.PlayerData, boo
 	return p_data, isExist
 }
 
+func (handle *DBHandler) DeleteUser(userId int, soils map[int]datastruct.SoilData, petbars map[datastruct.AnimalType]datastruct.PetbarData) {
+	engine := handle.mysqlEngine
+	session := engine.NewSession()
+	defer session.Close()
+	session.Begin()
+
+	user := new(datastruct.UserInfo)
+	_, err := session.Id(userId).Delete(user)
+	if err != nil {
+		str := fmt.Sprintf("DBHandler->DeleteUser UserInfo :%s", err.Error())
+		rollback(str, session)
+	}
+
+	player := new(datastruct.PlayerInfo)
+	_, err = session.Id(userId).Delete(player)
+	if err != nil {
+		str := fmt.Sprintf("DBHandler->DeleteUser playerInfo :%s", err.Error())
+		rollback(str, session)
+	}
+
+	speedup := new(datastruct.PlayerSpeedUp)
+	_, err = session.Id(userId).Delete(speedup)
+	if err != nil {
+		str := fmt.Sprintf("DBHandler->DeleteUser playerSpeedUp :%s", err.Error())
+		rollback(str, session)
+	}
+
+	for k, _ := range petbars {
+		sql := fmt.Sprintf("DELETE FROM petbar%d WHERE p_id = %d", int(k), userId)
+		_, err = session.Exec(sql)
+		if err != nil {
+			str := fmt.Sprintf("DBHandler->SetPlayerData DELETE FROM PetBar%d :%s", int(k), err.Error())
+			rollback(str, session)
+		}
+	}
+	for k, _ := range soils {
+		sql := fmt.Sprintf("DELETE FROM soil%d WHERE p_id = %d", k, userId)
+		_, err = session.Exec(sql)
+		if err != nil {
+			str := fmt.Sprintf("DBHandler->SetPlayerData DELETE FROM soil%d :%s", k, err.Error())
+			rollback(str, session)
+		}
+	}
+
+	err = session.Commit()
+	if err != nil {
+		str := fmt.Sprintf("DBHandler->DeleteUser Commit :%s", err.Error())
+		rollback(str, session)
+	}
+}
+
 func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	engine := handle.mysqlEngine
 	session := engine.NewSession()
@@ -75,9 +126,9 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		}
 	} else {
 		var speedup datastruct.PlayerSpeedUp
-		has, err := session.Where("id=?", userinfo.Id).Get(&speedup)
+		has, err := session.Id(userinfo.Id).Get(&speedup)
 		if has {
-			_, err = engine.Id(userinfo.Id).Delete(&speedup)
+			_, err = session.Id(userinfo.Id).Delete(&speedup)
 			if err != nil {
 				str := fmt.Sprintf("DBHandler->SetPlayerData Delete player_speed_up :%s", err.Error())
 				rollback(str, session)

@@ -51,10 +51,14 @@ func (handle *EventHandler) checkOnlinePlayer() {
 		conn := handle.cacheHandler.GetConn()
 		defer conn.Close()
 		for _, v := range slice {
-			delete(handle.onlinePlayers.Bm, v.(string))
+			key := v.(string)
+			delete(handle.onlinePlayers.Bm, key)
+			isRemoved, userId := handle.cacheHandler.IsRemoveGuest(key)
+			if isRemoved {
+				go handle.dbHandler.DeleteUser(userId) //游客过期,删除数据
+			}
 		}
 		handle.deletefromRedis(slice)
-		//游客超过3天,删除数据
 	}
 }
 func (handle *EventHandler) deletefromRedis(keys []interface{}) {

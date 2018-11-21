@@ -17,6 +17,8 @@ const DefaultSpeedUpFactor = 1
 const AddMinute = "10m" //玩家超过10分钟不操作,判定离线
 const PerMin time.Duration = 5 * time.Minute
 
+const ExpiredTime int64 = 24 * 3600 * 3 //游客过期时间:3天,单位为秒
+
 // DBSessionGetError//xorm事务中Get方法执行出错
 // DBSessionExecError//xorm事务中Exec方法执行出错
 // DBSessionInsertError//xorm事务中Insert方法执行出错

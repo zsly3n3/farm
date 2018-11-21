@@ -19,6 +19,40 @@ func (handle *CACHEHandler) GetPlayerData(conn redis.Conn, code string) (*datast
 	return rs, isExist
 }
 
+func (handle *CACHEHandler) IsRemoveGuest(key string) (bool, int) {
+	conn := handle.GetConn()
+	defer conn.Close()
+	value, err := redis.Values(conn.Do("hmget", key, datastruct.PermissionIdField, datastruct.CreatedAtField, datastruct.IdField))
+	length := len(value)
+	if err != nil || length == 0 {
+		log.Debug("CACHEHandler IsRemoveGuest err:%s ,player:%s", err.Error(), key)
+		return false, -1
+	}
+	var permissionId int
+	var createdAt int64
+	var userId int
+	for i := 0; i < len(value); i++ {
+		tmp := value[i].([]byte)
+		str := string(tmp[:])
+		switch i {
+		case 0:
+			permissionId = tools.StringToInt(str)
+		case 1:
+			createdAt = tools.StringToInt64(str)
+		case 2:
+			userId = tools.StringToInt(str)
+		}
+	}
+	if permissionId == int(datastruct.Guest) {
+		tmp := time.Now().Unix() - createdAt
+		if tmp >= datastruct.ExpiredTime {
+			return true, userId
+		}
+
+	}
+	return false, -1
+}
+
 func (handle *CACHEHandler) GetConn() redis.Conn {
 	conn := handle.redisClient.Get()
 	return conn
