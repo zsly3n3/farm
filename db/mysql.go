@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+	"github.com/robfig/cron"
 )
 
 type DBHandler struct {
@@ -29,6 +30,7 @@ func CreateDBHandler() *DBHandler {
 	resetDB(engine)
 	initData(engine)
 	dbHandler.mysqlEngine = engine
+	go timerTask(engine)
 	return dbHandler
 }
 
@@ -152,4 +154,16 @@ func errhandle(err error) {
 	if err != nil {
 		log.Fatal("db error is %v", err.Error())
 	}
+}
+
+/*定时任务*/
+func timerTask(engine *xorm.Engine) {
+	c := cron.New()
+	spec := "0 0 0 * * 1"
+	c.AddFunc(spec, func() {
+		table0 := "reward_stamina"
+		truncate := "truncate table "
+		engine.Exec(truncate + table0)
+	})
+	c.Start()
 }
