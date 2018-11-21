@@ -77,13 +77,18 @@ func (handle *DBHandler) DeleteUser(userId int, soils map[int]datastruct.SoilDat
 func (handle *DBHandler) InsertInviteInfo(userId int, referrer int) {
 	engine := handle.mysqlEngine
 	var invite datastruct.InviteInfo
-	has, _ := engine.Where("received = ?", userId).Get(&invite)
-	if !has {
-		invite.Received = userId
-		invite.Sended = referrer
-		_, err := engine.Insert(&invite)
-		if err != nil {
-			log.Debug("InsertInviteInfo insert error:%v", err.Error())
+	var user datastruct.UserInfo
+	var has bool
+	has, _ = engine.Id(referrer).Get(&user)
+	if has && user.PermissionId == int(datastruct.Player) {
+		has, _ = engine.Where("received = ?", userId).Get(&invite)
+		if !has {
+			invite.Received = userId
+			invite.Sended = referrer
+			_, err := engine.Insert(&invite)
+			if err != nil {
+				log.Debug("InsertInviteInfo insert error:%v", err.Error())
+			}
 		}
 	}
 }
@@ -138,12 +143,15 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 
 	if p_data.Id <= 0 {
 		if p_data.PermissionId == int(datastruct.Player) && userinfo.Referrer > 0 && userinfo.Referrer < p_data.Id {
-			var inviteInfo datastruct.InviteInfo
-			inviteInfo.Received = userinfo.Id
-			inviteInfo.Sended = userinfo.Referrer
-			_, err := session.Insert(&inviteInfo)
-			if err != nil {
-				log.Debug("SetPlayerData Insert InviteInfo error:%v", err.Error())
+			has, _ = session.Id(userinfo.Referrer).Get(&tmp)
+			if has && tmp.PermissionId == int(datastruct.Player) {
+				var inviteInfo datastruct.InviteInfo
+				inviteInfo.Received = userinfo.Id
+				inviteInfo.Sended = userinfo.Referrer
+				_, err := session.Insert(&inviteInfo)
+				if err != nil {
+					log.Debug("SetPlayerData Insert InviteInfo error:%v", err.Error())
+				}
 			}
 		}
 		var rewardStamina datastruct.RewardStamina
