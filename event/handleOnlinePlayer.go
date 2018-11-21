@@ -55,7 +55,7 @@ func (handle *EventHandler) checkOnlinePlayer() {
 			delete(handle.onlinePlayers.Bm, key)
 			isRemoved, userId := handle.cacheHandler.IsRemoveGuest(key)
 			if isRemoved {
-				go handle.dbHandler.DeleteUser(userId) //游客过期,删除数据
+				go handle.dbHandler.DeleteUser(userId, handle.soils, handle.petbars) //游客过期,删除数据
 			}
 		}
 		handle.deletefromRedis(slice)
