@@ -126,6 +126,8 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 	args = append(args, datastruct.ShieldField)
 	args = append(args, p_data.Shield)
 
+	args = append(args, datastruct.ReferrerField)
+	args = append(args, p_data.Referrer)
 	for k, v := range p_data.Soil {
 		soiltableName := fmt.Sprintf("soil%d", k)
 		value, isError := tools.PlayerSoilToString(v)
@@ -172,7 +174,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 		datastruct.IdField, datastruct.GoldField, datastruct.HoneyField,
 		datastruct.PermissionIdField, datastruct.CreatedAtField, datastruct.UpdateTimeField,
 		datastruct.NickNameField, datastruct.AvatarField, datastruct.SpeedUpField,
-		datastruct.StaminaField, datastruct.ShieldField))
+		datastruct.StaminaField, datastruct.ShieldField, datastruct.ReferrerField))
 	length := len(value)
 	if err != nil {
 		log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s", err.Error(), key)
@@ -207,6 +209,8 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 			rs.Stamina = tools.StringToInt(str)
 		case 10:
 			rs.Shield = tools.StringToInt(str)
+		case 11:
+			rs.Referrer = tools.StringToInt(str)
 		}
 	}
 
@@ -235,16 +239,34 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 	return rs
 }
 
-func (handle *CACHEHandler) UpdatePermisson(key string, permissionId int, body *datastruct.UserAuthBody) datastruct.CodeType {
+func (handle *CACHEHandler) UpdatePermisson(key string, permissionId int, body *datastruct.UserAuthBody) (datastruct.CodeType, int, int) {
 	conn := handle.GetConn()
 	defer conn.Close()
 	_, err := conn.Do("hmset", key, datastruct.PermissionIdField, permissionId, datastruct.NickNameField, body.NickName, datastruct.AvatarField, body.Avatar)
-	code := datastruct.NULLError
+
 	if err != nil {
-		code = datastruct.UpdateDataFailed
-		log.Debug("CACHEHandler UpdatePermisson err:%s", err.Error())
+		log.Debug("CACHEHandler UpdatePermisson hmset err:%s", err.Error())
+		return datastruct.UpdateDataFailed, -1, -1
 	}
-	return code
+	value, err := redis.Values(conn.Do("hmget", key, datastruct.IdField, datastruct.ReferrerField))
+	if err != nil {
+		log.Debug("CACHEHandler UpdatePermisson hmget err:%s ,player:%s", err.Error(), key)
+		return datastruct.GetDataFailed, -1, -1
+	}
+
+	var userId int
+	var referrer int
+	for i := 0; i < len(value); i++ {
+		tmp := value[i].([]byte)
+		switch i {
+		case 0:
+			userId = tools.StringToInt(string(tmp[:]))
+		case 1:
+			referrer = tools.StringToInt(string(tmp[:]))
+		}
+	}
+
+	return datastruct.NULLError, userId, referrer
 }
 
 func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.UpgradeSoil, soils map[int]datastruct.SoilData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, *datastruct.ResponseUpgradeSoil) {

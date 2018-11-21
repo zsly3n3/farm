@@ -76,6 +76,7 @@ const SoilLevelField = "SoilLevel"
 const SpeedUpField = "SpeedUp"
 const StaminaField = "Stamina"
 const ShieldField = "Shield"
+const ReferrerField = "Referrer"
 
 const PlayerPetbarField = "PlayerPetbar"
 
@@ -87,6 +88,13 @@ type UserInfo struct {
 	UpdateTime   int64  `xorm:"bigint not null"`       //最近一次离开或者登陆的时间
 	NickName     string `xorm:"VARCHAR(255) not null"` //昵称
 	Avatar       string `xorm:"VARCHAR(255) not null"` //头像
+	Referrer     int    `xorm:"not null INT(11)"`      //推荐人ID
+}
+
+//邀请信息表
+type InviteInfo struct {
+	Sended   int `xorm:"not null INT(11)"`    //发送邀请者
+	Received int `xorm:"not null pk INT(11)"` //被邀请者
 }
 
 type Permission struct {
@@ -169,6 +177,7 @@ type PlayerData struct {
 	HoneyCount   int64  //蜂蜜数量
 	Stamina      int    //玩家当前体力值
 	Shield       int    //当前盾牌数量
+	Referrer     int    //推荐人id
 	NickName     string
 	Avatar       string
 	SoilLevel    int                          //可购买土地的等级
@@ -555,6 +564,7 @@ type UserLogin struct {
 	IsAuth     int      `json:"isauth"`     //是否授权
 	NickName   string   `json:"nickname"`
 	Avatar     string   `json:"avatar"`
+	Referrer   int      `json:"referrer"` //推荐人id
 }
 
 type PlantInSoil struct {

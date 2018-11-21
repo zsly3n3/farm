@@ -39,8 +39,8 @@ func (handle *EventHandler) Login(c *gin.Context) {
 				p_data, isExistMysql = handle.dbHandler.GetPlayerData(openid) //find in mysql
 				if !isExistMysql {
 					p_data = handle.createUser(openid, getPermissionId(body.IsAuth), body.NickName, body.Avatar)
+					p_data.Referrer = body.Referrer
 					p_data.Id = handle.dbHandler.SetPlayerData(p_data) //入库
-					handle.dbHandler.InsertRewardStamina(p_data.Id)
 				} else {
 					tmpLoginData = handle.refreshPlayerData(p_data, body.IsAuth)
 				}
@@ -174,7 +174,10 @@ func (handle *EventHandler) UpdatePermisson(key string, permissionId int, c *gin
 	if err != nil {
 		return datastruct.JsonParseFailedFromPostBody
 	}
-	code := handle.cacheHandler.UpdatePermisson(key, permissionId, &body)
+	code, userId, referrer := handle.cacheHandler.UpdatePermisson(key, permissionId, &body)
+	if referrer > 0 && referrer < userId {
+		handle.dbHandler.InsertInviteInfo(userId, referrer)
+	}
 	return code
 }
 
@@ -339,15 +342,15 @@ func (handle *EventHandler) GetStamina(key string) (datastruct.CodeType, *datast
 	if !isGetedStamina && stamina < datastruct.MaxStamina {
 		stamina = datastruct.MaxStamina
 		handle.cacheHandler.SetStamina(key, stamina, conn)
-
 	}
 	resp_data := new(datastruct.ResponesStaminaData)
 	resp_data.Stamina = stamina
 
 	now_Time := time.Now()
 	tomorrow := now_Time.Add(24 * time.Hour)
+
 	year, month, day := tomorrow.Date()
-	tomorrow_Time := time.Date(year, month, day, 0, 0, 0, 0, time.Local)
+	tomorrow_Time := time.Date(year, month, day, 0, 0, 1, 0, time.Local)
 	resp_data.NextRequest = tomorrow_Time.Unix() - now_Time.Unix()
 	return datastruct.NULLError, resp_data
 }

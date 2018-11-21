@@ -74,13 +74,26 @@ func (handle *DBHandler) DeleteUser(userId int, soils map[int]datastruct.SoilDat
 	}
 }
 
+func (handle *DBHandler) InsertInviteInfo(userId int, referrer int) {
+	engine := handle.mysqlEngine
+	var invite datastruct.InviteInfo
+	has, _ := engine.Where("received = ?", userId).Get(&invite)
+	if !has {
+		invite.Received = userId
+		invite.Sended = referrer
+		_, err := engine.Insert(&invite)
+		if err != nil {
+			log.Debug("InsertInviteInfo insert error:%v", err.Error())
+		}
+	}
+}
+
 func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	engine := handle.mysqlEngine
 	session := engine.NewSession()
 	defer session.Close()
 	session.Begin()
 
-	//add
 	var userinfo datastruct.UserInfo
 	userinfo.IdentityId = p_data.Token
 	userinfo.CreatedAt = p_data.CreatedAt
@@ -89,15 +102,29 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	userinfo.Avatar = p_data.Avatar
 	userinfo.NickName = p_data.NickName
 
+	var tmp datastruct.UserInfo
+	var has bool
 	var err error
+
+	if p_data.Id <= 0 {
+		if p_data.Referrer > 0 {
+			has, _ = session.Id(p_data.Referrer).Get(&tmp)
+			if has {
+				userinfo.Referrer = p_data.Referrer
+			} else {
+				userinfo.Referrer = 0
+			}
+		} else {
+			userinfo.Referrer = 0
+		}
+	}
+
 	if p_data.Id <= 0 {
 		_, err = session.Insert(&userinfo)
 	} else {
-		var tmp datastruct.UserInfo
-		var has bool
-		has, err = session.Where("id=?", p_data.Id).Get(&tmp)
+		has, _ = session.Id(p_data.Id).Get(&tmp)
 		if has {
-			_, err = session.Where("id=?", p_data.Id).Update(&userinfo)
+			_, err = session.Id(p_data.Id).Update(&userinfo)
 			userinfo.Id = p_data.Id
 		} else {
 			_, err = session.Insert(&userinfo)
@@ -108,6 +135,26 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		rollback(str, session)
 		return userinfo.Id
 	}
+
+	if p_data.Id <= 0 {
+		if p_data.PermissionId == int(datastruct.Player) && userinfo.Referrer > 0 && userinfo.Referrer < p_data.Id {
+			var inviteInfo datastruct.InviteInfo
+			inviteInfo.Received = userinfo.Id
+			inviteInfo.Sended = userinfo.Referrer
+			_, err := session.Insert(&inviteInfo)
+			if err != nil {
+				log.Debug("SetPlayerData Insert InviteInfo error:%v", err.Error())
+			}
+		}
+		var rewardStamina datastruct.RewardStamina
+		rewardStamina.Id = userinfo.Id
+		rewardStamina.GetTime = time.Now().Unix()
+		_, err := session.Insert(&rewardStamina)
+		if err != nil {
+			log.Debug("SetPlayerData Insert RewardStamina error:%v", err.Error())
+		}
+	}
+
 	sql := fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,soil_level,stamina,shield)VALUES(%d,%d,%d,%d,%d,%d)", userinfo.Id, p_data.HoneyCount, p_data.GoldCount, p_data.SoilLevel, p_data.Stamina, p_data.Shield)
 	_, err = session.Exec(sql)
 	if err != nil {
@@ -126,7 +173,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		}
 	} else {
 		var speedup datastruct.PlayerSpeedUp
-		has, err := session.Id(userinfo.Id).Get(&speedup)
+		has, _ = session.Id(userinfo.Id).Get(&speedup)
 		if has {
 			_, err = session.Id(userinfo.Id).Delete(&speedup)
 			if err != nil {
@@ -170,22 +217,18 @@ func rollback(err_str string, session *xorm.Session) {
 	session.Rollback()
 }
 
-func (handle *DBHandler) InsertRewardStamina(player_id int) {
-	engine := handle.mysqlEngine
-	var rewardStamina datastruct.RewardStamina
-	rewardStamina.Id = player_id
-	rewardStamina.GetTime = time.Now().Unix()
-	_, err := engine.Insert(&rewardStamina)
-	if err != nil {
-		log.Debug("InsertRewardStamina error:%v", err.Error())
-	}
-	return
-}
-
 func (handle *DBHandler) IsGetStamina(player_id int) bool {
 	engine := handle.mysqlEngine
 	var rewardStamina datastruct.RewardStamina
 	has, _ := engine.Where("id=?", player_id).Get(&rewardStamina)
+	if !has {
+		rewardStamina.Id = player_id
+		rewardStamina.GetTime = time.Now().Unix()
+		_, err := engine.Insert(&rewardStamina)
+		if err != nil {
+			log.Debug("IsGetStamina insert error:%v", err.Error())
+		}
+	}
 	return has
 }
 
