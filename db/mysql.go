@@ -159,7 +159,7 @@ func errhandle(err error) {
 /*定时任务*/
 func timerTask(engine *xorm.Engine) {
 	c := cron.New()
-	spec := "0 0 0 * * 1"
+	spec := "0 0 0 * * ?"
 	c.AddFunc(spec, func() {
 		table0 := "reward_stamina"
 		truncate := "truncate table "
