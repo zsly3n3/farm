@@ -121,9 +121,10 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	var has bool
 	var err error
 
+	var referrer datastruct.UserInfo
 	if p_data.Id <= 0 {
 		if p_data.Referrer > 0 {
-			has, _ = session.Id(p_data.Referrer).Get(&tmp)
+			has, _ = session.Id(p_data.Referrer).Get(&referrer)
 			if has {
 				userinfo.Referrer = p_data.Referrer
 			} else {
@@ -152,16 +153,13 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	}
 
 	if p_data.Id <= 0 {
-		if p_data.PermissionId == int(datastruct.Player) && userinfo.Referrer > 0 && userinfo.Referrer < p_data.Id {
-			has, _ = session.Id(userinfo.Referrer).Get(&tmp)
-			if has && tmp.PermissionId == int(datastruct.Player) {
-				var inviteInfo datastruct.InviteInfo
-				inviteInfo.Received = userinfo.Id
-				inviteInfo.Sended = userinfo.Referrer
-				_, err := session.Insert(&inviteInfo)
-				if err != nil {
-					log.Debug("SetPlayerData Insert InviteInfo error:%v", err.Error())
-				}
+		if p_data.PermissionId == int(datastruct.Player) && userinfo.Referrer > 0 && userinfo.Referrer < userinfo.Id && referrer.PermissionId == int(datastruct.Player) {
+			var inviteInfo datastruct.InviteInfo
+			inviteInfo.Received = userinfo.Id
+			inviteInfo.Sended = userinfo.Referrer
+			_, err := session.Insert(&inviteInfo)
+			if err != nil {
+				log.Debug("SetPlayerData Insert InviteInfo error:%v", err.Error())
 			}
 		}
 		var rewardStamina datastruct.RewardStamina
