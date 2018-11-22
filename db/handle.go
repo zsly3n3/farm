@@ -93,6 +93,16 @@ func (handle *DBHandler) InsertInviteInfo(userId int, referrer int) {
 	}
 }
 
+func (handle *DBHandler) GetInvitecount(userId int) (int64, datastruct.CodeType) {
+	var inviteInfo datastruct.InviteInfo
+	engine := handle.mysqlEngine
+	total, err := engine.Where("sended = ?", userId).Count(&inviteInfo)
+	if err != nil {
+		return -1, datastruct.GetDataFailed
+	}
+	return total, datastruct.NULLError
+}
+
 func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	engine := handle.mysqlEngine
 	session := engine.NewSession()

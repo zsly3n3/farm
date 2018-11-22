@@ -181,6 +181,18 @@ func (handle *EventHandler) UpdatePermisson(key string, permissionId int, c *gin
 	return code
 }
 
+func (handle *EventHandler) GetInvitecount(key string) (int64, datastruct.CodeType) {
+	var userId int
+	var code datastruct.CodeType
+	var count int64
+	userId, code = handle.cacheHandler.GetUserId(key)
+	if code != datastruct.NULLError {
+		return -1, code
+	}
+	count, code = handle.dbHandler.GetInvitecount(userId)
+	return count, code
+}
+
 func (handle *EventHandler) UpgradeSoil(key string, c *gin.Context) (datastruct.CodeType, *datastruct.ResponseUpgradeSoil) {
 	var body datastruct.UpgradeSoil
 	err := c.BindJSON(&body)

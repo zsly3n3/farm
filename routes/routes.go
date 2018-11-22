@@ -353,6 +353,31 @@ func refreshOnlineState(r *gin.Engine, eventHandler *event.EventHandler) {
 	})
 }
 
+func getInvitecount(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.GET("/user/invitecount", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c, eventHandler)
+		if !tf {
+			return
+		}
+		count, code := eventHandler.GetInvitecount(token)
+		if code == datastruct.NULLError {
+			mp := make(map[string]interface{})
+			mp["count"] = count
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		} else {
+			c.JSON(200, gin.H{
+				"code": code,
+			})
+		}
+	})
+}
+
 func test1(r *gin.Engine, eventHandler *event.EventHandler) {
 	r.POST("/Test1", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
@@ -421,6 +446,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	getStamina(r, eventHandler)
 	lottery(r, eventHandler)
 	refreshOnlineState(r, eventHandler)
+	getInvitecount(r, eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }

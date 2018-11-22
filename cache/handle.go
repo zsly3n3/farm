@@ -58,6 +58,16 @@ func (handle *CACHEHandler) GetConn() redis.Conn {
 	return conn
 }
 
+func (handle *CACHEHandler) GetUserId(key string) (int, datastruct.CodeType) {
+	conn := handle.GetConn()
+	defer conn.Close()
+	value, err := redis.String(conn.Do("hget", key, datastruct.IdField))
+	if err != nil {
+		return -1, datastruct.GetDataFailed
+	}
+	return tools.StringToInt(value), datastruct.NULLError
+}
+
 func (handle *CACHEHandler) SetPlayerID(conn redis.Conn, key string, p_id int) {
 	_, err := conn.Do("hset", key, datastruct.IdField, p_id)
 	if err != nil {
