@@ -90,7 +90,7 @@ func createSoil(soils map[int]datastruct.SoilData) map[int]*datastruct.PlayerSoi
 	for k, v := range soils {
 		tmp := new(datastruct.PlayerSoil)
 		state := datastruct.Locked
-		tmp.PlantId = 1
+		tmp.PlantId = 0
 		if k == 1 {
 			state = datastruct.Unlocked
 		}
@@ -98,7 +98,7 @@ func createSoil(soils map[int]datastruct.SoilData) map[int]*datastruct.PlayerSoi
 		tmp.Level = v.Level
 		tmp.UpgradeLevelPrice = tools.GetUpgradeLevelPriceForSoil(tmp.Level)
 		tmp.State = state
-		tmp.PlantLevel = 1
+		tmp.PlantLevel = 0
 		rs[k] = tmp
 	}
 	return rs
