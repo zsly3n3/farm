@@ -90,7 +90,7 @@ func createSoil(soils map[int]datastruct.SoilData) map[int]*datastruct.PlayerSoi
 	for k, v := range soils {
 		tmp := new(datastruct.PlayerSoil)
 		state := datastruct.Locked
-		tmp.PlantId = 0
+		tmp.PlantId = 1
 		if k == 1 {
 			state = datastruct.Unlocked
 		}
@@ -108,7 +108,7 @@ func createPetbar(petbars map[datastruct.AnimalType]datastruct.PetbarData) map[d
 	rs := make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)
 	for k, _ := range petbars {
 		tmp := new(datastruct.PlayerPetbar)
-		tmp.AnimalNumber = 1
+		tmp.AnimalNumber = 0
 		tmp.State = datastruct.Locked
 		tmp.CurrentExp = 0
 		rs[k] = tmp
