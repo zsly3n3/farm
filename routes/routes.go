@@ -4,16 +4,21 @@ import (
 	"farm/datastruct"
 	"farm/event"
 	"farm/tools"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	//"farm/log"
 )
 
 func getTest(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.GET("/test333", func(c *gin.Context) {
+	r.GET("/test/:sec", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
+		sec := c.Param("sec")
+		int_sec := tools.StringToInt64(sec)
+		d := time.Duration(int_sec) * time.Second
+		time.Sleep(d)
 		data := new(datastruct.TestData)
 		data.UserName = "user333"
 		data.Avatar = "avatar333"
