@@ -3,10 +3,10 @@ package main
 import (
 	"farm/conf"
 	"farm/event"
-	"farm/log"
 	"farm/routes"
 	"net/http"
 
+	"github.com/facebookgo/grace/gracehttp"
 	"github.com/gin-gonic/gin"
 )
 
@@ -51,12 +51,10 @@ func main() {
 	r.Use(cors())
 	routes.Register(r, eventHandler)
 
-	//log.Debug("Listening and serving HTTP on %s\n", address)
 	server := &http.Server{Addr: conf.Server.HttpServer, Handler: r}
-	err := server.ListenAndServe()
-	if err != nil {
-		log.Debug(err.Error())
-		return
-	}
+	gracehttp.Serve(server)
+
+	//log.Debug("Listening and serving HTTP on %s\n", address)
+
 	//r.Run(conf.Server.HttpServer) //listen and serve on 0.0.0.0:8080
 }
