@@ -77,6 +77,7 @@ const SpeedUpField = "SpeedUp"
 const StaminaField = "Stamina"
 const ShieldField = "Shield"
 const ReferrerField = "Referrer"
+const SpeedFactorField = "SpeedFactor"
 
 const PlayerPetbarField = "PlayerPetbar"
 
@@ -103,12 +104,13 @@ type Permission struct {
 }
 
 type PlayerInfo struct {
-	Id         int   `xorm:"not null pk INT(11)"` //关联UserInfo中id
-	HoneyCount int64 `xorm:"bigint not null"`     //蜂蜜数量
-	GoldCount  int64 `xorm:"bigint not null"`     //金币数量
-	SoilLevel  int   `xorm:"not null INT(11) "`   //玩家的土地购买等级
-	Stamina    int   `xorm:"not null INT(11) "`   //玩家当前体力值
-	Shield     int   `xorm:"not null INT(11) "`   //玩家当前的盾牌，可防止被偷取数据，UI上显示为狗
+	Id          int   `xorm:"not null pk INT(11)"` //关联UserInfo中id
+	HoneyCount  int64 `xorm:"bigint not null"`     //蜂蜜数量
+	GoldCount   int64 `xorm:"bigint not null"`     //金币数量
+	SoilLevel   int   `xorm:"not null INT(11) "`   //玩家的土地购买等级
+	Stamina     int   `xorm:"not null INT(11) "`   //玩家当前体力值
+	Shield      int   `xorm:"not null INT(11) "`   //玩家当前的盾牌，可防止被偷取数据，UI上显示为狗
+	SpeedFactor int   `xorm:"not null INT(11) "`   //玩家的永久生产加速值,默认值为1
 }
 
 type PlayerSpeedUp struct {
@@ -178,6 +180,7 @@ type PlayerData struct {
 	Stamina      int    //玩家当前体力值
 	Shield       int    //当前盾牌数量
 	Referrer     int    //推荐人id
+	SpeedFactor  int    //永久加速值,默认为1
 	NickName     string
 	Avatar       string
 	SoilLevel    int                          //可购买土地的等级

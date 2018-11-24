@@ -446,20 +446,20 @@ func UniqueId() string {
 	return getMd5String(base64.URLEncoding.EncodeToString(b))
 }
 
-func ComputeCurrentGold(soil map[int]*datastruct.PlayerSoil, petbar map[datastruct.AnimalType]*datastruct.PlayerPetbar, factor int, sec int64, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) int64 {
+func ComputeCurrentGold(speedfactor int, soil map[int]*datastruct.PlayerSoil, petbar map[datastruct.AnimalType]*datastruct.PlayerPetbar, factor int, sec int64, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) int64 {
 	//compute
 	var addGold int64
 	addGold = 0
 	for _, v := range soil {
 		if v.PlantId > 0 {
 			rs_factor := float64(v.Factor / 100.0)
-			addGold += int64(float64(plants[v.PlantId-1].InCome*sec*int64(factor)) * rs_factor)
+			addGold += int64(float64(plants[v.PlantId-1].InCome*sec*int64(factor*speedfactor)) * rs_factor)
 		}
 	}
 	for k, v := range petbar {
 		if v.AnimalNumber > 0 {
 			animal := animals[k][v.AnimalNumber]
-			addGold += animal.InCome * sec * int64(factor)
+			addGold += animal.InCome * sec * int64(factor*speedfactor)
 		}
 	}
 	return addGold
