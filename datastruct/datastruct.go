@@ -393,6 +393,7 @@ func ResponseLoginData(tmp *TmpLoginData, p_data *PlayerData, soils map[int]Soil
 	mp["permissionid"] = &(p_data.PermissionId)
 	mp["token"] = &(p_data.Token)
 	mp["lottery"] = responesLottery(p_data)
+	farm_mp["speedfactor"] = &(p_data.SpeedFactor)
 	farm_mp["goldcount"] = &(p_data.GoldCount)
 	farm_mp["honeycount"] = &(p_data.HoneyCount)
 	farm_mp["dogs"] = &(p_data.Shield)
