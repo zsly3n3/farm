@@ -54,7 +54,5 @@ func main() {
 	server := &http.Server{Addr: conf.Server.HttpServer, Handler: r}
 	gracehttp.Serve(server)
 
-	//log.Debug("Listening and serving HTTP on %s\n", address)
-
 	//r.Run(conf.Server.HttpServer) //listen and serve on 0.0.0.0:8080
 }
