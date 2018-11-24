@@ -10,13 +10,13 @@ import (
 )
 
 func getTest(r *gin.Engine, eventHandler *event.EventHandler) {
-	r.GET("/test111", func(c *gin.Context) {
+	r.GET("/test333", func(c *gin.Context) {
 		if !checkVersion(c, eventHandler) {
 			return
 		}
 		data := new(datastruct.TestData)
-		data.UserName = "user111"
-		data.Avatar = "avatar111"
+		data.UserName = "user333"
+		data.Avatar = "avatar333"
 		c.JSON(200, gin.H{
 			"data": data,
 		})
