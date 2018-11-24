@@ -70,6 +70,7 @@ func getOpenId(code string, platform datastruct.Platform) string {
 	if platform != datastruct.WX_Platform {
 		return code
 	}
+	//select token from userinfo where code = openid
 	return thirdParty.GetWXOpenID(code)
 }
 

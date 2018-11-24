@@ -3,6 +3,7 @@ package main
 import (
 	"farm/conf"
 	"farm/event"
+	"farm/log"
 	"farm/routes"
 	"net/http"
 
@@ -49,5 +50,13 @@ func main() {
 	gin.SetMode(mode)
 	r.Use(cors())
 	routes.Register(r, eventHandler)
-	r.Run(conf.Server.HttpServer) //listen and serve on 0.0.0.0:8080
+
+	//log.Debug("Listening and serving HTTP on %s\n", address)
+	server := &http.Server{Addr: conf.Server.HttpServer, Handler: r}
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Debug(err.Error())
+		return
+	}
+	//r.Run(conf.Server.HttpServer) //listen and serve on 0.0.0.0:8080
 }
