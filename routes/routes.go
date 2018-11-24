@@ -20,8 +20,8 @@ func getTest(r *gin.Engine, eventHandler *event.EventHandler) {
 		d := time.Duration(int_sec) * time.Second
 		time.Sleep(d)
 		data := new(datastruct.TestData)
-		data.UserName = "user333"
-		data.Avatar = "avatar333"
+		data.UserName = "userAAA"
+		data.Avatar = "avatarBBB"
 		c.JSON(200, gin.H{
 			"data": data,
 		})
