@@ -472,7 +472,3 @@ func GetGuestName(userId int) string {
 func GetGuestAvatar() string {
 	return conf.Server.Domain + "/guest/avatar.jpg"
 }
-func GetInviteFactor(count int) int {
-	factor := 1
-	return factor + 1
-}

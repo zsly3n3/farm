@@ -191,7 +191,7 @@ func (handle *EventHandler) GetInvitecount(key string) ([]*datastruct.ResponseIn
 	if code != datastruct.NULLError {
 		return nil, code
 	}
-	arr, code = handle.dbHandler.GetInvitecount(userId)
+	arr, code = handle.dbHandler.GetInvitecount(userId, 1)
 	return arr, code
 }
 
