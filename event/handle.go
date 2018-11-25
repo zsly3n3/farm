@@ -87,7 +87,7 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 	addGold = 0
 	animals := handle.animals
 	plants := handle.plants
-	speedFactor := p_data.SpeedFactor
+	speedFactor := p_data.InviteSpeedFactor
 	if p_data.SpeedUp != nil {
 		sec := p_data.SpeedUp.Ending - current_UpdateTime
 		if sec > 0 {

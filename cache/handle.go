@@ -139,8 +139,8 @@ func (handle *CACHEHandler) SetPlayerAllData(conn redis.Conn, p_data *datastruct
 	args = append(args, datastruct.ReferrerField)
 	args = append(args, p_data.Referrer)
 
-	args = append(args, datastruct.SpeedFactorField)
-	args = append(args, p_data.SpeedFactor)
+	args = append(args, datastruct.InviteSpeedFactorField)
+	args = append(args, p_data.InviteSpeedFactor)
 
 	for k, v := range p_data.Soil {
 		soiltableName := fmt.Sprintf("soil%d", k)
@@ -189,7 +189,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 		datastruct.PermissionIdField, datastruct.CreatedAtField, datastruct.UpdateTimeField,
 		datastruct.NickNameField, datastruct.AvatarField, datastruct.SpeedUpField,
 		datastruct.StaminaField, datastruct.ShieldField, datastruct.ReferrerField,
-		datastruct.SpeedFactorField))
+		datastruct.InviteSpeedFactorField))
 	length := len(value)
 	if err != nil {
 		log.Debug("CACHEHandler ReadPlayerData err:%s ,player:%s", err.Error(), key)
@@ -227,7 +227,7 @@ func (handle *CACHEHandler) ReadPlayerData(conn redis.Conn, key string) *datastr
 		case 11:
 			rs.Referrer = tools.StringToInt(str)
 		case 12:
-			rs.SpeedFactor = tools.StringToInt(str)
+			rs.InviteSpeedFactor = tools.StringToInt(str)
 		}
 	}
 
@@ -587,12 +587,12 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 
 func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64) {
 
-	value, err := redis.Values(conn.Do("hmget", key, datastruct.GoldField, datastruct.UpdateTimeField, datastruct.SpeedUpField, datastruct.SpeedFactorField))
+	value, err := redis.Values(conn.Do("hmget", key, datastruct.GoldField, datastruct.UpdateTimeField, datastruct.SpeedUpField, datastruct.InviteSpeedFactorField))
 	length := len(value)
 	var currentGold int64
 	var playerUpdateTime int64
 	var currentSpeedUp *datastruct.SpeedUpData
-	var speedFactor int
+	var inviteSpeedFactor int
 	for i := 0; i < length; i++ {
 		tmp := value[i].([]byte)
 		str := string(tmp[:])
@@ -607,7 +607,7 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string, plan
 				currentSpeedUp, _ = tools.BytesToSpeedUp(tmp)
 			}
 		case 3:
-			speedFactor = tools.StringToInt(str)
+			inviteSpeedFactor = tools.StringToInt(str)
 		}
 	}
 
@@ -638,6 +638,8 @@ func (handle *CACHEHandler) ComputeCurrentGold(conn redis.Conn, key string, plan
 	var addGold int64
 	addGold = 0
 
+	var speedFactor int
+	speedFactor = inviteSpeedFactor
 	if currentSpeedUp != nil {
 		sec := currentSpeedUp.Ending - current_UpdateTime
 		if sec > 0 {

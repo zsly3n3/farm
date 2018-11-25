@@ -170,8 +170,8 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 			log.Debug("SetPlayerData Insert RewardStamina error:%v", err.Error())
 		}
 	}
-
-	sql := fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,soil_level,stamina,shield,speed_factor)VALUES(%d,%d,%d,%d,%d,%d,%d)", userinfo.Id, p_data.HoneyCount, p_data.GoldCount, p_data.SoilLevel, p_data.Stamina, p_data.Shield, p_data.SpeedFactor)
+	
+	sql := fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,soil_level,stamina,shield,invite_speed_factor)VALUES(%d,%d,%d,%d,%d,%d,%d)", userinfo.Id, p_data.HoneyCount, p_data.GoldCount, p_data.SoilLevel, p_data.Stamina, p_data.Shield, p_data.InviteSpeedFactor)
 	_, err = session.Exec(sql)
 	if err != nil {
 		str := fmt.Sprintf("DBHandler->SetPlayerData REPLACE PlayerInfo :%s", err.Error())
@@ -274,7 +274,7 @@ func (handle *DBHandler) GetPlayerDataFromDataBase(user *datastruct.UserInfo) *d
 	p_data.Stamina = playerInfo.Stamina
 	p_data.Shield = playerInfo.Shield
 	p_data.SoilLevel = playerInfo.SoilLevel
-	p_data.SpeedFactor = playerInfo.SpeedFactor
+	p_data.InviteSpeedFactor = playerInfo.InviteSpeedFactor
 
 	soil_mp := make(map[int]*datastruct.PlayerSoil)
 	petBar_mp := make(map[datastruct.AnimalType]*datastruct.PlayerPetbar)

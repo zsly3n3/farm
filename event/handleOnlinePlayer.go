@@ -82,7 +82,7 @@ func (handle *EventHandler) createUser(code string, permissionId int, nickName s
 	player.SpeedUp = nil
 	player.Stamina = datastruct.MaxStamina
 	player.Shield = 0
-	player.SpeedFactor = 1
+	player.InviteSpeedFactor = 1
 	return player
 }
 
