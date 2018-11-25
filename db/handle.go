@@ -152,6 +152,11 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 		return userinfo.Id
 	}
 
+	if p_data.PermissionId == int(datastruct.Guest) {
+		p_data.NickName = tools.GetGuestName(userinfo.Id)
+		p_data.Avatar = tools.GetGuestAvatar()
+	}
+
 	if p_data.Id <= 0 {
 		if p_data.PermissionId == int(datastruct.Player) && userinfo.Referrer > 0 && userinfo.Referrer < userinfo.Id && referrer.PermissionId == int(datastruct.Player) {
 			var inviteInfo datastruct.InviteInfo
@@ -170,7 +175,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 			log.Debug("SetPlayerData Insert RewardStamina error:%v", err.Error())
 		}
 	}
-	
+
 	sql := fmt.Sprintf("REPLACE INTO player_info (id,honey_count,gold_count,soil_level,stamina,shield,invite_speed_factor)VALUES(%d,%d,%d,%d,%d,%d,%d)", userinfo.Id, p_data.HoneyCount, p_data.GoldCount, p_data.SoilLevel, p_data.Stamina, p_data.Shield, p_data.InviteSpeedFactor)
 	_, err = session.Exec(sql)
 	if err != nil {

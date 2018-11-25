@@ -464,3 +464,10 @@ func ComputeCurrentGold(speedfactor int, soil map[int]*datastruct.PlayerSoil, pe
 	}
 	return addGold
 }
+
+func GetGuestName(userId int) string {
+	return fmt.Sprintf("游客%d", userId)
+}
+func GetGuestAvatar() string {
+	return ""
+}
