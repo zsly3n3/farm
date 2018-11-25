@@ -85,6 +85,7 @@ func (handle *DBHandler) InsertInviteInfo(userId int, referrer int) {
 		if !has {
 			invite.Received = userId
 			invite.Sended = referrer
+			invite.CreatedAt = time.Now().Unix()
 			_, err := engine.Insert(&invite)
 			if err != nil {
 				log.Debug("InsertInviteInfo insert error:%v", err.Error())
@@ -93,14 +94,19 @@ func (handle *DBHandler) InsertInviteInfo(userId int, referrer int) {
 	}
 }
 
-func (handle *DBHandler) GetInvitecount(userId int) (int64, datastruct.CodeType) {
-	var inviteInfo datastruct.InviteInfo
+func (handle *DBHandler) GetInvitecount(userId int, inviteSpeedFactor int) ([]datastruct.ResponseInviteCount, datastruct.CodeType) {
+
 	engine := handle.mysqlEngine
-	total, err := engine.Where("sended = ?", userId).Count(&inviteInfo)
-	if err != nil {
-		return -1, datastruct.GetDataFailed
+	users := make([]datastruct.UserInfo, 0)
+	arr := make([]*datastruct.ResponseInviteCount, 0)
+	engine.Join("INNER", "invite_info", "invite_info.sended = user_info.id").Find(&users)
+	for _, v := range users {
+		resp := new(datastruct.ResponseInviteCount)
+		resp.Avatar = v.Avatar
+
+		arr = append(arr, resp)
 	}
-	return total, datastruct.NULLError
+	return arr, datastruct.NULLError
 }
 
 func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
@@ -162,6 +168,7 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 			var inviteInfo datastruct.InviteInfo
 			inviteInfo.Received = userinfo.Id
 			inviteInfo.Sended = userinfo.Referrer
+			inviteInfo.CreatedAt = time.Now().Unix()
 			_, err := session.Insert(&inviteInfo)
 			if err != nil {
 				log.Debug("SetPlayerData Insert InviteInfo error:%v", err.Error())

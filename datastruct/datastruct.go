@@ -94,8 +94,9 @@ type UserInfo struct {
 
 //邀请信息表
 type InviteInfo struct {
-	Sended   int `xorm:"not null INT(11)"`    //发送邀请者
-	Received int `xorm:"not null pk INT(11)"` //被邀请者
+	Sended    int   `xorm:"not null INT(11)"`    //发送邀请者
+	Received  int   `xorm:"not null pk INT(11)"` //被邀请者
+	CreatedAt int64 `xorm:"bigint not null"`     //数据创建时间
 }
 
 type Permission struct {
@@ -104,12 +105,12 @@ type Permission struct {
 }
 
 type PlayerInfo struct {
-	Id          int   `xorm:"not null pk INT(11)"` //关联UserInfo中id
-	HoneyCount  int64 `xorm:"bigint not null"`     //蜂蜜数量
-	GoldCount   int64 `xorm:"bigint not null"`     //金币数量
-	SoilLevel   int   `xorm:"not null INT(11) "`   //玩家的土地购买等级
-	Stamina     int   `xorm:"not null INT(11) "`   //玩家当前体力值
-	Shield      int   `xorm:"not null INT(11) "`   //玩家当前的盾牌，可防止被偷取数据，UI上显示为狗
+	Id                int   `xorm:"not null pk INT(11)"` //关联UserInfo中id
+	HoneyCount        int64 `xorm:"bigint not null"`     //蜂蜜数量
+	GoldCount         int64 `xorm:"bigint not null"`     //金币数量
+	SoilLevel         int   `xorm:"not null INT(11) "`   //玩家的土地购买等级
+	Stamina           int   `xorm:"not null INT(11) "`   //玩家当前体力值
+	Shield            int   `xorm:"not null INT(11) "`   //玩家当前的盾牌，可防止被偷取数据，UI上显示为狗
 	InviteSpeedFactor int   `xorm:"not null INT(11) "`   //玩家邀请好友产生的加速值,默认值为1
 }
 
@@ -170,23 +171,23 @@ type ShopData struct {
 
 //save reids,save mysql
 type PlayerData struct {
-	Id           int    //对应数据库中userinfo表中的id
-	PermissionId int    //权限id
-	Token        string //标识id IdentityId
-	CreatedAt    int64  //创建用户的时间
-	UpdateTime   int64  //最近一次操作的时间
-	GoldCount    int64  //金币数量
-	HoneyCount   int64  //蜂蜜数量
-	Stamina      int    //玩家当前体力值
-	Shield       int    //当前盾牌数量
-	Referrer     int    //推荐人id
-	InviteSpeedFactor  int  //邀请好友的加速值,默认为1
-	NickName     string
-	Avatar       string
-	SoilLevel    int                          //可购买土地的等级
-	Soil         map[int]*PlayerSoil          //玩家土地信息
-	PetBar       map[AnimalType]*PlayerPetbar //宠物栏信息
-	SpeedUp      *SpeedUpData                 //全局加速数据
+	Id                int    //对应数据库中userinfo表中的id
+	PermissionId      int    //权限id
+	Token             string //标识id IdentityId
+	CreatedAt         int64  //创建用户的时间
+	UpdateTime        int64  //最近一次操作的时间
+	GoldCount         int64  //金币数量
+	HoneyCount        int64  //蜂蜜数量
+	Stamina           int    //玩家当前体力值
+	Shield            int    //当前盾牌数量
+	Referrer          int    //推荐人id
+	InviteSpeedFactor int    //邀请好友的加速值,默认为1
+	NickName          string
+	Avatar            string
+	SoilLevel         int                          //可购买土地的等级
+	Soil              map[int]*PlayerSoil          //玩家土地信息
+	PetBar            map[AnimalType]*PlayerPetbar //宠物栏信息
+	SpeedUp           *SpeedUpData                 //全局加速数据
 }
 
 type SpeedUpData struct {
@@ -559,6 +560,12 @@ type ResponseStolen struct {
 	StolenHoney int64                  `json:"stolenhoney"`
 	Succeed     int                    `json:"succeed"`
 	PlayerData  map[string]interface{} `json:"playerdata"`
+}
+
+type ResponseInviteCount struct {
+	SpeedFactor int    `json:"speedfactor"`
+	State       int    `json:"state"`
+	Avatar      string `json:"avatar"`
 }
 
 //body

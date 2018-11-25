@@ -367,13 +367,11 @@ func getInvitecount(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		count, code := eventHandler.GetInvitecount(token)
+		arr, code := eventHandler.GetInvitecount(token)
 		if code == datastruct.NULLError {
-			mp := make(map[string]interface{})
-			mp["count"] = count
 			c.JSON(200, gin.H{
 				"code": code,
-				"data": mp,
+				"data": arr,
 			})
 		} else {
 			c.JSON(200, gin.H{
