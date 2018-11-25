@@ -161,6 +161,14 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	if p_data.PermissionId == int(datastruct.Guest) {
 		p_data.NickName = tools.GetGuestName(userinfo.Id)
 		p_data.Avatar = tools.GetGuestAvatar()
+		userinfo.Avatar = p_data.Avatar
+		userinfo.NickName = p_data.NickName
+		_, err = session.Id(userinfo.Id).Update(&userinfo)
+		if err != nil {
+			str := fmt.Sprintf("DBHandler->SetPlayerData Update NickName Avatar :%s", err.Error())
+			rollback(str, session)
+			return userinfo.Id
+		}
 	}
 
 	if p_data.Id <= 0 {

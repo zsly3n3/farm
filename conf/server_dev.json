@@ -1,4 +1,5 @@
 {
+	"Domain":"https://swnc.lemeow.cn",
 	"HttpServer":"127.0.0.1:9995",
 	"Redis_IP":"localhost:6379",
 	"Redis_Name":"0",

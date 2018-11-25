@@ -13,6 +13,7 @@ const (
 )
 
 var Server struct {
+	Domain      string
 	HttpServer  string
 	Redis_IP    string
 	Redis_Name  string
