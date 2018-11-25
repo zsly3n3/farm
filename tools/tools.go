@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	"farm/conf"
 	"farm/datastruct"
 	"farm/log"
 	"fmt"
@@ -469,5 +470,5 @@ func GetGuestName(userId int) string {
 	return fmt.Sprintf("游客%d", userId)
 }
 func GetGuestAvatar() string {
-	return ""
+	return conf.Server.Domain + "/guest/avatar.jpg"
 }
