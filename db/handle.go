@@ -94,18 +94,18 @@ func (handle *DBHandler) InsertInviteInfo(userId int, referrer int) {
 	}
 }
 
-func (handle *DBHandler) GetInvitecount(userId int, inviteSpeedFactor int) ([]datastruct.ResponseInviteCount, datastruct.CodeType) {
+func (handle *DBHandler) GetInvitecount(userId int, inviteSpeedFactor int) ([]*datastruct.ResponseInviteCount, datastruct.CodeType) {
 
 	engine := handle.mysqlEngine
 	users := make([]datastruct.UserInfo, 0)
 	arr := make([]*datastruct.ResponseInviteCount, 0)
 	engine.Join("INNER", "invite_info", "invite_info.sended = user_info.id").Find(&users)
-	for _, v := range users {
-		resp := new(datastruct.ResponseInviteCount)
-		resp.Avatar = v.Avatar
-
-		arr = append(arr, resp)
-	}
+	// for _, v := range users {
+	// 	resp := new(datastruct.ResponseInviteCount)
+	// 	resp.Avatar = v.Avatar
+	// 	resp.SpeedFactor =
+	// 	arr = append(arr, resp)
+	// }
 	return arr, datastruct.NULLError
 }
 
@@ -161,14 +161,6 @@ func (handle *DBHandler) SetPlayerData(p_data *datastruct.PlayerData) int {
 	if p_data.PermissionId == int(datastruct.Guest) {
 		p_data.NickName = tools.GetGuestName(userinfo.Id)
 		p_data.Avatar = tools.GetGuestAvatar()
-		userinfo.Avatar = p_data.Avatar
-		userinfo.NickName = p_data.NickName
-		_, err = session.Id(userinfo.Id).Update(&userinfo)
-		if err != nil {
-			str := fmt.Sprintf("DBHandler->SetPlayerData Update NickName Avatar :%s", err.Error())
-			rollback(str, session)
-			return userinfo.Id
-		}
 	}
 
 	if p_data.Id <= 0 {
