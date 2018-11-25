@@ -183,10 +183,10 @@ func (handle *EventHandler) UpdatePermisson(key string, permissionId int, c *gin
 	return code
 }
 
-func (handle *EventHandler) GetInvitecount(key string) ([]datastruct.ResponseInviteCount, datastruct.CodeType) {
+func (handle *EventHandler) GetInvitecount(key string) ([]*datastruct.ResponseInviteCount, datastruct.CodeType) {
 	var userId int
 	var code datastruct.CodeType
-	var arr []datastruct.ResponseInviteCount
+	var arr []*datastruct.ResponseInviteCount
 	userId, code = handle.cacheHandler.GetUserId(key)
 	if code != datastruct.NULLError {
 		return nil, code
