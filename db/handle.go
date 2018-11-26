@@ -386,7 +386,8 @@ func (handle *DBHandler) GoldDesc(userId int) ([]*datastruct.ResponseGoldDesc, d
 		resp := new(datastruct.ResponseGoldDesc)
 		resp.Avatar = string(v["avatar"][:])
 		resp.NickName = string(v["nick_name"][:])
-		resp.Gold = tools.BytesToInt64(v["gold_count"][:])
+		resp.Gold = tools.StringToInt64(string(v["gold_count"][:]))
+		//tools.BytesToInt64(v["gold_count"][:])
 		arr = append(arr, resp)
 	}
 	return arr, datastruct.NULLError
