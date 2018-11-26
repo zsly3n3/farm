@@ -475,6 +475,17 @@ func (handle *EventHandler) IsExistUser(token string) bool {
 	return handle.cacheHandler.IsExistUser(token)
 }
 
+func (handle *EventHandler) GoldDesc(token string) ([]map[string][]byte, datastruct.CodeType) {
+	var userId int
+	var code datastruct.CodeType
+	userId, code = handle.cacheHandler.GetUserId(token)
+	if code != datastruct.NULLError {
+		return nil, code
+	}
+	arr, code := handle.dbHandler.GoldDesc(userId)
+	return arr, code
+}
+
 func (handle *EventHandler) Test1(c *gin.Context) {
 	var body datastruct.UserLogin
 	c.BindJSON(&body)

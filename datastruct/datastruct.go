@@ -568,6 +568,12 @@ type ResponseInviteCount struct {
 	Avatar      string `json:"avatar"`
 }
 
+type ResponseGoldDesc struct {
+	Gold     int64  `json:"goldcount"`
+	NickName string `json:"nickname"`
+	Avatar   string `json:"avatar"`
+}
+
 //body
 type UserLogin struct {
 	PlatformId Platform `json:"platformid"` //平台

@@ -380,6 +380,28 @@ func getInvitecount(r *gin.Engine, eventHandler *event.EventHandler) {
 		}
 	})
 }
+func getGoldDesc(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.GET("/user/golddesc", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c, eventHandler)
+		if !tf {
+			return
+		}
+		arr, code := eventHandler.GoldDesc(token)
+		if code == datastruct.NULLError {
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": arr,
+			})
+		} else {
+			c.JSON(200, gin.H{
+				"code": code,
+			})
+		}
+	})
+}
 
 func test1(r *gin.Engine, eventHandler *event.EventHandler) {
 	r.POST("/Test1", func(c *gin.Context) {
@@ -450,6 +472,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	lottery(r, eventHandler)
 	refreshOnlineState(r, eventHandler)
 	getInvitecount(r, eventHandler)
+	getGoldDesc(r, eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }
