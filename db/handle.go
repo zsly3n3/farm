@@ -373,13 +373,21 @@ func (handle *DBHandler) GetAnimalsMap() map[datastruct.AnimalType]map[int]datas
 	return mp
 }
 
-func (handle *DBHandler) GoldDesc(userId int) ([]map[string][]byte, datastruct.CodeType) {
+func (handle *DBHandler) GoldDesc(userId int) ([]*datastruct.ResponseGoldDesc, datastruct.CodeType) {
 	engine := handle.mysqlEngine
+	arr := make([]*datastruct.ResponseGoldDesc, 0)
 	sql := "select nick_name,avatar,gold_count from user_info,player_info,invite_info where user_info.id = player_info.id and ((user_info.id = received and sended = %d) or (user_info.id = sended and received = %d)) order by gold_count desc"
 	results, err := engine.Query(fmt.Sprintf(sql, userId, userId))
 	if err != nil {
 		log.Debug("err:%s", err.Error())
-		return results, datastruct.GetDataFailed
+		return nil, datastruct.GetDataFailed
 	}
-	return results, datastruct.NULLError
+	for _, v := range results {
+		resp := new(datastruct.ResponseGoldDesc)
+		resp.Avatar = string(v["avatar"][:])
+		resp.NickName = string(v["nick_name"][:])
+		resp.Gold = tools.BytesToInt64(v["gold_count"][:])
+		arr = append(arr, resp)
+	}
+	return arr, datastruct.NULLError
 }
