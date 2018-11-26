@@ -304,7 +304,7 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 		return datastruct.GetDataFailed, resp_tmp
 	}
 	tmp, _ := tools.BytesToPlayerSoil([]byte(value))
-	if tmp.State != datastruct.Owned || gold < tmp.UpgradeLevelPrice {
+	if tmp.State != datastruct.Bought || gold < tmp.UpgradeLevelPrice {
 		resp_tmp := new(datastruct.ResponseUpgradeSoil)
 		resp_tmp.Level = tmp.Level
 		resp_tmp.UpgradePrice = tmp.UpgradeLevelPrice
@@ -324,15 +324,84 @@ func (handle *CACHEHandler) UpgradeSoil(key string, upgradeSoil *datastruct.Upgr
 	return datastruct.NULLError, resp_tmp
 }
 
-func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.PlantInSoil, soils map[int]datastruct.SoilData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64, string, int) {
+func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.PlantInSoil, soils map[int]datastruct.SoilData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64, string) {
 	conn := handle.GetConn()
 	defer conn.Close()
 	soiltableName := fmt.Sprintf("soil%d", plantInSoil.SoilId)
 
-	value, err := redis.Values(conn.Do("hmget", key, soiltableName, datastruct.SoilLevelField))
+	value, err := redis.String(conn.Do("hget", key, soiltableName))
 	if err != nil {
 		log.Debug("CACHEHandler PlantInSoil hmget err:%s ,player:%s", err.Error(), key)
-		return datastruct.GetDataFailed, -1, "", -1
+		return datastruct.GetDataFailed, -1, ""
+	}
+
+	player_soil, _ := tools.BytesToPlayerSoil([]byte(value))
+	if player_soil.State != datastruct.Bought {
+		return datastruct.SoilIsNotOwned, -1, ""
+	}
+
+	if player_soil.PlantId == plantInSoil.PlantId {
+		return datastruct.RepeatPlant, -1, ""
+	}
+
+	code, gold := handle.ComputeCurrentGold(conn, key, plants, animals)
+	if code != datastruct.NULLError {
+		return datastruct.UpdateDataFailed, -1, ""
+	}
+
+	args := make([]interface{}, 0, 5)
+	args = append(args, key)
+
+	plant := plants[plantInSoil.PlantId-1]
+	plantLevel := player_soil.PlantLevel
+	if plantLevel >= plant.Level {
+		return datastruct.UpdateDataFailed, -1, ""
+	}
+
+	if gold < plant.Price {
+		return datastruct.GoldIsNotEnoughForPlant, gold, plant.CName
+	}
+
+	if plantLevel+1 == plant.Level {
+		gold = gold - plant.Price
+		plantLevel = plant.Level
+		player_soil.PlantLevel = plantLevel
+	} else {
+		last_plant := plants[plant.Level-2]
+		return datastruct.PlantRequireUnlock, gold, last_plant.CName
+	}
+
+	player_soil.PlantId = plantInSoil.PlantId
+
+	player_soil_str, isError := tools.PlayerSoilToString(player_soil)
+	if isError {
+		log.Debug("CACHEHandler PlantInSoil PlayerSoilToString err:%s player:%s", soiltableName, key)
+		return datastruct.UpdateDataFailed, -1, ""
+	}
+	args = append(args, datastruct.GoldField)
+	args = append(args, gold)
+	args = append(args, soiltableName)
+	args = append(args, player_soil_str)
+
+	_, err = conn.Do("hmset", args...)
+
+	if err != nil {
+		log.Debug("CACHEHandler PlantInSoil MULTI set data err:%s", err.Error())
+		return datastruct.UpdateDataFailed, -1, ""
+	}
+
+	return datastruct.NULLError, gold, ""
+}
+
+func (handle *CACHEHandler) BuySoil(key string, soil_id int, soils map[int]datastruct.SoilData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64, int) {
+	var gold int64
+	conn := handle.GetConn()
+	defer conn.Close()
+	soiltableName := fmt.Sprintf("soil%d", soil_id)
+	value, err := redis.Values(conn.Do("hmget", key, soiltableName, datastruct.SoilLevelField))
+	if err != nil {
+		log.Debug("CACHEHandler BuySoil hmget err:%s ,player:%s", err.Error(), key)
+		return datastruct.GetDataFailed, -1, -1
 	}
 
 	var player_soil *datastruct.PlayerSoil
@@ -347,67 +416,47 @@ func (handle *CACHEHandler) PlantInSoil(key string, plantInSoil *datastruct.Plan
 		}
 	}
 
-	plant := plants[plantInSoil.PlantId-1]
-	plantLevel := player_soil.PlantLevel
-	if plantLevel >= plant.Level {
-		return datastruct.UpdateDataFailed, -1, "", -1
+	if player_soil.State == datastruct.Bought {
+		return datastruct.RepeatBuy, -1, -1
 	}
 
 	code, gold := handle.ComputeCurrentGold(conn, key, plants, animals)
 	if code != datastruct.NULLError {
-		return datastruct.UpdateDataFailed, -1, "", -1
+		return datastruct.UpdateDataFailed, -1, -1
 	}
 
-	if gold < plant.Price {
-		return datastruct.GoldIsNotEnoughForPlant, gold, plant.CName, -1
+	soil := soils[soil_id]
+	if gold < soil.Price {
+		return datastruct.GoldIsNotEnoughForSoil, gold, -1
 	}
-
-	if plantLevel+1 == plant.Level {
-		gold = gold - plant.Price
-		plantLevel = plant.Level
-		player_soil.PlantLevel = plantLevel
+	if soilLevel+1 == soil.Require {
+		gold = gold - soil.Price
+		soilLevel = soil.Require
+		player_soil.State = datastruct.Bought
 	} else {
-		last_plant := plants[plant.Level-2]
-		return datastruct.PlantRequireUnlock, gold, last_plant.CName, -1
-	}
-
-	player_soil.PlantId = plantInSoil.PlantId
-	args := make([]interface{}, 0, 5)
-	args = append(args, key)
-	if player_soil.State != datastruct.Owned {
-		soil := soils[plantInSoil.SoilId]
-		if gold < soil.Price {
-			return datastruct.GoldIsNotEnoughForSoil, gold, "", -1
-		}
-		if soilLevel+1 == soil.Require {
-			gold = gold - soil.Price
-			soilLevel = soil.Require
-			player_soil.State = datastruct.Owned
-		} else {
-			return datastruct.SoilRequireUnlock, gold, "", soil.LastId
-		}
-		args = append(args, datastruct.SoilLevelField)
-		args = append(args, soilLevel)
+		return datastruct.SoilRequireUnlock, gold, soil.LastId
 	}
 
 	player_soil_str, isError := tools.PlayerSoilToString(player_soil)
 	if isError {
-		log.Debug("CACHEHandler PlantInSoil PlayerSoilToString err:%s player:%s", soiltableName, key)
-		return datastruct.UpdateDataFailed, -1, "", -1
+		log.Debug("CACHEHandler BuySoil PlayerSoilToString err:%s player:%s", soiltableName, key)
+		return datastruct.UpdateDataFailed, -1, -1
 	}
+	args := make([]interface{}, 0, 7)
+	args = append(args, key)
+	args = append(args, datastruct.SoilLevelField)
+	args = append(args, soilLevel)
 	args = append(args, datastruct.GoldField)
 	args = append(args, gold)
 	args = append(args, soiltableName)
 	args = append(args, player_soil_str)
 
 	_, err = conn.Do("hmset", args...)
-
 	if err != nil {
-		log.Debug("CACHEHandler PlantInSoil MULTI set data err:%s", err.Error())
-		return datastruct.UpdateDataFailed, -1, "", -1
+		log.Debug("CACHEHandler BuySoil MULTI set data err:%s", err.Error())
+		return datastruct.UpdateDataFailed, -1, -1
 	}
-
-	return datastruct.NULLError, gold, "", -1
+	return datastruct.NULLError, gold, -1
 }
 
 func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datastruct.AnimalType]datastruct.PetbarData, plants []datastruct.Plant, animals map[datastruct.AnimalType]map[int]datastruct.Animal) (datastruct.CodeType, int64, *datastruct.ResponseAnimal, int) {
@@ -451,8 +500,8 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 		}
 	}
 
-	if rs_tmp.State == datastruct.Owned {
-		return datastruct.UpdateDataFailed, -1, animal, soil_id
+	if rs_tmp.State == datastruct.Bought {
+		return datastruct.RepeatBuy, -1, animal, soil_id
 	}
 
 	code, gold := handle.ComputeCurrentGold(conn, key, plants, animals)
@@ -470,7 +519,7 @@ func (handle *CACHEHandler) BuyPetbar(key string, soid_id int, petbars map[datas
 	}
 	gold = gold - tmp.Price
 	soilLevel = tmp.Require
-	rs_tmp.State = datastruct.Owned
+	rs_tmp.State = datastruct.Bought
 	animalNumber := 1
 	rs_tmp.AnimalNumber = animalNumber
 	rs_tmp.CurrentExp = 0
@@ -535,7 +584,7 @@ func (handle *CACHEHandler) AnimalUpgrade(key string, perbarId int, petbars map[
 		}
 	}
 
-	if rs_tmp.AnimalNumber == 0 || rs_tmp.State != datastruct.Owned {
+	if rs_tmp.AnimalNumber == 0 || rs_tmp.State != datastruct.Bought {
 		return datastruct.UpdateDataFailed, resp_data
 	}
 
@@ -779,12 +828,12 @@ func (handle *CACHEHandler) AddExpForAnimal(key string, body *datastruct.AddExpF
 	}
 
 	//没有购买宠物栏
-	if playerPetbar.State != datastruct.Owned {
+	if playerPetbar.State != datastruct.Bought {
 		return datastruct.UpdateDataFailed, -1
 	}
 
 	//没有植物可提供经验
-	if player_soil.PlantId == 0 || player_soil.State != datastruct.Owned {
+	if player_soil.PlantId == 0 || player_soil.State != datastruct.Bought {
 		return datastruct.UpdateDataFailed, -1
 	}
 

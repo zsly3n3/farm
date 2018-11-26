@@ -60,13 +60,11 @@ func plant(r *gin.Engine, eventHandler *event.EventHandler) {
 		if !tf {
 			return
 		}
-		code, gold, plantName, soil_id := eventHandler.PlantInSoil(token, c)
+		code, gold, plantName := eventHandler.PlantInSoil(token, c)
 		mp := make(map[string]interface{})
 		mp["goldcount"] = gold
 		switch code {
 		case datastruct.NULLError:
-			fallthrough
-		case datastruct.GoldIsNotEnoughForSoil:
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
@@ -79,13 +77,38 @@ func plant(r *gin.Engine, eventHandler *event.EventHandler) {
 				"code": code,
 				"data": mp,
 			})
-		case datastruct.SoilRequireUnlock:
+		default:
+			c.JSON(200, gin.H{
+				"code": code,
+			})
+		}
+	})
+}
+
+func buySoil(r *gin.Engine, eventHandler *event.EventHandler) {
+	r.POST("/user/buysoil", func(c *gin.Context) {
+		if !checkVersion(c, eventHandler) {
+			return
+		}
+		token, tf := checkToken(c, eventHandler)
+		if !tf {
+			return
+		}
+		code, gold, soil_id := eventHandler.BuySoil(token, c)
+		mp := make(map[string]interface{})
+		mp["goldcount"] = gold
+		if code == datastruct.NULLError || code == datastruct.GoldIsNotEnoughForSoil {
+			c.JSON(200, gin.H{
+				"code": code,
+				"data": mp,
+			})
+		} else if code == datastruct.SoilRequireUnlock {
 			mp["soilid"] = soil_id
 			c.JSON(200, gin.H{
 				"code": code,
 				"data": mp,
 			})
-		default:
+		} else {
 			c.JSON(200, gin.H{
 				"code": code,
 			})
@@ -473,6 +496,7 @@ func Register(r *gin.Engine, eventHandler *event.EventHandler) {
 	refreshOnlineState(r, eventHandler)
 	getInvitecount(r, eventHandler)
 	getGoldDesc(r, eventHandler)
+	buySoil(r, eventHandler)
 	test1(r, eventHandler)
 	test2(r, eventHandler)
 }

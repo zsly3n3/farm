@@ -42,6 +42,9 @@ const (
 	ExpIsNotFullForUpgradeAnimal                          //升级动物失败,经验值不满足 value=13
 	HoneyCountIsNotEnoughForUpgradeAnimal                 //升级动物失败,蜂蜜不足 value=14
 	AddHoneyCD                                            //采集时间未到
+	SoilIsNotOwned                                        //土地未购买
+	RepeatBuy                                             //重复购买
+	RepeatPlant                                           //重复种植
 )
 
 type RewardType int //奖励类型
@@ -204,84 +207,91 @@ const (
 	Owned                      //已拥有
 )
 
+type SoilState int
+
+const (
+	NotBuy SoilState = iota //未购买
+	Bought                  //已购买
+)
+
 //土地表1,2,3,4,5
 type Soil1 struct {
-	PId               int        `xorm:"not null pk INT(11)"` //玩家id
-	Level             int        `xorm:"not null INT(11)"`    //土地等级
-	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
-	Factor            int        `xorm:"not null INT(11)"`    //生产系数
-	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
-	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
+	PId               int       `xorm:"not null pk INT(11)"` //玩家id
+	Level             int       `xorm:"not null INT(11)"`    //土地等级
+	PlantId           int       `xorm:"not null INT(11)"`    //0表示没有种植
+	UpgradeLevelPrice int64     `xorm:"not null INT(11)"`    //升下一级的价格
+	Factor            int       `xorm:"not null INT(11)"`    //生产系数
+	State             SoilState `xorm:"not null INT(11)"`    //土地状态
+	PlantLevel        int       `xorm:"not null INT(11)"`    //可购买商店植物的等级
 }
 
 type Soil2 struct {
-	PId               int        `xorm:"not null pk INT(11)"` //玩家id
-	Level             int        `xorm:"not null INT(11)"`    //土地等级
-	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
-	Factor            int        `xorm:"not null INT(11)"`    //生产系数
-	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
-	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
+	PId               int       `xorm:"not null pk INT(11)"` //玩家id
+	Level             int       `xorm:"not null INT(11)"`    //土地等级
+	PlantId           int       `xorm:"not null INT(11)"`    //0表示没有种植
+	UpgradeLevelPrice int64     `xorm:"not null INT(11)"`    //升下一级的价格
+	Factor            int       `xorm:"not null INT(11)"`    //生产系数
+	State             SoilState `xorm:"not null INT(11)"`    //土地状态
+	PlantLevel        int       `xorm:"not null INT(11)"`    //可购买商店植物的等级
 }
 
 type Soil3 struct {
-	PId               int        `xorm:"not null pk INT(11)"` //玩家id
-	Level             int        `xorm:"not null INT(11)"`    //土地等级
-	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
-	Factor            int        `xorm:"not null INT(11)"`    //生产系数
-	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
-	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
+	PId               int       `xorm:"not null pk INT(11)"` //玩家id
+	Level             int       `xorm:"not null INT(11)"`    //土地等级
+	PlantId           int       `xorm:"not null INT(11)"`    //0表示没有种植
+	UpgradeLevelPrice int64     `xorm:"not null INT(11)"`    //升下一级的价格
+	Factor            int       `xorm:"not null INT(11)"`    //生产系数
+	State             SoilState `xorm:"not null INT(11)"`    //土地状态
+	PlantLevel        int       `xorm:"not null INT(11)"`    //可购买商店植物的等级
 }
 
 type Soil4 struct {
-	PId               int        `xorm:"not null pk INT(11)"` //玩家id
-	Level             int        `xorm:"not null INT(11)"`    //土地等级
-	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
-	Factor            int        `xorm:"not null INT(11)"`    //生产系数
-	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
-	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
+	PId               int       `xorm:"not null pk INT(11)"` //玩家id
+	Level             int       `xorm:"not null INT(11)"`    //土地等级
+	PlantId           int       `xorm:"not null INT(11)"`    //0表示没有种植
+	UpgradeLevelPrice int64     `xorm:"not null INT(11)"`    //升下一级的价格
+	Factor            int       `xorm:"not null INT(11)"`    //生产系数
+	State             SoilState `xorm:"not null INT(11)"`    //土地状态
+	PlantLevel        int       `xorm:"not null INT(11)"`    //可购买商店植物的等级
 }
 
 type Soil5 struct {
-	PId               int        `xorm:"not null pk INT(11)"` //玩家id
-	Level             int        `xorm:"not null INT(11)"`    //土地等级
-	PlantId           int        `xorm:"not null INT(11)"`    //0表示没有种植
-	UpgradeLevelPrice int64      `xorm:"not null INT(11)"`    //升下一级的价格
-	Factor            int        `xorm:"not null INT(11)"`    //生产系数
-	State             GoodsState `xorm:"not null INT(11)"`    //土地状态
-	PlantLevel        int        `xorm:"not null INT(11)"`    //可购买商店植物的等级
+	PId               int       `xorm:"not null pk INT(11)"` //玩家id
+	Level             int       `xorm:"not null INT(11)"`    //土地等级
+	PlantId           int       `xorm:"not null INT(11)"`    //0表示没有种植
+	UpgradeLevelPrice int64     `xorm:"not null INT(11)"`    //升下一级的价格
+	Factor            int       `xorm:"not null INT(11)"`    //生产系数
+	State             SoilState `xorm:"not null INT(11)"`    //土地状态
+	PlantLevel        int       `xorm:"not null INT(11)"`    //可购买商店植物的等级
 }
 
 //宠物栏1,2,3,4 海，陆，空，神
 type Petbar1 struct {
-	PId          int        `xorm:"not null pk INT(11)"` //玩家id
-	AnimalNumber int        `xorm:"not null INT(11)"`    //0表示没有种植
-	CurrentExp   int64      `xorm:"not null bigint"`     //当前宠物栏经验
-	State        GoodsState `xorm:"not null INT(11)"`    //状态
+	PId          int       `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int       `xorm:"not null INT(11)"`    //0表示没有种植
+	CurrentExp   int64     `xorm:"not null bigint"`     //当前宠物栏经验
+	State        SoilState `xorm:"not null INT(11)"`    //状态
 }
 
 type Petbar2 struct {
-	PId          int        `xorm:"not null pk INT(11)"` //玩家id
-	AnimalNumber int        `xorm:"not null INT(11)"`    //0表示没有种植
-	CurrentExp   int64      `xorm:"not null bigint"`     //当前宠物栏经验
-	State        GoodsState `xorm:"not null INT(11)"`    //状态
+	PId          int       `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int       `xorm:"not null INT(11)"`    //0表示没有种植
+	CurrentExp   int64     `xorm:"not null bigint"`     //当前宠物栏经验
+	State        SoilState `xorm:"not null INT(11)"`    //状态
 }
 
 type Petbar3 struct {
-	PId          int        `xorm:"not null pk INT(11)"` //玩家id
-	AnimalNumber int        `xorm:"not null INT(11)"`    //0表示没有种植
-	CurrentExp   int64      `xorm:"not null bigint"`     //当前宠物栏经验
-	State        GoodsState `xorm:"not null INT(11)"`    //状态
+	PId          int       `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int       `xorm:"not null INT(11)"`    //0表示没有种植
+	CurrentExp   int64     `xorm:"not null bigint"`     //当前宠物栏经验
+	State        SoilState `xorm:"not null INT(11)"`    //状态
 }
 
 type Petbar4 struct {
-	PId          int        `xorm:"not null pk INT(11)"` //玩家id
-	AnimalNumber int        `xorm:"not null INT(11)"`    //0表示没有种植
-	CurrentExp   int64      `xorm:"not null bigint"`     //当前宠物栏经验
-	State        GoodsState `xorm:"not null INT(11)"`    //状态
+	PId          int       `xorm:"not null pk INT(11)"` //玩家id
+	AnimalNumber int       `xorm:"not null INT(11)"`    //0表示没有种植
+	CurrentExp   int64     `xorm:"not null bigint"`     //当前宠物栏经验
+	State        SoilState `xorm:"not null INT(11)"`    //状态
 }
 
 type SoilData struct {
@@ -293,10 +303,10 @@ type SoilData struct {
 }
 
 type PlayerSoilBase struct {
-	Level             int        `json:"level"`             //土地等级
-	UpgradeLevelPrice int64      `json:"upgradelevelprice"` //升下一级的价格
-	Factor            int        `json:"factor"`            //生产系数
-	State             GoodsState `json:"state"`             //土地状态
+	Level             int       `json:"level"`             //土地等级
+	UpgradeLevelPrice int64     `json:"upgradelevelprice"` //升下一级的价格
+	Factor            int       `json:"factor"`            //生产系数
+	State             SoilState `json:"state"`             //土地状态
 }
 
 type PlayerSoil struct {
@@ -338,7 +348,7 @@ type PetbarData struct {
 type PlayerPetbar struct {
 	AnimalNumber int   //为0,表示没有养动物
 	CurrentExp   int64 //当前宠物栏经验
-	State        GoodsState
+	State        SoilState
 }
 
 type ResponsePetbar struct {
@@ -349,7 +359,7 @@ type ResponsePetbar struct {
 type ResponsePetbarBase struct {
 	Type  AnimalType `json:"type"`  //宠物栏类型
 	Price int64      `json:"price"` //单价
-	State GoodsState `json:"state"`
+	State SoilState  `json:"state"`
 	Id    int        `json:"id"` //宠物栏id
 }
 
@@ -596,6 +606,10 @@ type UpgradeSoil struct {
 
 type BuyPetbar struct {
 	PetbarId int `json:"petbarid"`
+}
+
+type BuySoil struct {
+	SoilId int `json:"soilid"`
 }
 
 type AddExpForAnimal struct {

@@ -90,11 +90,8 @@ func createSoil(soils map[int]datastruct.SoilData) map[int]*datastruct.PlayerSoi
 	rs := make(map[int]*datastruct.PlayerSoil)
 	for k, v := range soils {
 		tmp := new(datastruct.PlayerSoil)
-		state := datastruct.Locked
+		state := datastruct.NotBuy
 		tmp.PlantId = 0
-		if k == 1 {
-			state = datastruct.Unlocked
-		}
 		tmp.Factor = v.Factor
 		tmp.Level = v.Level
 		tmp.UpgradeLevelPrice = tools.GetUpgradeLevelPriceForSoil(tmp.Level)
@@ -110,7 +107,7 @@ func createPetbar(petbars map[datastruct.AnimalType]datastruct.PetbarData) map[d
 	for k, _ := range petbars {
 		tmp := new(datastruct.PlayerPetbar)
 		tmp.AnimalNumber = 0
-		tmp.State = datastruct.Locked
+		tmp.State = datastruct.NotBuy
 		tmp.CurrentExp = 0
 		rs[k] = tmp
 	}

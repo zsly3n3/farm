@@ -139,16 +139,6 @@ func (handle *EventHandler) refreshPlayerData(p_data *datastruct.PlayerData, isa
 	p_data.UpdateTime = current_UpdateTime
 	p_data.GoldCount += addGold
 
-	for k, v := range handle.soils {
-		if p_data.Soil[k].State != datastruct.Owned && p_data.GoldCount >= v.Price {
-			p_data.Soil[k].State = datastruct.Unlocked
-		}
-	}
-	for k, v := range handle.petbars {
-		if p_data.PetBar[k].State != datastruct.Owned && p_data.GoldCount >= v.Price {
-			p_data.PetBar[k].State = datastruct.Unlocked
-		}
-	}
 	return tmpLoginData
 }
 
@@ -214,25 +204,24 @@ func (handle *EventHandler) UpgradeSoil(key string, c *gin.Context) (datastruct.
 	return code, resp_tmp
 }
 
-func (handle *EventHandler) PlantInSoil(key string, c *gin.Context) (datastruct.CodeType, int64, string, int) {
+func (handle *EventHandler) PlantInSoil(key string, c *gin.Context) (datastruct.CodeType, int64, string) {
 	var body datastruct.PlantInSoil
 	err := c.BindJSON(&body)
 	code := datastruct.NULLError
 	var gold int64
 	var plantName string
-	var soil_id int
 	if err == nil {
 		_, tf := handle.soils[body.SoilId]
 		index := body.PlantId - 1
 		if tf && index >= 0 && index < len(handle.plants) {
-			code, gold, plantName, soil_id = handle.cacheHandler.PlantInSoil(key, &body, handle.soils, handle.plants, handle.animals)
+			code, gold, plantName = handle.cacheHandler.PlantInSoil(key, &body, handle.soils, handle.plants, handle.animals)
 		} else {
 			code = datastruct.UpdateDataFailed
 		}
 	} else {
 		code = datastruct.JsonParseFailedFromPostBody
 	}
-	return code, gold, plantName, soil_id
+	return code, gold, plantName
 }
 
 func (handle *EventHandler) BuyPetbar(key string, c *gin.Context) (datastruct.CodeType, int64, *datastruct.ResponseAnimal, int) {
@@ -249,6 +238,14 @@ func (handle *EventHandler) BuyPetbar(key string, c *gin.Context) (datastruct.Co
 		code = datastruct.JsonParseFailedFromPostBody
 	}
 	return code, gold, animal, soil_id
+}
+func (handle *EventHandler) BuySoil(key string, c *gin.Context) (datastruct.CodeType, int64, int) {
+	var body datastruct.BuySoil
+	err := c.BindJSON(&body)
+	if err != nil {
+		return datastruct.JsonParseFailedFromPostBody, -1, -1
+	}
+	return handle.cacheHandler.BuySoil(key, body.SoilId, handle.soils, handle.plants, handle.animals)
 }
 
 func (handle *EventHandler) GetShopData(c *gin.Context, token string, soil_id int) {
