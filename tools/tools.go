@@ -470,5 +470,5 @@ func GetGuestName(userId int) string {
 	return fmt.Sprintf("游客%d", userId)
 }
 func GetGuestAvatar() string {
-	return conf.Server.Domain + "/guest/avatar.jpg"
+	return conf.Server.Domain + "/guest/avatar.png"
 }
