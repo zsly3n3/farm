@@ -375,7 +375,7 @@ func (handle *DBHandler) GetAnimalsMap() map[datastruct.AnimalType]map[int]datas
 
 func (handle *DBHandler) GoldDesc(userId int) ([]map[string][]byte, datastruct.CodeType) {
 	engine := handle.mysqlEngine
-	sql := "select nick_name,avatar,gold_count from user_info,player_info,invite_info where user_info.id = player_info.id and ((user_info.id = sended and sended = %d) or (user_info.id = received and received = %d))"
+	sql := "select nick_name,avatar,gold_count from user_info,player_info,invite_info where user_info.id = player_info.id and ((user_info.id = received and sended = %d) or (user_info.id = sended and received = %d)) order by gold_count desc"
 	results, err := engine.Query(fmt.Sprintf(sql, userId, userId))
 	if err != nil {
 		log.Debug("err:%s", err.Error())
