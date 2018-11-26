@@ -475,7 +475,7 @@ func (handle *EventHandler) IsExistUser(token string) bool {
 	return handle.cacheHandler.IsExistUser(token)
 }
 
-func (handle *EventHandler) GoldDesc(token string) ([]map[string][]byte, datastruct.CodeType) {
+func (handle *EventHandler) GoldDesc(token string) ([]*datastruct.ResponseGoldDesc, datastruct.CodeType) {
 	var userId int
 	var code datastruct.CodeType
 	userId, code = handle.cacheHandler.GetUserId(token)
